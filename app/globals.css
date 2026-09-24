@@ -1,0 +1,51 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-body: "Inter", system-ui, -apple-system, sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: #ffffff;
+  color: #241c1e;
+  -webkit-font-smoothing: antialiased;
+}
+
+@layer components {
+  .container-x {
+    @apply mx-auto w-full max-w-content px-5 sm:px-8;
+  }
+
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-medium transition;
+  }
+  .btn-primary {
+    @apply btn bg-rose text-white hover:bg-rose-deep;
+  }
+  .btn-outline {
+    @apply btn border border-rose/30 text-rose hover:bg-rose-soft;
+  }
+
+  .field {
+    @apply w-full rounded-xl border border-rose-line bg-white px-4 py-3 text-sm outline-none transition placeholder:text-muted focus:border-rose;
+  }
+  .label {
+    @apply mb-1.5 block text-sm font-medium text-ink;
+  }
+
+  /* Placeholder foto sebelum foto asli dipasang */
+  .foto-ph {
+    @apply flex items-center justify-center bg-rose-soft text-rose/40;
+    background-image: linear-gradient(135deg, #f7edef 25%, #f2e2e6 25%, #f2e2e6 50%, #f7edef 50%, #f7edef 75%, #f2e2e6 75%);
+    background-size: 28px 28px;
+  }
+
+  .eyebrow {
+    @apply text-xs font-semibold uppercase tracking-[0.2em] text-rose;
+  }
+}
