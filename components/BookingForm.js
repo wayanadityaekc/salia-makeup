@@ -13,7 +13,7 @@ import {
   hairdoAddon as cfgAddon,
   site,
 } from "@/lib/config";
-import { formatRupiah, formatTanggal, waLink } from "@/lib/utils";
+import { formatRupiah, formatTanggal, waLink, normalizeWa } from "@/lib/utils";
 import { saveBooking, getServicesData, getSettings, uploadProof } from "@/lib/storage";
 import { compressImage } from "@/lib/image";
 
@@ -297,7 +297,7 @@ function PayStep({ booked, settings, onSent, onBack }) {
       `\nTotal: ${formatRupiah(b.total)}\n` +
       `DP ${settings.dpPercent}%: ${formatRupiah(dpAmount)}\n` +
       (proofUrl ? `\nBukti transfer: ${proofUrl}` : `\n(Bukti transfer menyusul)`);
-    window.open(waLink(site.whatsapp, pesan), "_blank");
+    window.open(waLink(normalizeWa(settings.whatsapp || site.whatsapp), pesan), "_blank");
     onSent();
   };
 

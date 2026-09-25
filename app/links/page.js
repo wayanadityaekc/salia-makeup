@@ -26,8 +26,8 @@ function GoogleIcon({ size = 20 }) {
 }
 
 export default async function LinksPage() {
-  const { social } = await getSettings();
-  const wa = waLink(normalizeWa(site.whatsapp), `Halo ${site.brand}, saya mau booking 😊`);
+  const { social, whatsapp } = await getSettings();
+  const wa = waLink(normalizeWa(whatsapp || site.whatsapp), `Halo ${site.brand}, saya mau booking 😊`);
   const webBase = `https://${site.domain}`;
 
   const links = [

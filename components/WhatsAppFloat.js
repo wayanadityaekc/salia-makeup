@@ -1,12 +1,14 @@
 import { MessageCircle } from "lucide-react";
 import { site } from "@/lib/config";
-import { waLink } from "@/lib/utils";
+import { getSettings } from "@/lib/storage";
+import { waLink, normalizeWa } from "@/lib/utils";
 
-export default function WhatsAppFloat() {
+export default async function WhatsAppFloat() {
+  const { whatsapp } = await getSettings();
   const pesan = `Halo ${site.brand}, saya mau tanya soal layanan make up / nail art.`;
   return (
     <a
-      href={waLink(site.whatsapp, pesan)}
+      href={waLink(normalizeWa(whatsapp || site.whatsapp), pesan)}
       target="_blank"
       rel="noopener noreferrer"
       aria-label="Chat WhatsApp"

@@ -37,6 +37,7 @@ export default function SettingsManager({ onUnauthorized }) {
         bank: form.bank,
         areas: form.areas.map((a) => ({ ...a, fee: Number(a.fee) || 0 })),
         social: form.social,
+        whatsapp: form.whatsapp || "",
       });
       setForm(s);
       setSaved(true);
@@ -61,6 +62,14 @@ export default function SettingsManager({ onUnauthorized }) {
             value={form.dpPercent} onChange={(e) => { setForm((f) => ({ ...f, dpPercent: e.target.value })); setSaved(false); }} />
           <span className="text-sm text-ink">% dari total</span>
         </div>
+      </section>
+
+      {/* WhatsApp */}
+      <section className="rounded-2xl border border-rose-line bg-white p-5">
+        <h3 className="font-semibold text-ink">Nomor WhatsApp</h3>
+        <p className="mt-1 text-sm text-muted">Dipakai untuk booking, tombol chat, & halaman /links. Format: 62… (tanpa + / 0 depan).</p>
+        <input className="field mt-3 sm:w-72" placeholder="6281234567890"
+          value={form.whatsapp || ""} onChange={(e) => { setForm((f) => ({ ...f, whatsapp: e.target.value })); setSaved(false); }} />
       </section>
 
       {/* Bank */}
