@@ -164,7 +164,7 @@ export default function DashboardPage() {
 
       {/* Tabs — scrollable on mobile so nothing gets cut off */}
       <div className="border-b border-rose-line bg-white">
-        <div className="container-x flex gap-1 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <div className="container-x flex gap-1 overflow-x-auto overflow-y-hidden overscroll-x-contain [touch-action:pan-x] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {[
             ["booking", "Booking"],
             ["income", "Income"],
