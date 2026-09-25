@@ -96,16 +96,22 @@ export default function SettingsManager({ onUnauthorized }) {
       <section className="rounded-2xl border border-rose-line bg-white p-5">
         <h3 className="font-semibold text-ink">Ongkir per Area</h3>
         <p className="mt-1 text-sm text-muted">Biaya tambahan sesuai jarak. Isi 0 untuk gratis.</p>
-        <div className="mt-3 space-y-3">
+        <div className="mt-3 grid gap-4 sm:grid-cols-2">
           {form.areas.map((a) => (
-            <div key={a.id} className="flex items-center justify-between gap-3">
-              <span className="text-sm text-ink">{a.nama}</span>
-              <div className="flex items-center gap-2">
-                <span className="text-sm text-muted">Rp</span>
-                <input type="number" min="0" className="field w-36 text-right"
-                  value={a.fee} onChange={(e) => setAreaFee(a.id, e.target.value)} />
-                <span className="w-28 text-right text-xs text-muted">{formatRupiah(Number(a.fee) || 0)}</span>
+            <div key={a.id}>
+              <label className="label">{a.nama}</label>
+              <div className="relative">
+                <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted">Rp</span>
+                <input
+                  type="number"
+                  min="0"
+                  inputMode="numeric"
+                  className="field pl-9 text-right"
+                  value={a.fee}
+                  onChange={(e) => setAreaFee(a.id, e.target.value)}
+                />
               </div>
+              <p className="mt-1 text-right text-xs text-muted">{Number(a.fee) > 0 ? formatRupiah(Number(a.fee)) : "Gratis"}</p>
             </div>
           ))}
         </div>

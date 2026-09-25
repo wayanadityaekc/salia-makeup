@@ -162,9 +162,9 @@ export default function DashboardPage() {
         </div>
       </header>
 
-      {/* Tabs */}
+      {/* Tabs — scrollable on mobile so nothing gets cut off */}
       <div className="border-b border-rose-line bg-white">
-        <div className="container-x flex gap-1">
+        <div className="container-x flex gap-1 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {[
             ["booking", "Booking"],
             ["income", "Income"],
@@ -175,7 +175,7 @@ export default function DashboardPage() {
             <button
               key={key}
               onClick={() => setTab(key)}
-              className={`-mb-px border-b-2 px-4 py-3 text-sm font-medium transition ${
+              className={`-mb-px shrink-0 whitespace-nowrap border-b-2 px-4 py-3 text-sm font-medium transition ${
                 tab === key ? "border-rose text-rose" : "border-transparent text-muted hover:text-ink"
               }`}
             >
