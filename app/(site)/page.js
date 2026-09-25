@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { ArrowRight, Sparkles, Heart, Clock } from "lucide-react";
-import { services as cfgServices, nailArt as cfgNailArt, site } from "@/lib/config";
+import { ArrowRight, Sparkles, Heart, Clock, Quote } from "lucide-react";
+import { services as cfgServices, nailArt as cfgNailArt, site, reviews } from "@/lib/config";
 import { getServicesData } from "@/lib/storage";
 import ServiceCard from "@/components/ServiceCard";
 import SectionHeader from "@/components/SectionHeader";
@@ -32,16 +32,15 @@ export default async function Home() {
               Lihat Layanan
             </Link>
           </div>
-          <div className="mt-10 flex items-center gap-8">
-            <div>
-              <div className="text-2xl font-bold text-rose">500+</div>
-              <div className="text-xs text-muted">Klien puas</div>
-            </div>
-            <div className="h-8 w-px bg-rose-line" />
-            <div>
-              <div className="text-2xl font-bold text-rose">5.0</div>
-              <div className="text-xs text-muted">Rating rata-rata</div>
-            </div>
+          <div className="mt-10 flex flex-wrap gap-2.5">
+            {["Make up & Hairdo", "Nail art", "Bisa datang ke lokasi"].map((t) => (
+              <span
+                key={t}
+                className="rounded-full border border-rose-line bg-white px-4 py-1.5 text-sm font-medium text-ink"
+              >
+                {t}
+              </span>
+            ))}
           </div>
         </div>
         <div className="foto-ph aspect-[4/5] rounded-3xl text-base">
@@ -111,6 +110,31 @@ export default async function Home() {
           </div>
         </div>
       </section>
+
+      {/* Testimoni */}
+      {reviews.length > 0 && (
+        <section className="container-x py-20">
+          <SectionHeader
+            eyebrow="Testimoni"
+            title="Kata mereka"
+            desc="Contoh tampilan — akan diganti dengan review asli."
+          />
+          <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {reviews.map((r, i) => (
+              <figure key={i} className="flex flex-col rounded-2xl border border-rose-line bg-white p-6">
+                <Quote className="text-rose/40" size={28} />
+                <blockquote className="mt-3 flex-1 text-sm leading-relaxed text-ink/80">
+                  “{r.teks}”
+                </blockquote>
+                <figcaption className="mt-5 border-t border-rose-line pt-4">
+                  <div className="text-sm font-semibold text-ink">{r.nama}</div>
+                  {r.layanan && <div className="text-xs text-muted">{r.layanan}</div>}
+                </figcaption>
+              </figure>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* CTA */}
       <section className="container-x py-20">
