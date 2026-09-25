@@ -17,6 +17,7 @@ import {
 } from "@/lib/storage";
 import ServicesManager from "@/components/dashboard/ServicesManager";
 import GalleryManager from "@/components/dashboard/GalleryManager";
+import SettingsManager from "@/components/dashboard/SettingsManager";
 
 const STATUS = {
   baru: { label: "Baru", cls: "bg-rose text-white" },
@@ -167,6 +168,7 @@ export default function DashboardPage() {
             ["booking", "Booking"],
             ["layanan", "Layanan"],
             ["galeri", "Galeri"],
+            ["pengaturan", "Pengaturan"],
           ].map(([key, label]) => (
             <button
               key={key}
@@ -190,6 +192,12 @@ export default function DashboardPage() {
       {tab === "galeri" && (
         <div className="container-x py-8">
           <GalleryManager onUnauthorized={handleUnauthorized} />
+        </div>
+      )}
+
+      {tab === "pengaturan" && (
+        <div className="container-x py-8">
+          <SettingsManager onUnauthorized={handleUnauthorized} />
         </div>
       )}
 
