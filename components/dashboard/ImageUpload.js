@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import { Upload } from "lucide-react";
 import { uploadImage, UnauthorizedError } from "@/lib/storage";
+import { compressImage } from "@/lib/image";
 
 // Small upload button. Sends the file to the API (Cloudinary) and calls
 // onUploaded(url) with the hosted URL.
@@ -17,7 +18,8 @@ export default function ImageUpload({ onUploaded, onUnauthorized, label = "Uploa
     setBusy(true);
     setErr("");
     try {
-      const url = await uploadImage(file);
+      const compressed = await compressImage(file);
+      const url = await uploadImage(compressed);
       onUploaded(url);
     } catch (e2) {
       if (e2 instanceof UnauthorizedError) onUnauthorized?.();
