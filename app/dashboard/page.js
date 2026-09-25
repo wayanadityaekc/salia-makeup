@@ -35,6 +35,7 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(false);
   const [loadErr, setLoadErr] = useState("");
   const [filter, setFilter] = useState("semua");
+  const [range, setRange] = useState("semua"); // semua | minggu | bulan | tahun
   const [q, setQ] = useState("");
   const [tab, setTab] = useState("booking"); // booking | layanan | galeri
 
@@ -106,23 +107,45 @@ export default function DashboardPage() {
     }
   };
 
+  // Bookings within the selected time window (by when they were created).
+  const inRange = (b) => {
+    if (range === "semua") return true;
+    const t = b.createdAt ? new Date(b.createdAt) : null;
+    if (!t || isNaN(t)) return false;
+    const now = new Date();
+    if (range === "tahun") return t.getFullYear() === now.getFullYear();
+    if (range === "bulan")
+      return t.getFullYear() === now.getFullYear() && t.getMonth() === now.getMonth();
+    if (range === "minggu") {
+      // Current week, Monday as the first day.
+      const start = new Date(now);
+      const dow = (start.getDay() + 6) % 7; // Mon=0 … Sun=6
+      start.setHours(0, 0, 0, 0);
+      start.setDate(start.getDate() - dow);
+      return t >= start;
+    }
+    return true;
+  };
+
+  const ranged = useMemo(() => list.filter(inRange), [list, range]);
+
   const shown = useMemo(() => {
-    return list
+    return ranged
       .filter((b) => (filter === "semua" ? true : b.status === filter))
       .filter((b) =>
         q
           ? (b.nama + b.telepon + (b.serviceNama || "")).toLowerCase().includes(q.toLowerCase())
           : true
       );
-  }, [list, filter, q]);
+  }, [ranged, filter, q]);
 
   const stats = useMemo(() => {
-    const baru = list.filter((b) => b.status === "baru").length;
-    const pendapatan = list
+    const baru = ranged.filter((b) => b.status === "baru").length;
+    const pendapatan = ranged
       .filter((b) => b.status === "selesai")
       .reduce((s, b) => s + (b.total || 0), 0);
-    return { total: list.length, baru, pendapatan };
-  }, [list]);
+    return { total: ranged.length, baru, pendapatan };
+  }, [ranged]);
 
   // Gate
   if (!authed) {
@@ -217,8 +240,28 @@ export default function DashboardPage() {
           <Stat label="Pendapatan (selesai)" value={formatRupiah(stats.pendapatan)} />
         </div>
 
+        {/* Filter periode */}
+        <div className="mt-6 flex flex-wrap gap-2">
+          {[
+            ["semua", "Semua"],
+            ["minggu", "Minggu ini"],
+            ["bulan", "Bulan ini"],
+            ["tahun", "Tahun ini"],
+          ].map(([key, label]) => (
+            <button
+              key={key}
+              onClick={() => setRange(key)}
+              className={`rounded-full px-4 py-1.5 text-sm transition ${
+                range === key ? "bg-rose text-white" : "border border-rose-line bg-white text-ink hover:bg-rose-soft"
+              }`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+
         {/* Kontrol */}
-        <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
           <div className="flex flex-wrap gap-2">
             {["semua", "baru", "konfirmasi", "selesai"].map((f) => (
               <button
