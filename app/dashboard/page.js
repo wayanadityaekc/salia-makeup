@@ -18,6 +18,7 @@ import {
 import ServicesManager from "@/components/dashboard/ServicesManager";
 import GalleryManager from "@/components/dashboard/GalleryManager";
 import SettingsManager from "@/components/dashboard/SettingsManager";
+import IncomeTracker from "@/components/dashboard/IncomeTracker";
 
 const STATUS = {
   baru: { label: "Baru", cls: "bg-rose text-white" },
@@ -166,6 +167,7 @@ export default function DashboardPage() {
         <div className="container-x flex gap-1">
           {[
             ["booking", "Booking"],
+            ["income", "Income"],
             ["layanan", "Layanan"],
             ["galeri", "Galeri"],
             ["pengaturan", "Pengaturan"],
@@ -192,6 +194,12 @@ export default function DashboardPage() {
       {tab === "galeri" && (
         <div className="container-x py-8">
           <GalleryManager onUnauthorized={handleUnauthorized} />
+        </div>
+      )}
+
+      {tab === "income" && (
+        <div className="container-x py-8">
+          <IncomeTracker onUnauthorized={handleUnauthorized} />
         </div>
       )}
 
