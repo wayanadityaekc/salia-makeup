@@ -80,6 +80,11 @@ export default async function Home() {
             <ServiceCard key={s.id} item={s} badge={s.hairdoIncluded ? "+ Hairdo" : null} />
           ))}
         </div>
+        <div className="mt-8 flex justify-center">
+          <Link href="/layanan" className="btn-outline">
+            Lihat semua layanan makeup <ArrowRight size={18} />
+          </Link>
+        </div>
       </section>
 
       {/* Nail art teaser */}
