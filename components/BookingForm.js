@@ -253,6 +253,8 @@ function PayStep({ booked, settings, onSent, onBack }) {
   const [proofUrl, setProofUrl] = useState("");
   const [uploading, setUploading] = useState(false);
   const [uploadErr, setUploadErr] = useState("");
+  const [phase, setPhase] = useState(""); // "compress" | "upload" | "process"
+  const [pct, setPct] = useState(0);
   const fileRef = useRef(null);
   const [copied, setCopied] = useState("");
 
@@ -269,14 +271,22 @@ function PayStep({ booked, settings, onSent, onBack }) {
     if (!file) return;
     setUploading(true);
     setUploadErr("");
+    setPhase("compress");
+    setPct(0);
     try {
       const compressed = await compressImage(file);
-      const url = await uploadProof(compressed);
+      setPhase("upload");
+      const url = await uploadProof(compressed, (p) => {
+        setPct(p);
+        if (p >= 100) setPhase("process");
+      });
       setProofUrl(url);
     } catch (e2) {
       setUploadErr(e2?.data?.error === "uploads_not_configured" ? "Upload belum aktif — kirim bukti via WhatsApp saja." : "Gagal upload. Coba lagi atau kirim bukti via WhatsApp.");
     } finally {
       setUploading(false);
+      setPhase("");
+      setPct(0);
       if (fileRef.current) fileRef.current.value = "";
     }
   };
@@ -361,10 +371,17 @@ function PayStep({ booked, settings, onSent, onBack }) {
             <button type="button" onClick={() => fileRef.current?.click()} className="text-sm text-rose hover:underline">Ganti</button>
           </div>
         ) : (
-          <button type="button" onClick={() => fileRef.current?.click()} disabled={uploading}
-            className="inline-flex items-center gap-2 rounded-lg border border-rose-line px-4 py-2.5 text-sm font-medium text-ink hover:bg-rose-soft disabled:opacity-60">
-            <Upload size={16} /> {uploading ? "Mengupload…" : "Upload bukti transfer"}
-          </button>
+          <div>
+            <button type="button" onClick={() => fileRef.current?.click()} disabled={uploading}
+              className="inline-flex items-center gap-2 rounded-lg border border-rose-line px-4 py-2.5 text-sm font-medium text-ink hover:bg-rose-soft disabled:opacity-60">
+              <Upload size={16} /> {uploading ? (phase === "compress" ? "Menyiapkan…" : phase === "process" ? "Memproses…" : `Mengupload… ${pct}%`) : "Upload bukti transfer"}
+            </button>
+            {uploading && (
+              <div className="mt-2 h-1.5 w-full max-w-[260px] overflow-hidden rounded-full bg-rose-line">
+                <div className="h-full rounded-full bg-rose transition-[width] duration-200" style={{ width: `${phase === "compress" ? 8 : phase === "process" ? 100 : pct}%` }} />
+              </div>
+            )}
+          </div>
         )}
         {uploadErr && <p className="mt-1 text-xs text-rose">{uploadErr}</p>}
       </div>
