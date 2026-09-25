@@ -1,15 +1,17 @@
 import Link from "next/link";
 import { ArrowRight, Sparkles, Heart, Clock, Quote } from "lucide-react";
 import { services as cfgServices, nailArt as cfgNailArt, site, reviews } from "@/lib/config";
-import { getServicesData } from "@/lib/storage";
+import { getServicesData, getSettings } from "@/lib/storage";
 import ServiceCard from "@/components/ServiceCard";
 import SectionHeader from "@/components/SectionHeader";
+import SocialLinks from "@/components/SocialLinks";
 
 export default async function Home() {
   // Live services from the API; fall back to the static table if the API is down.
   const data = await getServicesData();
   const services = data?.services?.length ? data.services : cfgServices;
   const nailArt = data?.nailArt?.length ? data.nailArt : cfgNailArt;
+  const { social } = await getSettings();
 
   return (
     <>
@@ -42,6 +44,8 @@ export default async function Home() {
               </span>
             ))}
           </div>
+
+          <SocialLinks social={social} className="mt-6" />
         </div>
         <div className="foto-ph aspect-[4/5] rounded-3xl text-base">
           Foto portofolio Salia
