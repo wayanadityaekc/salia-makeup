@@ -5,21 +5,36 @@ import { useForm } from "react-hook-form";
 import { useSearchParams } from "next/navigation";
 import { CheckCircle2, Send } from "lucide-react";
 import {
-  services,
-  nailArt,
-  areas,
-  hairdoAddon,
+  services as cfgServices,
+  nailArt as cfgNailArt,
+  areas as cfgAreas,
+  hairdoAddon as cfgAddon,
   site,
-  findService,
 } from "@/lib/config";
 import { formatRupiah, formatTanggal, waLink } from "@/lib/utils";
-import { saveBooking } from "@/lib/storage";
+import { saveBooking, getServicesData } from "@/lib/storage";
 
 export default function BookingForm() {
   const params = useSearchParams();
   const [done, setDone] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [submitErr, setSubmitErr] = useState("");
+
+  // Live catalog from the API; starts from the static config so the form works
+  // before the fetch resolves (and if the API is down).
+  const [catalog, setCatalog] = useState({
+    services: cfgServices,
+    nailArt: cfgNailArt,
+    areas: cfgAreas,
+    hairdoAddon: cfgAddon,
+  });
+  useEffect(() => {
+    getServicesData().then((d) => {
+      if (d && (d.services.length || d.nailArt.length)) setCatalog(d);
+    });
+  }, []);
+  const { services, nailArt, areas, hairdoAddon } = catalog;
+  const findService = (id) => [...services, ...nailArt].find((s) => s.id === id) || null;
 
   const {
     register,
@@ -44,7 +59,8 @@ export default function BookingForm() {
   useEffect(() => {
     const q = params.get("service");
     if (q && findService(q)) setValue("serviceId", q);
-  }, [params, setValue]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [params, setValue, catalog]);
 
   const serviceId = watch("serviceId");
   const areaId = watch("areaId");
@@ -52,7 +68,7 @@ export default function BookingForm() {
 
   const service = findService(serviceId);
   const area = areas.find((a) => a.id === areaId);
-  const bisaHairdo = service && "hairdoIncluded" in service && !service.hairdoIncluded;
+  const bisaHairdo = !!service && service.hairdoIncluded === false;
 
   const total =
     (service?.base || 0) +
@@ -62,7 +78,7 @@ export default function BookingForm() {
   const onSubmit = async (data) => {
     const svc = findService(data.serviceId);
     const ar = areas.find((a) => a.id === data.areaId);
-    const pakaiHairdo = svc && "hairdoIncluded" in svc && !svc.hairdoIncluded && data.hairdo;
+    const pakaiHairdo = !!svc && svc.hairdoIncluded === false && data.hairdo;
 
     setSubmitting(true);
     setSubmitErr("");

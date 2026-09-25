@@ -1,11 +1,17 @@
-import { services, hairdoAddon, areas } from "@/lib/config";
+import { services as cfgServices, hairdoAddon as cfgAddon, areas as cfgAreas } from "@/lib/config";
+import { getServicesData } from "@/lib/storage";
 import { formatRupiah } from "@/lib/utils";
 import ServiceCard from "@/components/ServiceCard";
 import SectionHeader from "@/components/SectionHeader";
 
 export const metadata = { title: "Make Up" };
 
-export default function LayananPage() {
+export default async function LayananPage() {
+  const data = await getServicesData();
+  const services = data?.services?.length ? data.services : cfgServices;
+  const areas = data?.areas?.length ? data.areas : cfgAreas;
+  const hairdoAddon = data?.hairdoAddon || cfgAddon;
+
   return (
     <div className="container-x py-16">
       <SectionHeader

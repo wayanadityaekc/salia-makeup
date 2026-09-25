@@ -15,6 +15,8 @@ import {
   clearToken,
   UnauthorizedError,
 } from "@/lib/storage";
+import ServicesManager from "@/components/dashboard/ServicesManager";
+import GalleryManager from "@/components/dashboard/GalleryManager";
 
 const STATUS = {
   baru: { label: "Baru", cls: "bg-rose text-white" },
@@ -32,6 +34,7 @@ export default function DashboardPage() {
   const [loadErr, setLoadErr] = useState("");
   const [filter, setFilter] = useState("semua");
   const [q, setQ] = useState("");
+  const [tab, setTab] = useState("booking"); // booking | layanan | galeri
 
   useEffect(() => {
     if (getToken()) setAuthed(true);
@@ -157,7 +160,40 @@ export default function DashboardPage() {
         </div>
       </header>
 
-      <div className="container-x py-8">
+      {/* Tabs */}
+      <div className="border-b border-rose-line bg-white">
+        <div className="container-x flex gap-1">
+          {[
+            ["booking", "Booking"],
+            ["layanan", "Layanan"],
+            ["galeri", "Galeri"],
+          ].map(([key, label]) => (
+            <button
+              key={key}
+              onClick={() => setTab(key)}
+              className={`-mb-px border-b-2 px-4 py-3 text-sm font-medium transition ${
+                tab === key ? "border-rose text-rose" : "border-transparent text-muted hover:text-ink"
+              }`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {tab === "layanan" && (
+        <div className="container-x py-8">
+          <ServicesManager onUnauthorized={handleUnauthorized} />
+        </div>
+      )}
+
+      {tab === "galeri" && (
+        <div className="container-x py-8">
+          <GalleryManager onUnauthorized={handleUnauthorized} />
+        </div>
+      )}
+
+      <div className={`container-x py-8 ${tab === "booking" ? "" : "hidden"}`}>
         {/* Stats */}
         <div className="grid gap-4 sm:grid-cols-3">
           <Stat label="Total booking" value={stats.total} />

@@ -5,7 +5,17 @@ import { formatRupiah } from "@/lib/utils";
 export default function ServiceCard({ item, badge }) {
   return (
     <div className="group flex flex-col overflow-hidden rounded-2xl border border-rose-line bg-white transition hover:shadow-[0_12px_40px_-18px_rgba(107,44,62,0.35)]">
-      <div className="foto-ph aspect-[4/3] text-sm">Foto {item.nama}</div>
+      {item.foto ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={item.foto}
+          alt={item.nama}
+          className="aspect-[4/3] w-full object-cover"
+          loading="lazy"
+        />
+      ) : (
+        <div className="foto-ph aspect-[4/3] text-sm">Foto {item.nama}</div>
+      )}
       <div className="flex flex-1 flex-col p-5">
         <div className="flex items-center justify-between gap-3">
           <h3 className="text-lg font-semibold text-ink">{item.nama}</h3>

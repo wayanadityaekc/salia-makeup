@@ -1,10 +1,16 @@
 import Link from "next/link";
 import { ArrowRight, Sparkles, Heart, Clock } from "lucide-react";
-import { services, nailArt, site } from "@/lib/config";
+import { services as cfgServices, nailArt as cfgNailArt, site } from "@/lib/config";
+import { getServicesData } from "@/lib/storage";
 import ServiceCard from "@/components/ServiceCard";
 import SectionHeader from "@/components/SectionHeader";
 
-export default function Home() {
+export default async function Home() {
+  // Live services from the API; fall back to the static table if the API is down.
+  const data = await getServicesData();
+  const services = data?.services?.length ? data.services : cfgServices;
+  const nailArt = data?.nailArt?.length ? data.nailArt : cfgNailArt;
+
   return (
     <>
       {/* Hero */}
@@ -91,11 +97,16 @@ export default function Home() {
               </Link>
             </div>
             <div className="grid grid-cols-2 gap-3">
-              {nailArt.slice(0, 4).map((n) => (
-                <div key={n.id} className="foto-ph aspect-square rounded-2xl text-xs">
-                  {n.nama}
-                </div>
-              ))}
+              {nailArt.slice(0, 4).map((n) =>
+                n.foto ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img key={n.id} src={n.foto} alt={n.nama} loading="lazy" className="aspect-square w-full rounded-2xl object-cover" />
+                ) : (
+                  <div key={n.id} className="foto-ph aspect-square rounded-2xl text-xs">
+                    {n.nama}
+                  </div>
+                )
+              )}
             </div>
           </div>
         </div>

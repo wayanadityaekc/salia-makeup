@@ -22,15 +22,23 @@ prefer an empty state over invented data.
   knows the API URL and does snake_case ⇆ camelCase mapping). Components just `await`.
 - `NEXT_PUBLIC_API_URL` = deployed API URL (unset ⇒ `http://localhost:4000`).
 
+## Services & photos are dashboard-managed
+- **Services + gallery photos live in the DB**, edited from `/dashboard`
+  (tabs Layanan & Galeri). Public pages (home/layanan/nail-art/galeri) read them
+  live from `GET /services` and `GET /gallery` via `lib/storage.js`, so those
+  routes are dynamic (ƒ). Photo upload goes to the API (`POST /uploads` →
+  Cloudinary); needs `CLOUDINARY_*` env on the server or it returns 501.
+- **`lib/config.js` is the FALLBACK table** — used only if the API is unreachable,
+  and as the seed the API loads into the `services` table on first boot. It still
+  mirrors the API's `pricing.js`, so **change one → change both** (the API's
+  `pricing-spec-test` asserts they match when both repos sit side by side).
+- Areas + the hairdo add-on are still fixed (not dashboard-editable yet).
+
 ## Money / pricing rules
-- **Never trust a client `total`.** The API recomputes everything from
-  `service_id` / `area_id` / `hairdo` on `POST /bookings`.
-- **The frontend `lib/config.js` table mirrors the API's `pricing.js`** (services,
-  nailArt, areas, hairdoAddon). Identical on purpose so the estimate the guest
-  sees equals the total the owner is shown. **Change one → change both**; the API's
-  `pricing-spec-test` asserts they match when both repos sit side by side.
-- **Hairdo add-on** applies only to a service flagged `hairdoIncluded: false`
-  (plain "Make Up"). Nail art / hairdo-included services never charge it, even if
+- **Never trust a client `total`.** The API recomputes from the DB service row +
+  `area_id` / `hairdo` on `POST /bookings`.
+- **Hairdo add-on** applies only when a makeup service has `hairdo_included = false`
+  ("Make Up"); nail art (null) and hairdo-included services never charge it, even if
   the client sends `hairdo: true` — mirror of `bisaHairdo` in `BookingForm.js`.
 
 ## Auth
