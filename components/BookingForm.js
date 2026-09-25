@@ -1,9 +1,11 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { useSearchParams } from "next/navigation";
 import { CheckCircle2, Send, Copy, Check, Upload } from "lucide-react";
+import Select from "@/components/ui/Select";
+import DatePicker from "@/components/ui/DatePicker";
 import {
   services as cfgServices,
   nailArt as cfgNailArt,
@@ -49,6 +51,7 @@ export default function BookingForm() {
     watch,
     setValue,
     reset,
+    control,
     formState: { errors },
   } = useForm({
     defaultValues: {
@@ -72,6 +75,21 @@ export default function BookingForm() {
   const bisaHairdo = !!service && service.hairdoIncluded === false;
   const total =
     (service?.base || 0) + (area?.fee || 0) + (bisaHairdo && hairdo ? hairdoAddon : 0);
+
+  // Options for the custom controls (no native select/date).
+  const serviceOptions = [
+    { group: "Make Up", options: services.map((s) => ({ value: s.id, label: `${s.nama} — ${formatRupiah(s.base)}` })) },
+    { group: "Nail Art", options: nailArt.map((n) => ({ value: n.id, label: `${n.nama} — ${formatRupiah(n.base)}` })) },
+  ];
+  const areaOptions = areas.map((a) => ({
+    value: a.id,
+    label: `${a.nama} ${a.fee > 0 ? `(+ ${formatRupiah(a.fee)})` : "(Gratis)"}`,
+  }));
+  const timeOptions = [];
+  for (let h = 6; h <= 21; h++) for (const m of [0, 30]) {
+    const t = `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
+    timeOptions.push({ value: t, label: t });
+  }
 
   const onSubmit = async (data) => {
     const svc = findService(data.serviceId);
@@ -149,15 +167,14 @@ export default function BookingForm() {
 
       <div>
         <label className="label">Pilih layanan</label>
-        <select className="field" {...register("serviceId", { required: "Pilih salah satu layanan" })}>
-          <option value="">— Pilih layanan —</option>
-          <optgroup label="Make Up">
-            {services.map((s) => <option key={s.id} value={s.id}>{s.nama} — {formatRupiah(s.base)}</option>)}
-          </optgroup>
-          <optgroup label="Nail Art">
-            {nailArt.map((n) => <option key={n.id} value={n.id}>{n.nama} — {formatRupiah(n.base)}</option>)}
-          </optgroup>
-        </select>
+        <Controller
+          name="serviceId"
+          control={control}
+          rules={{ required: "Pilih salah satu layanan" }}
+          render={({ field }) => (
+            <Select value={field.value} onChange={field.onChange} options={serviceOptions} placeholder="— Pilih layanan —" invalid={!!errors.serviceId} />
+          )}
+        />
         {errors.serviceId && <p className="mt-1 text-xs text-rose">{errors.serviceId.message}</p>}
       </div>
 
@@ -170,22 +187,36 @@ export default function BookingForm() {
 
       <div>
         <label className="label">Area / lokasi</label>
-        <select className="field" {...register("areaId")}>
-          {areas.map((a) => (
-            <option key={a.id} value={a.id}>{a.nama} {a.fee > 0 ? `(+ ${formatRupiah(a.fee)})` : "(Gratis)"}</option>
-          ))}
-        </select>
+        <Controller
+          name="areaId"
+          control={control}
+          render={({ field }) => (
+            <Select value={field.value} onChange={field.onChange} options={areaOptions} placeholder="Pilih area" />
+          )}
+        />
       </div>
 
       <div className="grid gap-5 sm:grid-cols-2">
         <div>
           <label className="label">Tanggal</label>
-          <input type="date" className="field" {...register("tanggal", { required: "Pilih tanggal" })} />
+          <Controller
+            name="tanggal"
+            control={control}
+            rules={{ required: "Pilih tanggal" }}
+            render={({ field }) => <DatePicker value={field.value} onChange={field.onChange} invalid={!!errors.tanggal} />}
+          />
           {errors.tanggal && <p className="mt-1 text-xs text-rose">{errors.tanggal.message}</p>}
         </div>
         <div>
           <label className="label">Jam</label>
-          <input type="time" className="field" {...register("jam", { required: "Pilih jam" })} />
+          <Controller
+            name="jam"
+            control={control}
+            rules={{ required: "Pilih jam" }}
+            render={({ field }) => (
+              <Select value={field.value} onChange={field.onChange} options={timeOptions} placeholder="— Pilih jam —" invalid={!!errors.jam} />
+            )}
+          />
           {errors.jam && <p className="mt-1 text-xs text-rose">{errors.jam.message}</p>}
         </div>
       </div>

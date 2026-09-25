@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Plus, Trash2, Save, EyeOff } from "lucide-react";
 import { formatRupiah } from "@/lib/utils";
+import Select from "@/components/ui/Select";
 import {
   getServicesAdmin,
   createService,
@@ -250,10 +251,11 @@ function AddService({ onDone, onUnauthorized }) {
       <div className="grid gap-3 sm:grid-cols-2">
         <div>
           <label className="label">Kategori</label>
-          <select className="field" value={form.kind} onChange={(e) => setForm({ ...form, kind: e.target.value })}>
-            <option value="makeup">Make Up</option>
-            <option value="nail">Nail Art</option>
-          </select>
+          <Select
+            value={form.kind}
+            onChange={(v) => setForm({ ...form, kind: v })}
+            options={[{ value: "makeup", label: "Make Up" }, { value: "nail", label: "Nail Art" }]}
+          />
         </div>
         <div>
           <label className="label">Nama layanan</label>

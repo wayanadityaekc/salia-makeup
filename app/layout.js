@@ -1,5 +1,6 @@
 import "./globals.css";
 import { site } from "@/lib/config";
+import IosZoomFix from "@/components/IosZoomFix";
 
 export const metadata = {
   title: {
@@ -28,7 +29,10 @@ export default function RootLayout({ children }) {
           rel="stylesheet"
         />
       </head>
-      <body>{children}</body>
+      <body>
+        <IosZoomFix />
+        {children}
+      </body>
     </html>
   );
 }
