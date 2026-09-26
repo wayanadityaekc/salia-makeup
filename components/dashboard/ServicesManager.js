@@ -14,7 +14,7 @@ import {
 import ImageUpload from "./ImageUpload";
 
 export default function ServicesManager({ onUnauthorized }) {
-  const [groups, setGroups] = useState({ services: [], nailArt: [] });
+  const [groups, setGroups] = useState({ services: [], hairdo: [], nailArt: [] });
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState("");
 
@@ -28,7 +28,7 @@ export default function ServicesManager({ onUnauthorized }) {
     setErr("");
     try {
       const d = await getServicesAdmin();
-      setGroups({ services: d.services, nailArt: d.nailArt });
+      setGroups({ services: d.services, hairdo: d.hairdo || [], nailArt: d.nailArt });
     } catch (e) {
       guard(e);
     } finally {
@@ -47,6 +47,7 @@ export default function ServicesManager({ onUnauthorized }) {
       <AddService onDone={refresh} onUnauthorized={onUnauthorized} />
 
       <Group title="Make Up" items={groups.services} onChange={refresh} onUnauthorized={onUnauthorized} />
+      <Group title="Hairdo" items={groups.hairdo} onChange={refresh} onUnauthorized={onUnauthorized} />
       <Group title="Nail Art" items={groups.nailArt} onChange={refresh} onUnauthorized={onUnauthorized} />
 
       {loading && <p className="text-sm text-muted">Memuat…</p>}
@@ -72,6 +73,8 @@ function ServiceRow({ svc, onChange, onUnauthorized }) {
   const [form, setForm] = useState({
     nama: svc.nama,
     ringkas: svc.ringkas || "",
+    deskripsi: svc.deskripsi || "",
+    detail: svc.detail || "",
     base: svc.base,
     foto: svc.foto || "",
     hairdoIncluded: svc.hairdoIncluded === true,
@@ -97,6 +100,8 @@ function ServiceRow({ svc, onChange, onUnauthorized }) {
       await updateService(svc.id, {
         nama: form.nama,
         ringkas: form.ringkas,
+        deskripsi: form.deskripsi,
+        detail: form.detail,
         base: form.base,
         foto: form.foto || null,
         hairdo_included: isMakeup ? form.hairdoIncluded : null,
@@ -167,6 +172,14 @@ function ServiceRow({ svc, onChange, onUnauthorized }) {
           <div>
             <label className="label">Deskripsi singkat</label>
             <input className="field" value={form.ringkas} onChange={(e) => set("ringkas", e.target.value)} />
+          </div>
+          <div>
+            <label className="label">Deskripsi lengkap (tampil di card)</label>
+            <textarea rows={3} className="field resize-none" value={form.deskripsi} onChange={(e) => set("deskripsi", e.target.value)} placeholder="Penjelasan lebih panjang tentang layanan ini." />
+          </div>
+          <div>
+            <label className="label">Detail (satu poin per baris)</label>
+            <textarea rows={3} className="field resize-none" value={form.detail} onChange={(e) => set("detail", e.target.value)} placeholder={"mis.\nTermasuk konsultasi look\nProduk tahan lama\nBisa datang ke lokasi"} />
           </div>
 
           <div className="flex flex-wrap items-center gap-4">
@@ -254,7 +267,7 @@ function AddService({ onDone, onUnauthorized }) {
           <Select
             value={form.kind}
             onChange={(v) => setForm({ ...form, kind: v })}
-            options={[{ value: "makeup", label: "Make Up" }, { value: "nail", label: "Nail Art" }]}
+            options={[{ value: "makeup", label: "Make Up" }, { value: "hairdo", label: "Hairdo" }, { value: "nail", label: "Nail Art" }]}
           />
         </div>
         <div>

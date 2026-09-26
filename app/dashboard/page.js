@@ -354,10 +354,11 @@ export default function DashboardPage() {
                     </span>
                   </div>
                   <p className="mt-1 text-sm text-muted">
-                    {b.serviceNama}{b.hairdo ? " + Hairdo" : ""} · {b.areaNama}
+                    {b.serviceNama}{b.hairdo ? " + Hairdo" : ""}
+                    {b.orang > 1 ? ` · ${b.orang} orang` : ""} · {b.areaNama}
                   </p>
                   <p className="mt-0.5 text-sm text-muted">
-                    {formatTanggal(b.tanggal)} · {b.jam} · {b.telepon}
+                    {formatTanggal(b.tanggal)} · ready {b.jam} · {b.telepon}
                   </p>
                   {b.catatan && <p className="mt-1 text-sm text-ink/70">“{b.catatan}”</p>}
                 </div>

@@ -1,30 +1,30 @@
-import { Suspense } from "react";
-import BookingForm from "@/components/BookingForm";
+import { services as cfgServices, hairdo as cfgHairdo, nailArt as cfgNailArt, areas as cfgAreas } from "@/lib/config";
+import { getServicesData, getSettings } from "@/lib/storage";
 import SectionHeader from "@/components/SectionHeader";
-import { site } from "@/lib/config";
+import Storefront from "@/components/store/Storefront";
 
 export const metadata = { title: "Booking" };
 
-export default function BookingPage() {
-  return (
-    <div className="container-x grid gap-12 py-16 lg:grid-cols-[1fr_1.2fr]">
-      <div>
-        <SectionHeader
-          eyebrow="Booking"
-          title="Amankan jadwalmu"
-          desc="Isi form di samping, lalu konfirmasi otomatis lewat WhatsApp. Cepat dan tanpa ribet."
-        />
-        <div className="mt-8 space-y-4 text-sm text-muted">
-          <p>• Booking minimal H-1 untuk ketersediaan jadwal terbaik.</p>
-          <p>• Bisa datang ke lokasi (biaya area menyesuaikan jarak).</p>
-          <p>• Pembayaran & detail final dikonfirmasi via WhatsApp.</p>
-          <p>• Jam operasional: {site.jam}.</p>
-        </div>
-      </div>
+export default async function BookingPage() {
+  const data = await getServicesData();
+  const settings = await getSettings();
+  const store = {
+    services: data?.services?.length ? data.services : cfgServices,
+    hairdo: data?.hairdo?.length ? data.hairdo : cfgHairdo,
+    nailArt: data?.nailArt?.length ? data.nailArt : cfgNailArt,
+    areas: data?.areas?.length ? data.areas : cfgAreas,
+  };
 
-      <Suspense fallback={<div className="text-sm text-muted">Memuat form…</div>}>
-        <BookingForm />
-      </Suspense>
+  return (
+    <div className="container-x py-16">
+      <SectionHeader
+        eyebrow="Booking"
+        title="Pilih layanan & checkout"
+        desc="Pilih item yang kamu mau (bisa makeup, hairdo, nails), lalu tekan Book untuk isi jadwal dan bayar DP. Konfirmasi otomatis lewat WhatsApp."
+      />
+      <div className="mt-10">
+        <Storefront data={store} settings={settings} />
+      </div>
     </div>
   );
 }
