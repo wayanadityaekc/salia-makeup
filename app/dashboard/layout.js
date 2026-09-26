@@ -1,4 +1,5 @@
 import RegisterSW from "@/components/pwa/RegisterSW";
+import InstallPrompt from "@/components/pwa/InstallPrompt";
 
 // PWA metadata is scoped to the admin dashboard segment only — the public
 // marketing site (app/(site)) is unaffected. Business logic, auth, API calls
@@ -39,6 +40,7 @@ export default function DashboardLayout({ children }) {
     <>
       <RegisterSW />
       {children}
+      <InstallPrompt />
     </>
   );
 }

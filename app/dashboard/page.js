@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import {
   Lock, LogOut, Trash2, MessageCircle, CheckCheck, Check, Search,
+  CalendarDays, Wallet, Sparkles, Images, Settings,
 } from "lucide-react";
 import { site } from "@/lib/config";
 import { formatRupiah, formatTanggal, normalizeWa, waLink } from "@/lib/utils";
@@ -26,6 +27,16 @@ const STATUS = {
   selesai: { label: "Selesai", cls: "bg-ink/10 text-ink" },
 };
 
+// One source of truth for the dashboard sections — used by the top tabs (browser)
+// and the bottom bar (installed app). "short" is the compact label for the bar.
+const TABS = [
+  { key: "booking", label: "Booking", short: "Booking", Icon: CalendarDays },
+  { key: "income", label: "Income", short: "Income", Icon: Wallet },
+  { key: "layanan", label: "Layanan", short: "Layanan", Icon: Sparkles },
+  { key: "galeri", label: "Galeri", short: "Galeri", Icon: Images },
+  { key: "pengaturan", label: "Pengaturan", short: "Atur", Icon: Settings },
+];
+
 export default function DashboardPage() {
   const [authed, setAuthed] = useState(false);
   const [pass, setPass] = useState("");
@@ -38,9 +49,24 @@ export default function DashboardPage() {
   const [range, setRange] = useState("semua"); // semua | minggu | bulan | tahun
   const [q, setQ] = useState("");
   const [tab, setTab] = useState("booking"); // booking | layanan | galeri
+  const [standalone, setStandalone] = useState(false); // true when launched as installed PWA
 
   useEffect(() => {
     if (getToken()) setAuthed(true);
+  }, []);
+
+  // Detect installed-app (standalone) launch so we can show the bottom bar there
+  // and the top tabs in the browser. Read after mount to keep SSR markup stable.
+  useEffect(() => {
+    const check = () =>
+      setStandalone(
+        window.matchMedia?.("(display-mode: standalone)").matches ||
+          window.navigator.standalone === true
+      );
+    check();
+    const mq = window.matchMedia?.("(display-mode: standalone)");
+    mq?.addEventListener?.("change", check);
+    return () => mq?.removeEventListener?.("change", check);
   }, []);
 
   // Any 401 means the token is gone/expired: drop back to the login gate.
@@ -175,37 +201,40 @@ export default function DashboardPage() {
 
   // Dashboard
   return (
-    <div className="min-h-screen bg-rose-soft/40">
-      <header className="border-b border-rose-line bg-white">
-        <div className="container-x flex h-16 items-center justify-between">
-          <div className="font-bold text-rose">{site.brand} · Admin</div>
-          <button onClick={logout} className="inline-flex items-center gap-2 text-sm text-muted hover:text-rose">
-            <LogOut size={16} /> Keluar
-          </button>
-        </div>
-      </header>
-
-      {/* Tabs — scrollable on mobile so nothing gets cut off */}
-      <div className="border-b border-rose-line bg-white">
-        <div className="container-x flex gap-1 overflow-x-auto overflow-y-hidden overscroll-x-contain [touch-action:pan-x] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          {[
-            ["booking", "Booking"],
-            ["income", "Income"],
-            ["layanan", "Layanan"],
-            ["galeri", "Galeri"],
-            ["pengaturan", "Pengaturan"],
-          ].map(([key, label]) => (
-            <button
-              key={key}
-              onClick={() => setTab(key)}
-              className={`-mb-px shrink-0 whitespace-nowrap border-b-2 px-4 py-3 text-sm font-medium transition ${
-                tab === key ? "border-rose text-rose" : "border-transparent text-muted hover:text-ink"
-              }`}
-            >
-              {label}
+    <div
+      className="min-h-screen bg-rose-soft/40"
+      // In the installed app, leave room for the fixed bottom bar (+ iPhone inset).
+      style={standalone ? { paddingBottom: "calc(68px + env(safe-area-inset-bottom))" } : undefined}
+    >
+      {/* Sticky header (+ tabs in browser) */}
+      <div className="sticky top-0 z-30">
+        <header className="border-b border-rose-line bg-white">
+          <div className="container-x flex h-16 items-center justify-between">
+            <div className="font-bold text-rose">{site.brand} · Admin</div>
+            <button onClick={logout} className="inline-flex items-center gap-2 text-sm text-muted hover:text-rose">
+              <LogOut size={16} /> Keluar
             </button>
-          ))}
-        </div>
+          </div>
+        </header>
+
+        {/* Top tabs — browser only; the app uses the bottom bar instead */}
+        {!standalone && (
+          <div className="border-b border-rose-line bg-white">
+            <div className="container-x flex gap-1 overflow-x-auto overflow-y-hidden overscroll-x-contain [touch-action:pan-x] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              {TABS.map(({ key, label }) => (
+                <button
+                  key={key}
+                  onClick={() => setTab(key)}
+                  className={`-mb-px shrink-0 whitespace-nowrap border-b-2 px-4 py-3 text-sm font-medium transition ${
+                    tab === key ? "border-rose text-rose" : "border-transparent text-muted hover:text-ink"
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       {tab === "layanan" && (
@@ -354,6 +383,35 @@ export default function DashboardPage() {
           ))}
         </div>
       </div>
+
+      {/* Bottom bar — installed app only. Drives the same tab state, so no logic
+          changes; hidden in the browser so the web layout is untouched. */}
+      {standalone && (
+        <nav
+          className="fixed inset-x-0 bottom-0 z-40 border-t border-rose-line bg-white/95 backdrop-blur"
+          style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
+          aria-label="Navigasi dashboard"
+        >
+          <div className="mx-auto flex max-w-content items-stretch justify-around px-2">
+            {TABS.map(({ key, short, Icon }) => {
+              const active = tab === key;
+              return (
+                <button
+                  key={key}
+                  onClick={() => setTab(key)}
+                  aria-current={active ? "page" : undefined}
+                  className={`flex flex-1 flex-col items-center gap-0.5 py-2 text-[11px] font-medium transition ${
+                    active ? "text-rose" : "text-muted"
+                  }`}
+                >
+                  <Icon size={22} strokeWidth={active ? 2.4 : 1.9} />
+                  {short}
+                </button>
+              );
+            })}
+          </div>
+        </nav>
+      )}
     </div>
   );
 }
