@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   Lock, LogOut, Trash2, MessageCircle, CheckCheck, Check, Search,
   CalendarDays, Wallet, Sparkles, Images, Settings, MessageSquare,
@@ -53,6 +53,8 @@ export default function DashboardPage() {
   const [q, setQ] = useState("");
   const [tab, setTab] = useState("booking"); // booking | layanan | galeri
   const [standalone, setStandalone] = useState(false); // true when launched as installed PWA
+  const topRef = useRef(null);
+  const [topH, setTopH] = useState(0); // sticky header + tabs height, for the full-height chat pane
 
   useEffect(() => {
     if (getToken()) setAuthed(true);
@@ -71,6 +73,19 @@ export default function DashboardPage() {
     mq?.addEventListener?.("change", check);
     return () => mq?.removeEventListener?.("change", check);
   }, []);
+
+  // Measure the sticky header/tabs so the chat pane can fill the rest of the
+  // viewport exactly (only the messages inside scroll, not the page).
+  useEffect(() => {
+    if (!authed) return;
+    const el = topRef.current;
+    if (!el) return;
+    const measure = () => setTopH(el.offsetHeight);
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [authed, standalone]);
 
   // Any 401 means the token is gone/expired: drop back to the login gate.
   const handleUnauthorized = () => {
@@ -207,10 +222,11 @@ export default function DashboardPage() {
     <div
       className="min-h-screen bg-rose-soft/40"
       // In the installed app, leave room for the fixed bottom bar (+ iPhone inset).
-      style={standalone ? { paddingBottom: "calc(68px + env(safe-area-inset-bottom))" } : undefined}
+      // The chat tab fills the viewport itself, so it opts out of this padding.
+      style={standalone && tab !== "chat" ? { paddingBottom: "calc(68px + env(safe-area-inset-bottom))" } : undefined}
     >
       {/* Sticky header (+ tabs in browser) */}
-      <div className="sticky top-0 z-30">
+      <div ref={topRef} className="sticky top-0 z-30">
         <header className="border-b border-rose-line bg-white">
           <div className="container-x flex h-16 items-center justify-between">
             <div className="font-bold text-rose">{site.brand} · Admin</div>
@@ -253,7 +269,12 @@ export default function DashboardPage() {
       )}
 
       {tab === "chat" && (
-        <div className="container-x py-8">
+        <div
+          className="container-x py-4"
+          style={{
+            height: `calc(100dvh - ${topH}px${standalone ? " - 68px - env(safe-area-inset-bottom)" : ""})`,
+          }}
+        >
           <ChatManager onUnauthorized={handleUnauthorized} />
         </div>
       )}

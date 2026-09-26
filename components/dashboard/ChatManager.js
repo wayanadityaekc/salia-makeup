@@ -113,9 +113,9 @@ export default function ChatManager({ onUnauthorized }) {
   const active = convos.find((c) => c.id === activeCid);
 
   return (
-    <div>
-      <h2 className="text-lg font-bold text-ink">Live chat</h2>
-      <div className="mt-4 flex h-[70vh] overflow-hidden rounded-2xl border border-rose-line bg-white">
+    <div className="flex h-full flex-col">
+      <h2 className="shrink-0 text-lg font-bold text-ink">Live chat</h2>
+      <div className="mt-4 flex min-h-0 flex-1 overflow-hidden rounded-2xl border border-rose-line bg-white">
         {/* Conversation list */}
         <div
           className={`w-full shrink-0 overflow-y-auto border-rose-line md:w-72 md:border-r ${
