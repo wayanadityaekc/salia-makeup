@@ -70,10 +70,9 @@ export default function Checkout({ data, settings, onClose }) {
   };
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-end justify-center bg-ink/40 p-0 sm:items-center sm:p-4" onClick={onClose}>
+    <div className="fixed inset-0 z-[60] bg-ink/40 sm:flex sm:items-center sm:justify-center sm:p-4" onClick={onClose}>
       <div
-        className="flex max-h-[92vh] w-full max-w-md flex-col overflow-hidden rounded-t-3xl bg-white sm:rounded-3xl"
-        style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
+        className="flex h-full w-full flex-col overflow-hidden bg-white sm:h-auto sm:max-h-[92vh] sm:max-w-lg sm:rounded-3xl"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between border-b border-rose-line px-5 py-3">
@@ -83,9 +82,9 @@ export default function Checkout({ data, settings, onClose }) {
           </button>
         </div>
 
-        <div className="overflow-y-auto p-4">
+        <div className="flex-1 overflow-y-auto p-4 sm:p-5" style={{ paddingBottom: "env(safe-area-inset-bottom)" }}>
           {step === "form" && (
-            <form onSubmit={submit} className="space-y-2.5">
+            <form onSubmit={submit} className="space-y-3">
               {/* Ringkasan pilihan — ringkas */}
               <div className="rounded-lg bg-rose-soft/60 px-3 py-2 text-xs text-ink">
                 {items.map((i, idx) => (
@@ -137,17 +136,14 @@ export default function Checkout({ data, settings, onClose }) {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-2.5">
-                <div>
-                  <label className="label">Area</label>
-                  <Select value={form.areaId} onChange={(v) => set("areaId", v)} options={areaOptions} placeholder="Pilih area" />
-                </div>
-                <div>
-                  <label className="label">Alamat</label>
-                  <input className="field" value={form.lokasi} onChange={(e) => set("lokasi", e.target.value)} placeholder="Alamat lengkap" />
-                </div>
+              <div>
+                <label className="label">Area</label>
+                <Select value={form.areaId} onChange={(v) => set("areaId", v)} options={areaOptions} placeholder="Pilih area" />
               </div>
-
+              <div>
+                <label className="label">Alamat lengkap</label>
+                <textarea rows={3} className="field resize-none" value={form.lokasi} onChange={(e) => set("lokasi", e.target.value)} placeholder="Nama jalan, no. rumah, patokan, kecamatan…" />
+              </div>
               <div>
                 <label className="label">Catatan (opsional)</label>
                 <input className="field" value={form.catatan} onChange={(e) => set("catatan", e.target.value)} placeholder="Referensi look, tema acara, dll." />
