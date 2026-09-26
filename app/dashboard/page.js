@@ -20,7 +20,7 @@ import ServicesManager from "@/components/dashboard/ServicesManager";
 import GalleryManager from "@/components/dashboard/GalleryManager";
 import SettingsManager from "@/components/dashboard/SettingsManager";
 import IncomeTracker from "@/components/dashboard/IncomeTracker";
-import MessagesManager from "@/components/dashboard/MessagesManager";
+import ChatManager from "@/components/dashboard/ChatManager";
 import NotifyToggle from "@/components/pwa/NotifyToggle";
 
 const STATUS = {
@@ -254,7 +254,7 @@ export default function DashboardPage() {
 
       {tab === "chat" && (
         <div className="container-x py-8">
-          <MessagesManager onUnauthorized={handleUnauthorized} />
+          <ChatManager onUnauthorized={handleUnauthorized} />
         </div>
       )}
 
