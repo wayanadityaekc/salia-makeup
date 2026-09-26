@@ -1,13 +1,16 @@
 "use client";
 
-import { useRef, useState } from "react";
-import { X, Send, Copy, Check, Upload, CheckCircle2, Minus, Plus, Loader2 } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { X, Send, Copy, Check, Upload, CheckCircle2, Minus, Plus, Loader2, Download, MessageCircle } from "lucide-react";
 import Select from "@/components/ui/Select";
 import DatePicker from "@/components/ui/DatePicker";
 import { site } from "@/lib/config";
 import { formatRupiah, formatTanggal, waLink, normalizeWa } from "@/lib/utils";
-import { saveCartBooking, uploadProof } from "@/lib/storage";
+import { saveCartBooking, uploadProof, uploadReceipt, sendReceiptToChat, emailReceipt } from "@/lib/storage";
 import { compressImage } from "@/lib/image";
+import { makeReceiptPdf } from "@/lib/receipt";
+import { chatCidFor, openChat } from "@/lib/chat";
+import { useUser } from "@/components/auth/UserProvider";
 import { useCart } from "./CartProvider";
 
 const timeOptions = (() => {
@@ -21,12 +24,20 @@ const timeOptions = (() => {
 
 export default function Checkout({ data, settings, onClose }) {
   const { items, subtotal, orang, setOrang, clear } = useCart();
+  const { user } = useUser();
   const areas = data.areas || [];
   const [step, setStep] = useState("form"); // form | pay | done
   const [form, setForm] = useState({ nama: "", telepon: "", instagram: "", areaId: areas[0]?.id || "dalam-kota", tanggal: "", jam: "", lokasi: "", catatan: "" });
   const [err, setErr] = useState("");
   const [busy, setBusy] = useState(false);
   const [booked, setBooked] = useState(null);
+  const [receipt, setReceipt] = useState(null); // { blob, filename }
+  const [emailed, setEmailed] = useState(false);
+
+  // Prefill from the logged-in account.
+  useEffect(() => {
+    if (user) setForm((f) => ({ ...f, nama: f.nama || user.nama || "", telepon: f.telepon || user.telepon || "" }));
+  }, [user]);
 
   const area = areas.find((a) => a.id === form.areaId) || areas[0] || { fee: 0, nama: "" };
   const total = subtotal * orang + (area.fee || 0);
@@ -60,13 +71,51 @@ export default function Checkout({ data, settings, onClose }) {
     setBooked({
       ...form,
       instagram: form.instagram,
+      ref: saved?.id ? `SALIA-${saved.id}` : "",
       itemsList: items.map((i) => i.nama),
+      items: items.map((i) => ({ nama: i.nama, base: i.base })),
       areaNama: area.nama,
+      areaFee: area.fee || 0,
       orang,
       total: saved?.total ?? total,
+      dpPercent: settings.dpPercent || 50,
     });
     setBusy(false);
     setStep("pay");
+  };
+
+  // After the WhatsApp handoff: build the receipt PDF, drop it into the chat
+  // (both sides see it), and email it if the guest is logged in. Best-effort —
+  // failures never block the "done" screen.
+  const finish = async () => {
+    setStep("done");
+    const b = booked;
+    if (!b) return;
+    try {
+      const pdf = await makeReceiptPdf({
+        ref: b.ref, nama: b.nama, telepon: b.telepon, items: b.items, orang: b.orang,
+        areaNama: b.areaNama, areaFee: b.areaFee, tanggal: b.tanggal, jam: b.jam,
+        total: b.total, dpPercent: b.dpPercent, brand: site.brand,
+      });
+      setReceipt({ blob: pdf.blob, filename: pdf.filename });
+      const cid = chatCidFor(user);
+      const file = new File([pdf.blob], pdf.filename, { type: "application/pdf" });
+      let url = "";
+      try { url = await uploadReceipt(file); } catch {}
+      if (url) await sendReceiptToChat(cid, { nama: b.nama, telepon: b.telepon, ref: b.ref, url }).catch(() => {});
+      if (user) {
+        const r = await emailReceipt({ ref: b.ref, filename: pdf.filename, pdfBase64: pdf.base64 }).catch(() => null);
+        if (r?.ok) setEmailed(true);
+      }
+    } catch {}
+  };
+
+  const downloadReceipt = () => {
+    if (!receipt) return;
+    const url = URL.createObjectURL(receipt.blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = receipt.filename; a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 4000);
   };
 
   return (
@@ -165,22 +214,28 @@ export default function Checkout({ data, settings, onClose }) {
           )}
 
           {step === "pay" && booked && (
-            <PayStep booked={booked} settings={settings} onSent={() => setStep("done")} />
+            <PayStep booked={booked} settings={settings} onSent={finish} />
           )}
 
           {step === "done" && (
             <div className="py-6 text-center">
               <CheckCircle2 className="mx-auto text-rose" size={44} />
-              <h3 className="mt-4 text-xl font-bold text-ink">Booking terkirim!</h3>
+              <h3 className="mt-4 text-xl font-bold text-ink">Terima kasih! 🎉</h3>
               <p className="mx-auto mt-2 max-w-xs text-sm text-muted">
-                Kami sudah mengarahkanmu ke WhatsApp untuk konfirmasi. Kalau belum terbuka, hubungi kami langsung ya.
+                Booking kamu tercatat. Struk sudah kami kirim ke <b>chat</b> untuk di-download.
+                {emailed ? " Struk juga dikirim ke email kamu." : ""} Ada pertanyaan? Lanjut di chat aja.
               </p>
-              <button
-                onClick={() => { clear(); onClose(); }}
-                className="btn-outline mt-6"
-              >
-                Selesai
-              </button>
+              <div className="mt-6 flex flex-col gap-2">
+                <button onClick={downloadReceipt} disabled={!receipt} className="btn-primary w-full disabled:opacity-60">
+                  <Download size={18} /> Download struk
+                </button>
+                <button onClick={() => { clear(); openChat(); onClose(); }} className="btn-outline w-full">
+                  <MessageCircle size={18} /> Buka chat
+                </button>
+                <button onClick={() => { clear(); onClose(); }} className="mt-1 text-sm text-muted hover:text-rose">
+                  Selesai
+                </button>
+              </div>
             </div>
           )}
         </div>

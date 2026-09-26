@@ -3,8 +3,10 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Menu, X } from "lucide-react";
+import { Menu, X, User, LogOut } from "lucide-react";
 import { site } from "@/lib/config";
+import { useUser } from "@/components/auth/UserProvider";
+import AuthModal from "@/components/auth/AuthModal";
 
 const nav = [
   { href: "/", label: "Beranda" },
@@ -15,8 +17,10 @@ const nav = [
 
 export default function Navbar() {
   const pathname = usePathname();
+  const { user, logout } = useUser();
   const [open, setOpen] = useState(false);
   const [solid, setSolid] = useState(false);
+  const [auth, setAuth] = useState(false);
 
   useEffect(() => {
     const onScroll = () => setSolid(window.scrollY > 12);
@@ -52,9 +56,20 @@ export default function Navbar() {
               {n.label}
             </Link>
           ))}
-          <Link href="/booking" className="btn-primary">
-            Booking
-          </Link>
+          {user ? (
+            <div className="flex items-center gap-3">
+              <span className="inline-flex items-center gap-1.5 text-sm font-medium text-ink">
+                <User size={16} className="text-rose" /> {user.nama?.split(" ")[0]}
+              </span>
+              <button onClick={logout} className="inline-flex items-center gap-1 text-sm text-muted hover:text-rose" aria-label="Keluar">
+                <LogOut size={15} /> Keluar
+              </button>
+            </div>
+          ) : (
+            <button onClick={() => setAuth(true)} className="btn-primary">
+              Login
+            </button>
+          )}
         </nav>
 
         <button
@@ -80,12 +95,25 @@ export default function Navbar() {
                 {n.label}
               </Link>
             ))}
-            <Link href="/booking" className="btn-primary mt-2">
-              Booking
-            </Link>
+            {user ? (
+              <div className="mt-2 flex items-center justify-between border-t border-rose-line pt-3">
+                <span className="inline-flex items-center gap-1.5 text-sm font-medium text-ink">
+                  <User size={16} className="text-rose" /> {user.nama}
+                </span>
+                <button onClick={logout} className="inline-flex items-center gap-1 text-sm text-muted hover:text-rose">
+                  <LogOut size={15} /> Keluar
+                </button>
+              </div>
+            ) : (
+              <button onClick={() => { setOpen(false); setAuth(true); }} className="btn-primary mt-2">
+                Login
+              </button>
+            )}
           </div>
         </nav>
       )}
+
+      {auth && <AuthModal onClose={() => setAuth(false)} />}
     </header>
   );
 }

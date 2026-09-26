@@ -12,6 +12,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "jspdf": "^2.5.2",
     "lucide-react": "0.469.0",
     "next": "16.3.6",
     "react": "19.3.0",
