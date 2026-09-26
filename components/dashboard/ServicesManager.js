@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Plus, Trash2, Save, EyeOff } from "lucide-react";
+import { Plus, Trash2, Save, EyeOff, Check } from "lucide-react";
 import { formatRupiah } from "@/lib/utils";
 import Select from "@/components/ui/Select";
 import {
@@ -85,9 +85,26 @@ function ServiceRow({ svc, onChange, onUnauthorized }) {
   const [saved, setSaved] = useState(false);
   const isMakeup = svc.kind === "makeup";
 
+  // Detail = up to 5 checklist points. Stored as newline-separated text.
+  const [detailRows, setDetailRows] = useState(() => {
+    const arr = String(svc.detail || "")
+      .split("\n")
+      .map((s) => s.replace(/^[-•✓]\s*/, "").trim())
+      .filter(Boolean)
+      .slice(0, 5);
+    while (arr.length < 5) arr.push("");
+    return arr;
+  });
+
   const set = (k, v) => {
     setForm((f) => ({ ...f, [k]: v }));
     setSaved(false);
+  };
+  const setDetailRow = (i, v) => {
+    const next = [...detailRows];
+    next[i] = v;
+    setDetailRows(next);
+    set("detail", next.map((x) => x.trim()).filter(Boolean).join("\n"));
   };
 
   const guard = (e) => {
@@ -180,8 +197,20 @@ function ServiceRow({ svc, onChange, onUnauthorized }) {
             <textarea rows={3} className="field resize-none" value={form.deskripsi} onChange={(e) => set("deskripsi", e.target.value)} placeholder="Penjelasan lebih panjang tentang layanan ini." />
           </div>
           <div>
-            <label className="label">Detail (satu poin per baris)</label>
-            <textarea rows={3} className="field resize-none" value={form.detail} onChange={(e) => set("detail", e.target.value)} placeholder={"mis.\nTermasuk konsultasi look\nProduk tahan lama\nBisa datang ke lokasi"} />
+            <label className="label">Detail (maks 5 poin)</label>
+            <div className="space-y-2">
+              {detailRows.map((val, i) => (
+                <div key={i} className="flex items-center gap-2">
+                  <Check size={16} className="shrink-0 text-rose" />
+                  <input
+                    className="field"
+                    value={val}
+                    onChange={(e) => setDetailRow(i, e.target.value)}
+                    placeholder={`Poin ${i + 1}${i === 0 ? " (mis. Termasuk konsultasi look)" : ""}`}
+                  />
+                </div>
+              ))}
+            </div>
           </div>
           <div>
             <label className="label">Detail produk (tampil di popup)</label>
