@@ -49,3 +49,12 @@ body {
     @apply text-xs font-semibold uppercase tracking-[0.2em] text-rose;
   }
 }
+
+/* PWA standalone (installed to home screen): respect the iPhone home-indicator
+   inset so bottom content isn't hidden. No effect in a normal browser tab, so
+   the public site (browsed, never installed) is unchanged. */
+@media (display-mode: standalone) {
+  body {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
