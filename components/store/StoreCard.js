@@ -1,13 +1,24 @@
 "use client";
 
-import { Check, Plus } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Check, Plus, X } from "lucide-react";
 import { formatRupiah } from "@/lib/utils";
 import { useCart } from "./CartProvider";
 
-// One service = one card (title, description, details, price, "Pilih" toggle).
+// One service = one card. Clicking the card opens a detail popup (photo,
+// description, details, price) with the Pilih button.
 export default function StoreCard({ item }) {
   const { pick, isSelected } = useCart();
+  const [open, setOpen] = useState(false);
   const selected = isSelected(item.id);
+
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e) => e.key === "Escape" && setOpen(false);
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open]);
+
   const desc = item.deskripsi || item.ringkas || "";
   const details = String(item.detail || "")
     .split("\n")
@@ -15,48 +26,92 @@ export default function StoreCard({ item }) {
     .filter(Boolean);
 
   return (
-    <div
-      className={`flex flex-col overflow-hidden rounded-2xl border bg-white transition ${
-        selected ? "border-rose ring-2 ring-rose" : "border-rose-line hover:shadow-[0_12px_40px_-18px_rgba(107,44,62,0.3)]"
-      }`}
-    >
-      {item.foto ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img src={item.foto} alt={item.nama} loading="lazy" className="aspect-[4/3] w-full object-cover" />
-      ) : (
-        <div className="foto-ph aspect-[4/3] text-xs">Foto {item.nama}</div>
-      )}
-
-      <div className="flex flex-1 flex-col p-3 sm:p-4">
-        <h3 className="text-sm font-semibold leading-snug text-ink sm:text-base">{item.nama}</h3>
-        {desc && <p className="mt-1 line-clamp-3 text-xs leading-relaxed text-muted sm:text-sm">{desc}</p>}
-
-        {details.length > 0 && (
-          <ul className="mt-2 space-y-1">
-            {details.slice(0, 4).map((d, i) => (
-              <li key={i} className="flex gap-1.5 text-[11px] leading-snug text-ink/70 sm:text-xs">
-                <Check size={12} className="mt-0.5 shrink-0 text-rose" />
-                <span>{d}</span>
-              </li>
-            ))}
-          </ul>
+    <>
+      {/* Card */}
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        className={`group relative flex flex-col overflow-hidden rounded-2xl border bg-white text-left transition ${
+          selected ? "border-rose ring-2 ring-rose" : "border-rose-line hover:shadow-[0_12px_40px_-18px_rgba(107,44,62,0.3)]"
+        }`}
+      >
+        {selected && (
+          <span className="absolute right-2 top-2 z-10 inline-flex items-center gap-1 rounded-full bg-rose px-2 py-1 text-[11px] font-semibold text-white">
+            <Check size={12} /> Dipilih
+          </span>
         )}
+        {item.foto ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={item.foto} alt={item.nama} loading="lazy" className="aspect-[4/3] w-full object-cover" />
+        ) : (
+          <div className="foto-ph aspect-[4/3] text-xs">Foto {item.nama}</div>
+        )}
+        <div className="flex flex-1 flex-col p-3 sm:p-4">
+          <h3 className="text-sm font-semibold leading-snug text-ink sm:text-base">{item.nama}</h3>
+          {desc && <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-muted sm:text-sm">{desc}</p>}
+          <div className="mt-3 flex-1" />
+          <div className="text-base font-bold text-rose sm:text-lg">{formatRupiah(item.base)}</div>
+          <span className="mt-2 inline-flex w-full items-center justify-center gap-1.5 rounded-full bg-rose-soft px-4 py-2 text-sm font-semibold text-rose">
+            Lihat detail
+          </span>
+        </div>
+      </button>
 
-        <div className="mt-3 flex-1" />
-        <div className="text-base font-bold text-rose sm:text-lg">{formatRupiah(item.base)}</div>
-        <button
-          onClick={() => pick(item)}
-          className={`mt-2 inline-flex w-full items-center justify-center gap-1.5 rounded-full px-4 py-2 text-sm font-semibold transition ${
-            selected ? "bg-rose-soft text-rose" : "bg-rose text-white hover:bg-rose-deep"
-          }`}
-        >
-          {selected ? (
-            <><Check size={16} /> Dipilih</>
-          ) : (
-            <><Plus size={16} /> Pilih</>
-          )}
-        </button>
-      </div>
-    </div>
+      {/* Detail popup */}
+      {open && (
+        <div className="fixed inset-0 z-[60] flex items-end justify-center bg-ink/50 p-0 sm:items-center sm:p-4" onClick={() => setOpen(false)}>
+          <div
+            className="flex max-h-[92vh] w-full max-w-md flex-col overflow-hidden rounded-t-3xl bg-white sm:rounded-3xl"
+            style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="relative">
+              {item.foto ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={item.foto} alt={item.nama} className="aspect-[4/3] w-full object-cover" />
+              ) : (
+                <div className="foto-ph aspect-[4/3] text-sm">Foto {item.nama}</div>
+              )}
+              <button
+                onClick={() => setOpen(false)}
+                aria-label="Tutup"
+                className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full bg-white/90 text-ink shadow hover:bg-white"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto p-5">
+              <div className="flex items-start justify-between gap-3">
+                <h3 className="text-lg font-bold text-ink">{item.nama}</h3>
+                <div className="shrink-0 text-lg font-bold text-rose">{formatRupiah(item.base)}</div>
+              </div>
+              {desc && <p className="mt-2 text-sm leading-relaxed text-muted">{desc}</p>}
+              {details.length > 0 && (
+                <ul className="mt-4 space-y-2">
+                  {details.map((d, i) => (
+                    <li key={i} className="flex gap-2 text-sm leading-snug text-ink/80">
+                      <Check size={15} className="mt-0.5 shrink-0 text-rose" />
+                      <span>{d}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+
+            <div className="border-t border-rose-line p-4">
+              <button
+                onClick={() => { pick(item); setOpen(false); }}
+                className={`inline-flex w-full items-center justify-center gap-2 rounded-full px-4 py-3 text-sm font-semibold transition ${
+                  selected ? "bg-rose-soft text-rose" : "bg-rose text-white hover:bg-rose-deep"
+                }`}
+              >
+                {selected ? (<><Check size={18} /> Batalkan pilihan</>) : (<><Plus size={18} /> Pilih layanan ini</>)}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 }

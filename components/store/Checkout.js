@@ -23,7 +23,7 @@ export default function Checkout({ data, settings, onClose }) {
   const { items, subtotal, orang, setOrang, clear } = useCart();
   const areas = data.areas || [];
   const [step, setStep] = useState("form"); // form | pay | done
-  const [form, setForm] = useState({ nama: "", telepon: "", areaId: areas[0]?.id || "dalam-kota", tanggal: "", jam: "", lokasi: "", catatan: "" });
+  const [form, setForm] = useState({ nama: "", telepon: "", instagram: "", areaId: areas[0]?.id || "dalam-kota", tanggal: "", jam: "", lokasi: "", catatan: "" });
   const [err, setErr] = useState("");
   const [busy, setBusy] = useState(false);
   const [booked, setBooked] = useState(null);
@@ -48,7 +48,8 @@ export default function Checkout({ data, settings, onClose }) {
     let saved;
     try {
       saved = await saveCartBooking({
-        nama: form.nama, telepon: form.telepon, items: items.map((i) => i.id), orang,
+        nama: form.nama, telepon: form.telepon, instagram: form.instagram,
+        items: items.map((i) => i.id), orang,
         areaId: form.areaId, tanggal: form.tanggal, jam: form.jam, lokasi: form.lokasi, catatan: form.catatan,
       });
     } catch {
@@ -57,6 +58,7 @@ export default function Checkout({ data, settings, onClose }) {
     }
     setBooked({
       ...form,
+      instagram: form.instagram,
       itemsList: items.map((i) => i.nama),
       areaNama: area.nama,
       orang,
@@ -102,6 +104,11 @@ export default function Checkout({ data, settings, onClose }) {
                   <label className="label">No. WhatsApp</label>
                   <input className="field" inputMode="numeric" value={form.telepon} onChange={(e) => set("telepon", e.target.value)} placeholder="08xxxx" />
                 </div>
+              </div>
+
+              <div>
+                <label className="label">Instagram (opsional)</label>
+                <input className="field" value={form.instagram} onChange={(e) => set("instagram", e.target.value)} placeholder="@username" />
               </div>
 
               {/* Jumlah orang */}
@@ -221,6 +228,7 @@ function PayStep({ booked, settings, onSent }) {
       `Halo ${site.brand}, saya mau booking:\n\n` +
       `Nama: ${b.nama}\n` +
       `No. HP: ${b.telepon}\n` +
+      (b.instagram ? `Instagram: @${String(b.instagram).replace(/^@/, "")}\n` : ``) +
       `Layanan: ${b.itemsList.join(", ")}\n` +
       `Jumlah orang: ${b.orang}\n` +
       `Area: ${b.areaNama}\n` +

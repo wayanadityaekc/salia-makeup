@@ -359,6 +359,7 @@ export default function DashboardPage() {
                   </p>
                   <p className="mt-0.5 text-sm text-muted">
                     {formatTanggal(b.tanggal)} · ready {b.jam} · {b.telepon}
+                    {b.instagram ? ` · IG @${b.instagram}` : ""}
                   </p>
                   {b.catatan && <p className="mt-1 text-sm text-ink/70">“{b.catatan}”</p>}
                 </div>
