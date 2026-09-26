@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import {
   Lock, LogOut, Trash2, MessageCircle, CheckCheck, Check, Search,
-  CalendarDays, Wallet, Sparkles, Images, Settings,
+  CalendarDays, Wallet, Sparkles, Images, Settings, MessageSquare,
 } from "lucide-react";
 import { site } from "@/lib/config";
 import { formatRupiah, formatTanggal, normalizeWa, waLink } from "@/lib/utils";
@@ -20,6 +20,7 @@ import ServicesManager from "@/components/dashboard/ServicesManager";
 import GalleryManager from "@/components/dashboard/GalleryManager";
 import SettingsManager from "@/components/dashboard/SettingsManager";
 import IncomeTracker from "@/components/dashboard/IncomeTracker";
+import MessagesManager from "@/components/dashboard/MessagesManager";
 import NotifyToggle from "@/components/pwa/NotifyToggle";
 
 const STATUS = {
@@ -32,6 +33,7 @@ const STATUS = {
 // and the bottom bar (installed app). "short" is the compact label for the bar.
 const TABS = [
   { key: "booking", label: "Booking", short: "Booking", Icon: CalendarDays },
+  { key: "chat", label: "Chat", short: "Chat", Icon: MessageSquare },
   { key: "income", label: "Income", short: "Income", Icon: Wallet },
   { key: "layanan", label: "Layanan", short: "Layanan", Icon: Sparkles },
   { key: "galeri", label: "Galeri", short: "Galeri", Icon: Images },
@@ -247,6 +249,12 @@ export default function DashboardPage() {
       {tab === "galeri" && (
         <div className="container-x py-8">
           <GalleryManager onUnauthorized={handleUnauthorized} />
+        </div>
+      )}
+
+      {tab === "chat" && (
+        <div className="container-x py-8">
+          <MessagesManager onUnauthorized={handleUnauthorized} />
         </div>
       )}
 
