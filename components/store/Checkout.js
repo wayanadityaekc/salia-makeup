@@ -43,6 +43,7 @@ export default function Checkout({ data, settings, onClose }) {
     if (!/^[0-9+]{9,15}$/.test(form.telepon.trim())) return setErr("Nomor WhatsApp tidak valid.");
     if (!form.tanggal) return setErr("Pilih tanggal.");
     if (!form.jam) return setErr("Pilih jam ready.");
+    if (!form.lokasi.trim()) return setErr("Alamat wajib diisi.");
     setErr("");
     setBusy(true);
     let saved;
@@ -82,20 +83,20 @@ export default function Checkout({ data, settings, onClose }) {
           </button>
         </div>
 
-        <div className="overflow-y-auto p-5">
+        <div className="overflow-y-auto p-4">
           {step === "form" && (
-            <form onSubmit={submit} className="space-y-4">
-              {/* Ringkasan pilihan */}
-              <div className="rounded-xl border border-rose-line p-3">
-                {items.map((i) => (
-                  <div key={i.id} className="flex justify-between py-1 text-sm">
-                    <span className="text-ink">{i.nama}</span>
-                    <span className="font-medium text-ink">{formatRupiah(i.base)}</span>
-                  </div>
+            <form onSubmit={submit} className="space-y-2.5">
+              {/* Ringkasan pilihan — ringkas */}
+              <div className="rounded-lg bg-rose-soft/60 px-3 py-2 text-xs text-ink">
+                {items.map((i, idx) => (
+                  <span key={i.id}>
+                    {idx > 0 && <span className="text-muted"> · </span>}
+                    {i.nama}
+                  </span>
                 ))}
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 gap-2.5">
                 <div>
                   <label className="label">Nama</label>
                   <input className="field" value={form.nama} onChange={(e) => set("nama", e.target.value)} placeholder="Nama kamu" />
@@ -106,27 +107,26 @@ export default function Checkout({ data, settings, onClose }) {
                 </div>
               </div>
 
-              <div>
-                <label className="label">Instagram (opsional)</label>
-                <input className="field" value={form.instagram} onChange={(e) => set("instagram", e.target.value)} placeholder="@username" />
-              </div>
-
-              {/* Jumlah orang */}
-              <div>
-                <label className="label">Jumlah orang</label>
-                <div className="flex items-center gap-3">
-                  <button type="button" onClick={() => setOrang(Math.max(1, orang - 1))} className="flex h-10 w-10 items-center justify-center rounded-full border border-rose-line text-rose hover:bg-rose-soft">
-                    <Minus size={16} />
-                  </button>
-                  <span className="w-8 text-center text-lg font-bold text-ink">{orang}</span>
-                  <button type="button" onClick={() => setOrang(Math.min(50, orang + 1))} className="flex h-10 w-10 items-center justify-center rounded-full border border-rose-line text-rose hover:bg-rose-soft">
-                    <Plus size={16} />
-                  </button>
-                  <span className="text-xs text-muted">harga per item dikali jumlah orang</span>
+              <div className="grid grid-cols-2 items-end gap-2.5">
+                <div>
+                  <label className="label">Instagram</label>
+                  <input className="field" value={form.instagram} onChange={(e) => set("instagram", e.target.value)} placeholder="@username" />
+                </div>
+                <div>
+                  <label className="label">Jumlah orang</label>
+                  <div className="flex items-center justify-between rounded-xl border border-rose-line px-2 py-1">
+                    <button type="button" onClick={() => setOrang(Math.max(1, orang - 1))} className="flex h-8 w-8 items-center justify-center rounded-full text-rose hover:bg-rose-soft">
+                      <Minus size={16} />
+                    </button>
+                    <span className="text-base font-bold text-ink">{orang}</span>
+                    <button type="button" onClick={() => setOrang(Math.min(50, orang + 1))} className="flex h-8 w-8 items-center justify-center rounded-full text-rose hover:bg-rose-soft">
+                      <Plus size={16} />
+                    </button>
+                  </div>
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 gap-2.5">
                 <div>
                   <label className="label">Tanggal</label>
                   <DatePicker value={form.tanggal} onChange={(v) => set("tanggal", v)} />
@@ -137,25 +137,28 @@ export default function Checkout({ data, settings, onClose }) {
                 </div>
               </div>
 
-              <div>
-                <label className="label">Area / lokasi</label>
-                <Select value={form.areaId} onChange={(v) => set("areaId", v)} options={areaOptions} placeholder="Pilih area" />
-              </div>
-              <div>
-                <label className="label">Alamat (opsional)</label>
-                <input className="field" value={form.lokasi} onChange={(e) => set("lokasi", e.target.value)} placeholder="Alamat kalau minta datang ke lokasi" />
-              </div>
-              <div>
-                <label className="label">Catatan (opsional)</label>
-                <textarea rows={2} className="field resize-none" value={form.catatan} onChange={(e) => set("catatan", e.target.value)} placeholder="Referensi look, tema acara, dll." />
+              <div className="grid grid-cols-2 gap-2.5">
+                <div>
+                  <label className="label">Area</label>
+                  <Select value={form.areaId} onChange={(v) => set("areaId", v)} options={areaOptions} placeholder="Pilih area" />
+                </div>
+                <div>
+                  <label className="label">Alamat</label>
+                  <input className="field" value={form.lokasi} onChange={(e) => set("lokasi", e.target.value)} placeholder="Alamat lengkap" />
+                </div>
               </div>
 
-              <div className="rounded-xl bg-rose-soft p-4">
-                <div className="flex items-center justify-between text-sm text-muted">
-                  <span>Total ({orang} orang{area.fee > 0 ? " + ongkir" : ""})</span>
+              <div>
+                <label className="label">Catatan (opsional)</label>
+                <input className="field" value={form.catatan} onChange={(e) => set("catatan", e.target.value)} placeholder="Referensi look, tema acara, dll." />
+              </div>
+
+              <div className="flex items-center justify-between rounded-xl bg-rose-soft px-4 py-3">
+                <div>
+                  <div className="text-xs text-muted">Total ({orang} orang{area.fee > 0 ? " + ongkir" : ""})</div>
+                  <div className="text-xl font-bold text-rose">{formatRupiah(total)}</div>
                 </div>
-                <div className="mt-1 text-2xl font-bold text-rose">{formatRupiah(total)}</div>
-                <p className="mt-1 text-xs text-muted">DP {settings.dpPercent || 50}% untuk kunci jadwal. Sisanya dibayar hari-H.</p>
+                <div className="text-right text-[11px] leading-tight text-muted">DP {settings.dpPercent || 50}%<br />kunci jadwal</div>
               </div>
 
               {err && <p className="text-sm text-rose">{err}</p>}

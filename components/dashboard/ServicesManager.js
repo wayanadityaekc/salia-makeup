@@ -75,6 +75,7 @@ function ServiceRow({ svc, onChange, onUnauthorized }) {
     ringkas: svc.ringkas || "",
     deskripsi: svc.deskripsi || "",
     detail: svc.detail || "",
+    info: svc.info || "",
     base: svc.base,
     foto: svc.foto || "",
     hairdoIncluded: svc.hairdoIncluded === true,
@@ -102,6 +103,7 @@ function ServiceRow({ svc, onChange, onUnauthorized }) {
         ringkas: form.ringkas,
         deskripsi: form.deskripsi,
         detail: form.detail,
+        info: form.info,
         base: form.base,
         foto: form.foto || null,
         hairdo_included: isMakeup ? form.hairdoIncluded : null,
@@ -180,6 +182,10 @@ function ServiceRow({ svc, onChange, onUnauthorized }) {
           <div>
             <label className="label">Detail (satu poin per baris)</label>
             <textarea rows={3} className="field resize-none" value={form.detail} onChange={(e) => set("detail", e.target.value)} placeholder={"mis.\nTermasuk konsultasi look\nProduk tahan lama\nBisa datang ke lokasi"} />
+          </div>
+          <div>
+            <label className="label">Detail produk (tampil di popup)</label>
+            <textarea rows={3} className="field resize-none" value={form.info} onChange={(e) => set("info", e.target.value)} placeholder="Info produk yang dipakai, brand, ketahanan, syarat, dll." />
           </div>
 
           <div className="flex flex-wrap items-center gap-4">

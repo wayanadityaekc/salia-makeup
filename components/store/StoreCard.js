@@ -97,6 +97,12 @@ export default function StoreCard({ item }) {
                   ))}
                 </ul>
               )}
+              {item.info && (
+                <div className="mt-4 border-t border-rose-line pt-4">
+                  <h4 className="text-xs font-semibold uppercase tracking-wider text-rose">Detail produk</h4>
+                  <p className="mt-2 whitespace-pre-wrap text-sm leading-relaxed text-ink/80">{item.info}</p>
+                </div>
+              )}
             </div>
 
             <div className="border-t border-rose-line p-4">
