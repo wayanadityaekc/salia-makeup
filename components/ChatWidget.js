@@ -130,8 +130,8 @@ export default function ChatWidget() {
       <div className="fixed inset-x-0 bottom-0 z-[61] flex justify-center">
         <div
           ref={panelRef}
-          className="flex w-full max-w-lg flex-col overflow-hidden rounded-t-3xl border border-rose-line bg-white shadow-xl animate-[saliaSheetUp_.22s_ease-out]"
-          style={{ paddingBottom: "env(safe-area-inset-bottom)", maxHeight: "min(85vh, 620px)" }}
+          className={`flex w-full max-w-lg flex-col overflow-hidden rounded-t-3xl border border-rose-line bg-white shadow-xl animate-[saliaSheetUp_.22s_ease-out] ${view === "chat" ? "h-[80dvh]" : ""}`}
+          style={{ paddingBottom: "env(safe-area-inset-bottom)", maxHeight: "min(85dvh, 640px)" }}
         >
           <div className="flex items-center justify-between bg-rose px-4 py-3 text-white">
             <div className="flex items-center gap-2">
@@ -171,7 +171,7 @@ export default function ChatWidget() {
 
           {view === "chat" && (
             <>
-              <div className="flex-1 space-y-2 overflow-y-auto bg-rose-soft/40 p-4">
+              <div className="min-h-0 flex-1 space-y-2 overflow-y-auto bg-rose-soft/40 p-4">
                 {msgs.length === 0 && <p className="py-6 text-center text-xs text-muted">Tulis pesanmu, kami balas secepatnya. 💬</p>}
                 {msgs.map((m) => (
                   <div key={m.id} className={`flex ${m.sender === "guest" ? "justify-end" : "justify-start"}`}>
