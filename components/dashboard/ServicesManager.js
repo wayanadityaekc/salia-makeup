@@ -78,12 +78,10 @@ function ServiceRow({ svc, onChange, onUnauthorized }) {
     info: svc.info || "",
     base: svc.base,
     foto: svc.foto || "",
-    hairdoIncluded: svc.hairdoIncluded === true,
     active: svc.active,
   });
   const [busy, setBusy] = useState(false);
   const [saved, setSaved] = useState(false);
-  const isMakeup = svc.kind === "makeup";
 
   // Detail = up to 5 checklist points. Stored as newline-separated text.
   const [detailRows, setDetailRows] = useState(() => {
@@ -123,7 +121,6 @@ function ServiceRow({ svc, onChange, onUnauthorized }) {
         info: form.info,
         base: form.base,
         foto: form.foto || null,
-        hairdo_included: isMakeup ? form.hairdoIncluded : null,
         active: form.active,
       });
       setSaved(true);
@@ -218,17 +215,6 @@ function ServiceRow({ svc, onChange, onUnauthorized }) {
           </div>
 
           <div className="flex flex-wrap items-center gap-4">
-            {isMakeup && (
-              <label className="flex items-center gap-2 text-sm text-ink">
-                <input
-                  type="checkbox"
-                  className="h-4 w-4 accent-rose"
-                  checked={form.hairdoIncluded}
-                  onChange={(e) => set("hairdoIncluded", e.target.checked)}
-                />
-                Sudah termasuk hairdo
-              </label>
-            )}
             <label className="flex items-center gap-2 text-sm text-ink">
               <input
                 type="checkbox"

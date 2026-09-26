@@ -1,41 +1,53 @@
 "use client";
 
-import SectionHeader from "@/components/SectionHeader";
+import { useState } from "react";
 import { CartProvider } from "./CartProvider";
 import StoreCard from "./StoreCard";
 import BookBar from "./BookBar";
 
-// The pick-and-checkout storefront: three category sections of cards (5-up on
-// desktop, 2-up on mobile) + a sticky book bar. Wrapped in the cart context.
+// Pick-and-checkout storefront. A sticky category bar (Make Up / Hairdo / Nails)
+// switches which list is shown; items are big, one-per-screen cards you scroll
+// through vertically. Wrapped in the cart context.
 export default function Storefront({ data, settings }) {
-  // Stamp the category on every item so picking works regardless of source
-  // (the static fallback table doesn't carry `kind`).
   const withKind = (arr, kind) => (arr || []).map((x) => ({ ...x, kind }));
-  const sections = [
-    { key: "makeup", eyebrow: "Make Up", title: "Pilih riasanmu", items: withKind(data.services, "makeup") },
-    { key: "hairdo", eyebrow: "Hairdo", title: "Penataan rambut", items: withKind(data.hairdo, "hairdo") },
-    { key: "nail", eyebrow: "Nails", title: "Nail art", items: withKind(data.nailArt, "nail") },
+  const cats = [
+    { key: "makeup", label: "Make Up", items: withKind(data.services, "makeup") },
+    { key: "hairdo", label: "Hairdo", items: withKind(data.hairdo, "hairdo") },
+    { key: "nail", label: "Nails", items: withKind(data.nailArt, "nail") },
   ];
+  const [cat, setCat] = useState("makeup");
+  const active = cats.find((c) => c.key === cat) || cats[0];
 
   return (
     <CartProvider>
-      <div id="pilih" className="space-y-16 pb-28">
-        {sections.map((sec) => (
-          <section key={sec.key} className="scroll-mt-24">
-            <SectionHeader eyebrow={sec.eyebrow} title={sec.title} />
-            {sec.items.length === 0 ? (
-              <p className="mt-8 rounded-2xl border border-dashed border-rose-line bg-white py-12 text-center text-sm text-muted">
-                Belum ada item di kategori ini.
-              </p>
-            ) : (
-              <div className="mt-8 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-5">
-                {sec.items.map((item) => (
-                  <StoreCard key={item.id} item={item} />
-                ))}
-              </div>
-            )}
-          </section>
-        ))}
+      <div id="pilih">
+        {/* Category bar */}
+        <div className="sticky top-16 z-30 -mx-5 border-y border-rose-line bg-white/95 px-5 backdrop-blur sm:mx-0 sm:rounded-full sm:border">
+          <div className="mx-auto flex max-w-md gap-1 py-2">
+            {cats.map((c) => (
+              <button
+                key={c.key}
+                onClick={() => setCat(c.key)}
+                className={`flex-1 rounded-full px-3 py-2 text-sm font-semibold transition ${
+                  cat === c.key ? "bg-rose text-white" : "text-ink hover:bg-rose-soft"
+                }`}
+              >
+                {c.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* One big card per screen */}
+        <div className="mx-auto mt-6 max-w-md space-y-6 pb-28">
+          {active.items.length === 0 ? (
+            <p className="rounded-2xl border border-dashed border-rose-line bg-white py-16 text-center text-sm text-muted">
+              Belum ada item di kategori ini.
+            </p>
+          ) : (
+            active.items.map((item) => <StoreCard key={item.id} item={item} big />)
+          )}
+        </div>
       </div>
 
       <BookBar data={data} settings={settings} />

@@ -7,7 +7,7 @@ import { useCart } from "./CartProvider";
 
 // One service = one card. Clicking the card opens a detail popup (photo,
 // description, details, price) with the Pilih button.
-export default function StoreCard({ item }) {
+export default function StoreCard({ item, big = false }) {
   const { pick, isSelected } = useCart();
   const [open, setOpen] = useState(false);
   const selected = isSelected(item.id);
@@ -31,7 +31,7 @@ export default function StoreCard({ item }) {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className={`group relative flex flex-col overflow-hidden rounded-2xl border bg-white text-left transition ${
+        className={`group relative flex w-full flex-col overflow-hidden rounded-2xl border bg-white text-left transition ${
           selected ? "border-rose ring-2 ring-rose" : "border-rose-line hover:shadow-[0_12px_40px_-18px_rgba(107,44,62,0.3)]"
         }`}
       >
@@ -42,16 +42,16 @@ export default function StoreCard({ item }) {
         )}
         {item.foto ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={item.foto} alt={item.nama} loading="lazy" className="aspect-[4/3] w-full object-cover" />
+          <img src={item.foto} alt={item.nama} loading="lazy" className={`w-full object-cover ${big ? "aspect-[4/5]" : "aspect-[4/3]"}`} />
         ) : (
-          <div className="foto-ph aspect-[4/3] text-xs">Foto {item.nama}</div>
+          <div className={`foto-ph ${big ? "aspect-[4/5] text-sm" : "aspect-[4/3] text-xs"}`}>Foto {item.nama}</div>
         )}
-        <div className="flex flex-1 flex-col p-3 sm:p-4">
-          <h3 className="text-sm font-semibold leading-snug text-ink sm:text-base">{item.nama}</h3>
-          {desc && <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-muted sm:text-sm">{desc}</p>}
+        <div className={`flex flex-1 flex-col ${big ? "p-5" : "p-3 sm:p-4"}`}>
+          <h3 className={`font-semibold leading-snug text-ink ${big ? "text-lg" : "text-sm sm:text-base"}`}>{item.nama}</h3>
+          {desc && <p className={`mt-1 leading-relaxed text-muted ${big ? "text-sm" : "line-clamp-2 text-xs sm:text-sm"}`}>{desc}</p>}
           <div className="mt-3 flex-1" />
-          <div className="text-base font-bold text-rose sm:text-lg">{formatRupiah(item.base)}</div>
-          <span className="mt-2 inline-flex w-full items-center justify-center gap-1.5 rounded-full bg-rose-soft px-4 py-2 text-sm font-semibold text-rose">
+          <div className={`font-bold text-rose ${big ? "text-2xl" : "text-base sm:text-lg"}`}>{formatRupiah(item.base)}</div>
+          <span className={`mt-3 inline-flex w-full items-center justify-center gap-1.5 rounded-full bg-rose-soft font-semibold text-rose ${big ? "px-4 py-2.5 text-sm" : "px-4 py-2 text-sm"}`}>
             Lihat detail
           </span>
         </div>
