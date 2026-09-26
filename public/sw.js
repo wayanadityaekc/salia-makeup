@@ -15,7 +15,7 @@
  * which are immutable and contain no user data. Everything else falls through to
  * the network, so the app works normally even if the SW is unavailable.
  */
-const VERSION = "salia-admin-v1";
+const VERSION = "salia-admin-v2";
 const SHELL_CACHE = `${VERSION}-shell`;
 const ASSET_CACHE = `${VERSION}-assets`;
 
@@ -83,4 +83,40 @@ self.addEventListener("fetch", (event) => {
   }
 
   // Everything else: straight to the network.
+});
+
+// ---- Push notifications ------------------------------------------------------
+// A new-booking push from the server. Payload is JSON: { title, body, tag, url }.
+// No sensitive data is stored — the notification is shown and discarded.
+self.addEventListener("push", (event) => {
+  let data = {};
+  try {
+    data = event.data ? event.data.json() : {};
+  } catch {
+    data = { body: event.data && event.data.text ? event.data.text() : "" };
+  }
+  const title = data.title || "Salia Admin";
+  event.waitUntil(
+    self.registration.showNotification(title, {
+      body: data.body || "",
+      icon: "/icons/icon-192.png",
+      badge: "/icons/icon-192.png",
+      tag: data.tag || "salia",
+      data: { url: data.url || "/dashboard" },
+    })
+  );
+});
+
+// Tapping the notification focuses an open dashboard tab or opens one.
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+  const target = (event.notification.data && event.notification.data.url) || "/dashboard";
+  event.waitUntil(
+    self.clients.matchAll({ type: "window", includeUncontrolled: true }).then((clients) => {
+      for (const c of clients) {
+        if (c.url.includes("/dashboard") && "focus" in c) return c.focus();
+      }
+      return self.clients.openWindow ? self.clients.openWindow(target) : undefined;
+    })
+  );
 });

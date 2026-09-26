@@ -20,6 +20,7 @@ import ServicesManager from "@/components/dashboard/ServicesManager";
 import GalleryManager from "@/components/dashboard/GalleryManager";
 import SettingsManager from "@/components/dashboard/SettingsManager";
 import IncomeTracker from "@/components/dashboard/IncomeTracker";
+import NotifyToggle from "@/components/pwa/NotifyToggle";
 
 const STATUS = {
   baru: { label: "Baru", cls: "bg-rose text-white" },
@@ -256,7 +257,8 @@ export default function DashboardPage() {
       )}
 
       {tab === "pengaturan" && (
-        <div className="container-x py-8">
+        <div className="container-x space-y-8 py-8">
+          <NotifyToggle />
           <SettingsManager onUnauthorized={handleUnauthorized} />
         </div>
       )}
