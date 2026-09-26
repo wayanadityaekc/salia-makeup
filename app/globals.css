@@ -58,3 +58,9 @@ body {
     padding-bottom: env(safe-area-inset-bottom);
   }
 }
+
+/* Chat bottom sheet slide-up */
+@keyframes saliaSheetUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}

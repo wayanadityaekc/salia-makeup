@@ -229,7 +229,7 @@ export default function Checkout({ data, settings, onClose }) {
                 <button onClick={downloadReceipt} disabled={!receipt} className="btn-primary w-full disabled:opacity-60">
                   <Download size={18} /> Download struk
                 </button>
-                <button onClick={() => { clear(); openChat(); onClose(); }} className="btn-outline w-full">
+                <button onClick={() => { clear(); openChat("chat"); onClose(); }} className="btn-outline w-full">
                   <MessageCircle size={18} /> Buka chat
                 </button>
                 <button onClick={() => { clear(); onClose(); }} className="mt-1 text-sm text-muted hover:text-rose">

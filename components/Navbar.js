@@ -3,10 +3,11 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Menu, X, User, LogOut } from "lucide-react";
+import { Menu, X, User, LogOut, MessageCircle } from "lucide-react";
 import { site } from "@/lib/config";
 import { useUser } from "@/components/auth/UserProvider";
 import AuthModal from "@/components/auth/AuthModal";
+import { openChat } from "@/lib/chat";
 
 const nav = [
   { href: "/", label: "Beranda" },
@@ -56,6 +57,13 @@ export default function Navbar() {
               {n.label}
             </Link>
           ))}
+          <button
+            onClick={() => openChat()}
+            aria-label="Chat"
+            className="inline-flex items-center gap-1.5 text-sm text-ink transition hover:text-rose"
+          >
+            <MessageCircle size={18} className="text-rose" /> Chat
+          </button>
           {user ? (
             <div className="flex items-center gap-3">
               <span className="inline-flex items-center gap-1.5 text-sm font-medium text-ink">
@@ -72,13 +80,22 @@ export default function Navbar() {
           )}
         </nav>
 
-        <button
-          className="md:hidden text-rose"
-          onClick={() => setOpen((v) => !v)}
-          aria-label="Menu"
-        >
-          {open ? <X size={24} /> : <Menu size={24} />}
-        </button>
+        <div className="flex items-center gap-1 md:hidden">
+          <button
+            onClick={() => openChat()}
+            aria-label="Chat"
+            className="p-1.5 text-rose"
+          >
+            <MessageCircle size={22} />
+          </button>
+          <button
+            className="p-1.5 text-rose"
+            onClick={() => setOpen((v) => !v)}
+            aria-label="Menu"
+          >
+            {open ? <X size={24} /> : <Menu size={24} />}
+          </button>
+        </div>
       </div>
 
       {open && (

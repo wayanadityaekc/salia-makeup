@@ -42,15 +42,15 @@ export default function StoreCard({ item, big = false }) {
         )}
         {item.foto ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={item.foto} alt={item.nama} loading="lazy" className={`w-full object-cover ${big ? "aspect-[4/5]" : "aspect-[4/3]"}`} />
+          <img src={item.foto} alt={item.nama} loading="lazy" className={`w-full object-cover ${big ? "aspect-square" : "aspect-[4/3]"}`} />
         ) : (
-          <div className={`foto-ph ${big ? "aspect-[4/5] text-sm" : "aspect-[4/3] text-xs"}`}>Foto {item.nama}</div>
+          <div className={`foto-ph ${big ? "aspect-square text-sm" : "aspect-[4/3] text-xs"}`}>Foto {item.nama}</div>
         )}
-        <div className={`flex flex-1 flex-col ${big ? "p-5" : "p-3 sm:p-4"}`}>
-          <h3 className={`font-semibold leading-snug text-ink ${big ? "text-lg" : "text-sm sm:text-base"}`}>{item.nama}</h3>
+        <div className={`flex flex-1 flex-col ${big ? "p-4 sm:p-5" : "p-3 sm:p-4"}`}>
+          <h3 className={`font-semibold leading-snug text-ink ${big ? "text-base sm:text-lg" : "text-sm sm:text-base"}`}>{item.nama}</h3>
           {desc && <p className={`mt-1 leading-relaxed text-muted ${big ? "text-sm" : "line-clamp-2 text-xs sm:text-sm"}`}>{desc}</p>}
           <div className="mt-3 flex-1" />
-          <div className={`font-bold text-rose ${big ? "text-2xl" : "text-base sm:text-lg"}`}>{formatRupiah(item.base)}</div>
+          <div className={`font-bold text-rose ${big ? "text-xl" : "text-base sm:text-lg"}`}>{formatRupiah(item.base)}</div>
           <span className={`mt-3 inline-flex w-full items-center justify-center gap-1.5 rounded-full bg-rose-soft font-semibold text-rose ${big ? "px-4 py-2.5 text-sm" : "px-4 py-2 text-sm"}`}>
             Lihat detail
           </span>

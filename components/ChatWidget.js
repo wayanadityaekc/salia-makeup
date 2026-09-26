@@ -64,9 +64,9 @@ export default function ChatWidget() {
     setMsgs([]);
   }, [cid]);
 
-  // Open on request (e.g. right after a booking) and jump into the thread.
+  // Opened from the navbar (menu view) or right after a booking (chat view).
   useEffect(() => {
-    const onOpen = () => { setOpen(true); setView("chat"); };
+    const onOpen = (e) => { setOpen(true); setView(e?.detail?.view || "menu"); };
     window.addEventListener(OPEN_CHAT_EVENT, onOpen);
     return () => window.removeEventListener(OPEN_CHAT_EVENT, onOpen);
   }, []);
@@ -120,12 +120,18 @@ export default function ChatWidget() {
 
   const waHref = waLink(normalizeWa(wa || site.whatsapp), `Halo ${site.brand}, saya mau tanya soal layanan make up / nail art.`);
 
+  if (!open) return null;
+
   return (
-    <div ref={panelRef}>
-      {open && (
+    <>
+      {/* Scrim */}
+      <div className="fixed inset-0 z-[60] bg-ink/40" onClick={() => setOpen(false)} aria-hidden />
+      {/* Bottom sheet */}
+      <div className="fixed inset-x-0 bottom-0 z-[61] flex justify-center">
         <div
-          className="fixed bottom-24 right-5 z-50 flex w-[min(92vw,360px)] flex-col overflow-hidden rounded-2xl border border-rose-line bg-white shadow-xl"
-          style={{ marginBottom: "env(safe-area-inset-bottom)", maxHeight: "min(70vh, 560px)" }}
+          ref={panelRef}
+          className="flex w-full max-w-lg flex-col overflow-hidden rounded-t-3xl border border-rose-line bg-white shadow-xl animate-[saliaSheetUp_.22s_ease-out]"
+          style={{ paddingBottom: "env(safe-area-inset-bottom)", maxHeight: "min(85vh, 620px)" }}
         >
           <div className="flex items-center justify-between bg-rose px-4 py-3 text-white">
             <div className="flex items-center gap-2">
@@ -197,16 +203,7 @@ export default function ChatWidget() {
             </>
           )}
         </div>
-      )}
-
-      <button
-        onClick={() => { setOpen((v) => !v); if (!open) setView("menu"); }}
-        aria-label="Chat"
-        className="fixed bottom-5 right-5 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-rose text-white shadow-lg transition hover:bg-rose-deep"
-        style={{ marginBottom: "env(safe-area-inset-bottom)" }}
-      >
-        {open ? <X size={26} /> : <MessageCircle size={26} />}
-      </button>
-    </div>
+      </div>
+    </>
   );
 }
