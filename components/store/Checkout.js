@@ -225,6 +225,14 @@ export default function Checkout({ data, settings, onClose }) {
                 Booking kamu tercatat. Struk sudah kami kirim ke <b>chat</b> untuk di-download.
                 {emailed ? " Struk juga dikirim ke email kamu." : ""} Ada pertanyaan? Lanjut di chat aja.
               </p>
+              <a
+                href="/ketentuan"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mx-auto mt-4 block max-w-xs rounded-xl border border-rose-line bg-rose-soft/50 px-4 py-3 text-left text-xs text-ink/80 hover:bg-rose-soft"
+              >
+                📋 <b>Persiapan H-1:</b> siapkan diri, area makeup, skincare, pakaian & rambut sebelum hari acara. <span className="font-semibold text-rose">Baca selengkapnya →</span>
+              </a>
               <div className="mt-6 flex flex-col gap-2">
                 <button onClick={downloadReceipt} disabled={!receipt} className="btn-primary w-full disabled:opacity-60">
                   <Download size={18} /> Download struk

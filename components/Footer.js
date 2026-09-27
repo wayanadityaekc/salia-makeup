@@ -23,6 +23,7 @@ export default async function Footer() {
             <li><Link href="/nail-art" className="hover:text-rose">Nail Art</Link></li>
             <li><Link href="/galeri" className="hover:text-rose">Galeri</Link></li>
             <li><Link href="/booking" className="hover:text-rose">Booking</Link></li>
+            <li><Link href="/ketentuan" className="hover:text-rose">Ketentuan &amp; Persiapan</Link></li>
           </ul>
         </div>
 
