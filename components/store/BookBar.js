@@ -19,7 +19,7 @@ export default function BookBar({ data, settings }) {
         className="fixed inset-x-0 bottom-0 z-40 border-t-2 border-rose-deep bg-rose text-white shadow-[0_-10px_30px_-8px_rgba(107,44,62,0.5)]"
         style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
       >
-        <div className="container-x flex items-center gap-2.5 py-3 pr-[62px] sm:gap-3 sm:pr-24">
+        <div className="container-x flex items-center gap-2.5 py-3 sm:gap-3">
           <div className="relative shrink-0">
             <ShoppingBag size={22} />
             <span className="absolute -right-2 -top-2 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-white px-1 text-[11px] font-bold text-rose">
