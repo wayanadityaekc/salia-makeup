@@ -24,14 +24,19 @@ export default async function Home() {
     areas: data?.areas?.length ? data.areas : cfgAreas,
   };
 
+  // Editable hero content (dashboard) with hardcoded fallbacks so nothing breaks
+  // before the owner sets anything / if the API is slow.
+  const c = settings.content || {};
+  const heroKicker = c.heroKicker || site.tagline;
+
   return (
     <>
       {/* Hero */}
       <section className="container-x grid items-center gap-10 py-16 lg:grid-cols-2 lg:py-24">
         <div className="animate-rise">
-          <div className="eyebrow">{site.tagline}</div>
+          <div className="eyebrow">{heroKicker}</div>
           <h1 className="mt-4 text-4xl font-bold leading-[1.1] tracking-tight text-ink sm:text-5xl lg:text-6xl">
-            Cantik di hari <span className="text-rose">spesialmu</span>.
+            {c.heroTitle ? c.heroTitle : (<>Cantik di hari <span className="text-rose">spesialmu</span>.</>)}
           </h1>
           <p className="mt-5 max-w-md text-lg leading-relaxed text-muted">
             Jasa make up, hairdo, dan nail art profesional di {site.kota}. Pilih
@@ -47,7 +52,12 @@ export default async function Home() {
           </div>
           <SocialLinks social={settings.social} className="mt-6" />
         </div>
-        <div className="foto-ph aspect-[4/5] rounded-3xl text-base">Foto portofolio Salia</div>
+        {c.heroPhoto ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={c.heroPhoto} alt="Portofolio Salia Makeup" className="aspect-[4/5] w-full rounded-3xl object-cover" />
+        ) : (
+          <div className="foto-ph aspect-[4/5] rounded-3xl text-base">Foto portofolio Salia</div>
+        )}
       </section>
 
       {/* Keunggulan */}

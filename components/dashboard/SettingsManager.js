@@ -1,9 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Save } from "lucide-react";
+import { Save, Mail, Loader2, Send } from "lucide-react";
 import { formatRupiah } from "@/lib/utils";
-import { getSettings, updateSettings, UnauthorizedError } from "@/lib/storage";
+import { getSettings, updateSettings, getEmailPreview, sendTestEmail, UnauthorizedError } from "@/lib/storage";
+import ImageUpload from "./ImageUpload";
 
 export default function SettingsManager({ onUnauthorized }) {
   const [form, setForm] = useState(null);
@@ -21,6 +22,7 @@ export default function SettingsManager({ onUnauthorized }) {
 
   if (loading || !form) return <p className="text-sm text-muted">Memuat…</p>;
 
+  const setContent = (k, v) => { setForm((f) => ({ ...f, content: { ...(f.content || {}), [k]: v } })); setSaved(false); };
   const setBank = (k, v) => { setForm((f) => ({ ...f, bank: { ...f.bank, [k]: v } })); setSaved(false); };
   const setSocial = (k, v) => { setForm((f) => ({ ...f, social: { ...f.social, [k]: v } })); setSaved(false); };
   const setAreaFee = (id, fee) => {
@@ -38,6 +40,7 @@ export default function SettingsManager({ onUnauthorized }) {
         areas: form.areas.map((a) => ({ ...a, fee: Number(a.fee) || 0 })),
         social: form.social,
         whatsapp: form.whatsapp || "",
+        content: form.content || {},
       });
       setForm(s);
       setSaved(true);
@@ -52,6 +55,65 @@ export default function SettingsManager({ onUnauthorized }) {
   return (
     <div className="max-w-2xl space-y-6">
       {err && <p className="text-sm text-rose">{err}</p>}
+
+      {/* Konten Beranda */}
+      <section className="rounded-2xl border border-rose-line bg-white p-5">
+        <h3 className="font-semibold text-ink">Konten Beranda</h3>
+        <p className="mt-1 text-sm text-muted">Logo, judul & foto hero. Kosongkan untuk pakai bawaan.</p>
+
+        <div className="mt-4 grid gap-5 sm:grid-cols-2">
+          {/* Logo */}
+          <div>
+            <label className="label">Logo</label>
+            <div className="mt-1 flex items-center gap-3">
+              <div className="flex h-14 w-32 items-center justify-center overflow-hidden rounded-xl border border-rose-line bg-rose-soft/40">
+                {form.content?.logo ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={form.content.logo} alt="Logo" className="max-h-12 max-w-full object-contain" />
+                ) : (
+                  <span className="text-xs font-bold text-rose">Salia Makeup</span>
+                )}
+              </div>
+            </div>
+            <div className="mt-2 flex flex-wrap items-center gap-2">
+              <ImageUpload onUploaded={(url) => setContent("logo", url)} onUnauthorized={onUnauthorized} label={form.content?.logo ? "Ganti" : "Upload"} />
+              {form.content?.logo && (
+                <button type="button" onClick={() => setContent("logo", "")} className="text-xs text-muted hover:text-rose">Hapus</button>
+              )}
+            </div>
+          </div>
+
+          {/* Hero photo */}
+          <div>
+            <label className="label">Foto hero</label>
+            <div className="mt-1 aspect-[4/3] w-full overflow-hidden rounded-xl border border-rose-line bg-rose-soft/40">
+              {form.content?.heroPhoto ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={form.content.heroPhoto} alt="Hero" className="h-full w-full object-cover" />
+              ) : (
+                <div className="foto-ph h-full w-full text-xs">Belum ada foto</div>
+              )}
+            </div>
+            <div className="mt-2 flex flex-wrap items-center gap-2">
+              <ImageUpload onUploaded={(url) => setContent("heroPhoto", url)} onUnauthorized={onUnauthorized} label={form.content?.heroPhoto ? "Ganti" : "Upload"} />
+              {form.content?.heroPhoto && (
+                <button type="button" onClick={() => setContent("heroPhoto", "")} className="text-xs text-muted hover:text-rose">Hapus</button>
+              )}
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-4 grid gap-3">
+          <div>
+            <label className="label">Kicker (teks kecil di atas judul)</label>
+            <input className="field" placeholder="Make Up & Nail Art Artist" value={form.content?.heroKicker || ""} onChange={(e) => setContent("heroKicker", e.target.value)} />
+          </div>
+          <div>
+            <label className="label">Judul hero (H1)</label>
+            <input className="field" placeholder="Cantik di hari spesialmu." value={form.content?.heroTitle || ""} onChange={(e) => setContent("heroTitle", e.target.value)} />
+          </div>
+        </div>
+      </section>
 
       {/* DP */}
       <section className="rounded-2xl border border-rose-line bg-white p-5">
@@ -137,11 +199,79 @@ export default function SettingsManager({ onUnauthorized }) {
         </div>
       </section>
 
+      {/* Email pelanggan (preview) */}
+      <EmailPreview onUnauthorized={onUnauthorized} />
+
       <div className="flex items-center gap-3">
         <button onClick={save} disabled={busy} className="btn-primary px-5 disabled:opacity-60">
           <Save size={16} /> {saved ? "Tersimpan" : busy ? "Menyimpan…" : "Simpan pengaturan"}
         </button>
       </div>
     </div>
+  );
+}
+
+// Customer email design + preview. Renders the server-built HTML in a sandboxed
+// iframe, and can send a test to any inbox to check it for real.
+function EmailPreview({ onUnauthorized }) {
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [to, setTo] = useState("");
+  const [sending, setSending] = useState(false);
+  const [msg, setMsg] = useState("");
+
+  const load = async () => {
+    setLoading(true); setMsg("");
+    try { setData(await getEmailPreview()); }
+    catch (e) { if (e instanceof UnauthorizedError) onUnauthorized?.(); else setMsg("Gagal memuat preview."); }
+    finally { setLoading(false); }
+  };
+
+  const test = async () => {
+    if (!to.trim()) return setMsg("Isi email tujuan dulu.");
+    setSending(true); setMsg("");
+    try {
+      const r = await sendTestEmail(to.trim());
+      if (r?.ok) setMsg("Email tes terkirim ✓");
+      else if (r?.skipped) setMsg("Resend belum diaktifkan (set RESEND_API_KEY + RESEND_FROM). Preview tetap bisa dilihat.");
+      else setMsg(`Gagal kirim: ${r?.error || "coba lagi"}`);
+    } catch (e) {
+      if (e instanceof UnauthorizedError) onUnauthorized?.(); else setMsg("Gagal kirim email tes.");
+    } finally { setSending(false); }
+  };
+
+  return (
+    <section className="rounded-2xl border border-rose-line bg-white p-5">
+      <h3 className="flex items-center gap-2 font-semibold text-ink"><Mail size={17} className="text-rose" /> Email pelanggan</h3>
+      <p className="mt-1 text-sm text-muted">Struk + kebijakan + persiapan H-1. Lihat desainnya dulu sebelum diaktifkan.</p>
+
+      <div className="mt-3 flex flex-wrap items-center gap-2">
+        <button type="button" onClick={load} disabled={loading} className="btn-outline px-4 py-2 text-sm disabled:opacity-60">
+          {loading ? <Loader2 size={15} className="animate-spin" /> : <Mail size={15} />} {data ? "Muat ulang preview" : "Lihat preview"}
+        </button>
+        {data && (
+          <span className={`text-xs ${data.emailConfigured ? "text-green-600" : "text-muted"}`}>
+            {data.emailConfigured ? "Resend aktif" : "Resend belum aktif"}
+          </span>
+        )}
+      </div>
+
+      {data && (
+        <>
+          <div className="mt-3 text-xs text-muted">Subject: <span className="font-medium text-ink">{data.subject}</span></div>
+          <iframe title="Preview email" srcDoc={data.html} className="mt-2 h-[520px] w-full rounded-xl border border-rose-line bg-white" />
+          <div className="mt-3 flex flex-wrap items-end gap-2">
+            <div className="flex-1 min-w-[200px]">
+              <label className="label">Kirim tes ke email</label>
+              <input className="field" type="email" placeholder="email@kamu.com" value={to} onChange={(e) => setTo(e.target.value)} />
+            </div>
+            <button type="button" onClick={test} disabled={sending} className="btn-primary px-4 py-2.5 text-sm disabled:opacity-60">
+              {sending ? <Loader2 size={15} className="animate-spin" /> : <Send size={15} />} Kirim tes
+            </button>
+          </div>
+        </>
+      )}
+      {msg && <p className="mt-2 text-xs text-ink/70">{msg}</p>}
+    </section>
   );
 }

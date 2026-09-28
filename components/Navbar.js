@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Menu, X, User, LogOut, MessageCircle } from "lucide-react";
 import { site } from "@/lib/config";
+import { getSettings } from "@/lib/storage";
 import { useUser } from "@/components/auth/UserProvider";
 import AuthModal from "@/components/auth/AuthModal";
 import { openChat } from "@/lib/chat";
@@ -22,12 +23,18 @@ export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [solid, setSolid] = useState(false);
   const [auth, setAuth] = useState(false);
+  const [logo, setLogo] = useState("");
 
   useEffect(() => {
     const onScroll = () => setSolid(window.scrollY > 12);
     onScroll();
     window.addEventListener("scroll", onScroll);
     return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  // Editable logo (dashboard). Falls back to the brand wordmark until set.
+  useEffect(() => {
+    getSettings().then((s) => s?.content?.logo && setLogo(s.content.logo)).catch(() => {});
   }, []);
 
   useEffect(() => setOpen(false), [pathname]);
@@ -41,8 +48,13 @@ export default function Navbar() {
       }`}
     >
       <div className="container-x flex h-16 items-center justify-between">
-        <Link href="/" className="text-lg font-bold tracking-tight text-rose">
-          {site.brand}
+        <Link href="/" className="flex items-center text-lg font-bold tracking-tight text-rose" aria-label={site.brand}>
+          {logo ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={logo} alt={site.brand} className="h-8 w-auto max-w-[160px] object-contain" />
+          ) : (
+            site.brand
+          )}
         </Link>
 
         <nav className="hidden items-center gap-8 md:flex">
