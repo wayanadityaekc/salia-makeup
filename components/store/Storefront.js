@@ -38,14 +38,16 @@ export default function Storefront({ data, settings }) {
           </div>
         </div>
 
-        {/* One big card per screen */}
-        <div className="mx-auto mt-6 max-w-md space-y-6 pb-28">
+        {/* Mobile: row cards stacked. Desktop: vertical cards in a grid. */}
+        <div className="mt-6 pb-28">
           {active.items.length === 0 ? (
             <p className="rounded-2xl border border-dashed border-rose-line bg-white py-16 text-center text-sm text-muted">
               Belum ada item di kategori ini.
             </p>
           ) : (
-            active.items.map((item) => <StoreCard key={item.id} item={item} big />)
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {active.items.map((item) => <StoreCard key={item.id} item={item} big />)}
+            </div>
           )}
         </div>
       </div>

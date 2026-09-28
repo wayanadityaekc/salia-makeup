@@ -31,7 +31,9 @@ export default function StoreCard({ item, big = false }) {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className={`group relative flex w-full flex-col overflow-hidden rounded-2xl border bg-white text-left transition ${
+        className={`group relative flex w-full overflow-hidden rounded-2xl border bg-white text-left transition ${
+          big ? "flex-row sm:flex-col" : "flex-col"
+        } ${
           selected ? "border-rose ring-2 ring-rose" : "border-rose-line hover:shadow-[0_12px_40px_-18px_rgba(107,44,62,0.3)]"
         }`}
       >
@@ -42,16 +44,21 @@ export default function StoreCard({ item, big = false }) {
         )}
         {item.foto ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={item.foto} alt={item.nama} loading="lazy" className={`w-full object-cover ${big ? "aspect-square" : "aspect-[4/3]"}`} />
+          <img
+            src={item.foto}
+            alt={item.nama}
+            loading="lazy"
+            className={`aspect-square object-cover ${big ? "w-28 shrink-0 sm:w-full" : "w-full aspect-[4/3]"}`}
+          />
         ) : (
-          <div className={`foto-ph ${big ? "aspect-square text-sm" : "aspect-[4/3] text-xs"}`}>Foto {item.nama}</div>
+          <div className={`foto-ph ${big ? "aspect-square w-28 shrink-0 text-xs sm:w-full sm:text-sm" : "aspect-[4/3] w-full text-xs"}`}>Foto {item.nama}</div>
         )}
-        <div className={`flex flex-1 flex-col ${big ? "p-4 sm:p-5" : "p-3 sm:p-4"}`}>
+        <div className={`flex min-w-0 flex-1 flex-col ${big ? "p-3 sm:p-5" : "p-3 sm:p-4"}`}>
           <h3 className={`font-semibold leading-snug text-ink ${big ? "text-base sm:text-lg" : "text-sm sm:text-base"}`}>{item.nama}</h3>
-          {desc && <p className={`mt-1 leading-relaxed text-muted ${big ? "text-sm" : "line-clamp-2 text-xs sm:text-sm"}`}>{desc}</p>}
+          {desc && <p className={`mt-1 leading-relaxed text-muted ${big ? "line-clamp-2 text-sm sm:line-clamp-none" : "line-clamp-2 text-xs sm:text-sm"}`}>{desc}</p>}
           <div className="mt-3 flex-1" />
-          <div className={`font-bold text-rose ${big ? "text-xl" : "text-base sm:text-lg"}`}>{formatRupiah(item.base)}</div>
-          <span className={`mt-3 inline-flex w-full items-center justify-center gap-1.5 rounded-full bg-rose-soft font-semibold text-rose ${big ? "px-4 py-2.5 text-sm" : "px-4 py-2 text-sm"}`}>
+          <div className={`font-bold text-rose ${big ? "text-lg sm:text-xl" : "text-base sm:text-lg"}`}>{formatRupiah(item.base)}</div>
+          <span className={`mt-3 inline-flex items-center justify-center gap-1.5 rounded-full bg-rose-soft font-semibold text-rose ${big ? "w-full px-4 py-2 text-sm sm:py-2.5" : "w-full px-4 py-2 text-sm"}`}>
             Lihat detail
           </span>
         </div>
