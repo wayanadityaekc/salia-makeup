@@ -153,7 +153,7 @@ export default function InstallPrompt() {
                   <Plus size={15} className="mx-0.5 inline align-text-bottom text-rose" />.
                 </Step>
                 <Step n={3}>
-                  Ketuk <b>Add</b> di kanan atas. Selesai — buka Salia dari ikonnya.
+                  Ketuk <b>Add</b> di kanan atas. Selesai, buka Salia dari ikonnya.
                 </Step>
               </ol>
             ) : (

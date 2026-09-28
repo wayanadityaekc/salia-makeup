@@ -102,7 +102,7 @@ export default function NotifyToggle() {
         <div className="min-w-0 flex-1">
           <h3 className="font-semibold text-ink">Notifikasi booking</h3>
           <p className="mt-0.5 text-sm text-muted">
-            Dapat notifikasi langsung di HP tiap ada booking baru masuk — walau app ketutup.
+            Dapat notifikasi langsung di HP tiap ada booking baru masuk, walau app ketutup.
           </p>
 
           {status === "loading" && (

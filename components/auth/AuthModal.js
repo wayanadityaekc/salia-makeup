@@ -29,7 +29,7 @@ export default function AuthModal({ onClose }) {
     setErr(""); setBusy(true);
     try {
       const r = await requestCode(email.trim());
-      setNote(r?.delivered === false ? "Kode dibuat. (Pengiriman email belum aktif — hubungi admin.)" : `Kode dikirim ke ${email.trim()}. Cek inbox / spam.`);
+      setNote(r?.delivered === false ? "Kode dibuat. (Pengiriman email belum aktif, hubungi admin.)" : `Kode dikirim ke ${email.trim()}. Cek inbox / spam.`);
       setStep("code");
       setTimeout(() => codeRef.current?.focus(), 50);
     } catch {
@@ -71,7 +71,7 @@ export default function AuthModal({ onClose }) {
             <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-rose-soft">
               <Mail className="text-rose" size={22} />
             </div>
-            <p className="text-center text-sm text-muted">Masuk pakai email — kami kirim kode 6 angka, tanpa password.</p>
+            <p className="text-center text-sm text-muted">Masuk pakai email, kami kirim kode 6 angka tanpa password.</p>
             <div>
               <label className="label">Email</label>
               <input className="field" type="email" autoFocus value={email} onChange={(e) => setEmail(e.target.value)} placeholder="email@kamu.com" />

@@ -86,7 +86,7 @@ export default async function Home() {
       {/* Testimoni */}
       {reviews.length > 0 && (
         <section className="container-x py-16">
-          <SectionHeader eyebrow="Testimoni" title="Kata mereka" desc="Contoh tampilan — akan diganti dengan review asli." />
+          <SectionHeader eyebrow="Testimoni" title="Kata mereka" desc="Contoh tampilan, akan diganti dengan review asli." />
           <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {reviews.map((r, i) => (
               <figure key={i} className="flex flex-col rounded-2xl border border-rose-line bg-white p-6">

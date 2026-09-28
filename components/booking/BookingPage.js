@@ -160,7 +160,7 @@ function LockedPanel({ status, reason, cart, settings }) {
               ? "Link booking ini sudah lewat masa berlakunya. Chat admin lagi untuk link baru."
               : used
               ? "Link booking ini sudah dipakai. Kalau perlu booking lagi, chat admin untuk link baru."
-              : "Booking dibuka setelah admin konfirmasi tanggalnya available. Chat admin untuk cek — nanti kamu dikirim link untuk lanjut booking."}
+              : "Booking dibuka setelah admin konfirmasi tanggalnya available. Chat admin untuk cek, nanti kamu dikirim link untuk lanjut booking."}
           </p>
           <a href={href} target="_blank" rel="noopener noreferrer" className="btn-primary mt-5 w-full justify-center">
             <MessageCircle size={18} /> Cek ketersediaan via WhatsApp
@@ -212,7 +212,7 @@ function UnlockedForm({ cart, areas, settings, token, tanggal, user, onDone }) {
       const url = await uploadProof(compressed, (p) => setPct(p));
       setProofUrl(url);
     } catch (e2) {
-      setUploadErr(e2?.data?.error === "uploads_not_configured" ? "Upload belum aktif — kirim bukti via WhatsApp saja." : "Gagal upload. Coba lagi / kirim via WhatsApp.");
+      setUploadErr(e2?.data?.error === "uploads_not_configured" ? "Upload belum aktif, kirim bukti via WhatsApp saja." : "Gagal upload. Coba lagi / kirim via WhatsApp.");
     } finally { setUploading(false); setPct(0); if (fileRef.current) fileRef.current.value = ""; }
   };
 
@@ -296,7 +296,7 @@ function UnlockedForm({ cart, areas, settings, token, tanggal, user, onDone }) {
               <button type="button" onClick={() => setOrang(Math.min(50, orang + 1))} className="flex h-8 w-8 items-center justify-center rounded-full text-rose hover:bg-rose-soft"><Plus size={16} /></button>
             </div>
           </div>
-          <div><label className="label">Jam ready</label><Select value={form.jam} onChange={(v) => set("jam", v)} options={timeOptions} placeholder="— Jam ready —" /></div>
+          <div><label className="label">Jam ready</label><Select value={form.jam} onChange={(v) => set("jam", v)} options={timeOptions} placeholder="Pilih jam ready" /></div>
         </div>
         <div><label className="label">Area</label><Select value={form.areaId} onChange={(v) => set("areaId", v)} options={areaOptions} placeholder="Pilih area" /></div>
         <div><label className="label">Alamat lengkap</label><textarea rows={3} className="field resize-none" value={form.lokasi} onChange={(e) => set("lokasi", e.target.value)} placeholder="Nama jalan, no. rumah, patokan, kecamatan…" /></div>

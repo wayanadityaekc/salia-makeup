@@ -14,7 +14,7 @@ export default async function NailArtPage() {
       <SectionHeader
         eyebrow="Nail Art"
         title="Kuku cantik, detail sempurna"
-        desc="Perawatan dan seni kuku profesional — dari polish rapi sampai desain custom hand-painted yang tahan lama."
+        desc="Perawatan dan seni kuku profesional, dari polish rapi sampai desain custom hand-painted yang tahan lama."
       />
 
       <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
