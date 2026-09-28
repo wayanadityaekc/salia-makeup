@@ -1,16 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { X, ShoppingBag, ArrowRight } from "lucide-react";
 import { formatRupiah } from "@/lib/utils";
 import { useCart } from "./CartProvider";
-import Checkout from "./Checkout";
 
 // Sticky bottom bar that appears once something is picked. Shows the selected
-// items + running subtotal and a Book button that opens the checkout.
-export default function BookBar({ data, settings }) {
+// items + running subtotal and a Book button that goes to the full-screen
+// /booking page (the cart is persisted, so the selection carries over).
+export default function BookBar() {
   const { items, subtotal, remove } = useCart();
-  const [open, setOpen] = useState(false);
+  const router = useRouter();
   if (items.length === 0) return null;
 
   return (
@@ -45,15 +45,13 @@ export default function BookBar({ data, settings }) {
             <div className="text-sm font-bold text-white sm:text-base">{formatRupiah(subtotal)}</div>
           </div>
           <button
-            onClick={() => setOpen(true)}
+            onClick={() => router.push("/booking")}
             className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-white px-5 py-2.5 text-sm font-bold text-rose shadow-sm transition hover:bg-rose-soft sm:px-6"
           >
             Book <ArrowRight size={16} />
           </button>
         </div>
       </div>
-
-      {open && <Checkout data={data} settings={settings} onClose={() => setOpen(false)} />}
     </>
   );
 }

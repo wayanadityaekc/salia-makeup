@@ -1,10 +1,11 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState } from "react";
-import { getMe, loginUser, registerUser, getUserToken, clearUserToken } from "@/lib/storage";
+import { getMe, requestLoginCode, verifyLoginCode, getUserToken, clearUserToken } from "@/lib/storage";
 
 const Ctx = createContext(null);
 
+// Passwordless: enter email -> receive a 6-digit code -> verify. No password.
 export function UserProvider({ children }) {
   const [user, setUser] = useState(null);
   const [ready, setReady] = useState(false);
@@ -16,13 +17,9 @@ export function UserProvider({ children }) {
       .finally(() => setReady(true));
   }, []);
 
-  const login = async (identifier, password) => {
-    const u = await loginUser(identifier, password);
-    setUser(u);
-    return u;
-  };
-  const register = async (body) => {
-    const u = await registerUser(body);
+  const requestCode = (email) => requestLoginCode(email);
+  const verifyCode = async (email, code, nama) => {
+    const u = await verifyLoginCode(email, code, nama);
     setUser(u);
     return u;
   };
@@ -31,7 +28,7 @@ export function UserProvider({ children }) {
     setUser(null);
   };
 
-  return <Ctx.Provider value={{ user, ready, login, register, logout }}>{children}</Ctx.Provider>;
+  return <Ctx.Provider value={{ user, ready, requestCode, verifyCode, logout }}>{children}</Ctx.Provider>;
 }
 
 export const useUser = () => useContext(Ctx) || { user: null, ready: false };

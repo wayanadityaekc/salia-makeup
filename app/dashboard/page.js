@@ -21,6 +21,7 @@ import GalleryManager from "@/components/dashboard/GalleryManager";
 import SettingsManager from "@/components/dashboard/SettingsManager";
 import IncomeTracker from "@/components/dashboard/IncomeTracker";
 import ChatManager from "@/components/dashboard/ChatManager";
+import BookingLinks from "@/components/dashboard/BookingLinks";
 import NotifyToggle from "@/components/pwa/NotifyToggle";
 
 const STATUS = {
@@ -293,6 +294,11 @@ export default function DashboardPage() {
       )}
 
       <div className={`container-x py-8 ${tab === "booking" ? "" : "hidden"}`}>
+        {/* Magic-link generator */}
+        <div className="mb-6">
+          <BookingLinks onUnauthorized={handleUnauthorized} />
+        </div>
+
         {/* Stats */}
         <div className="grid gap-4 sm:grid-cols-3">
           <Stat label="Total booking" value={stats.total} />
@@ -381,8 +387,14 @@ export default function DashboardPage() {
                   <p className="mt-0.5 text-sm text-muted">
                     {formatTanggal(b.tanggal)} · ready {b.jam} · {b.telepon}
                     {b.instagram ? ` · IG @${b.instagram}` : ""}
+                    {b.email ? ` · ${b.email}` : ""}
                   </p>
                   {b.catatan && <p className="mt-1 text-sm text-ink/70">“{b.catatan}”</p>}
+                  {b.proofUrl && (
+                    <a href={b.proofUrl} target="_blank" rel="noopener noreferrer" className="mt-1 inline-block text-sm font-medium text-rose hover:underline">
+                      Lihat bukti transfer →
+                    </a>
+                  )}
                 </div>
                 <div className="text-right">
                   <div className="text-lg font-bold text-rose">{formatRupiah(b.total)}</div>

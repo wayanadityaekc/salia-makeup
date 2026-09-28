@@ -12,6 +12,7 @@ import { getServicesData, getSettings } from "@/lib/storage";
 import SectionHeader from "@/components/SectionHeader";
 import SocialLinks from "@/components/SocialLinks";
 import Storefront from "@/components/store/Storefront";
+import ReceiptBanner from "@/components/booking/ReceiptBanner";
 
 export default async function Home() {
   // Live catalog from the API; fall back to the static table if the API is down.
@@ -31,6 +32,8 @@ export default async function Home() {
 
   return (
     <>
+      <ReceiptBanner />
+
       {/* Hero */}
       <section className="container-x grid items-center gap-10 py-16 lg:grid-cols-2 lg:py-24">
         <div className="animate-rise">

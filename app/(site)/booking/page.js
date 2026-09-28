@@ -1,30 +1,16 @@
-import { services as cfgServices, hairdo as cfgHairdo, nailArt as cfgNailArt, areas as cfgAreas } from "@/lib/config";
-import { getServicesData, getSettings } from "@/lib/storage";
-import SectionHeader from "@/components/SectionHeader";
-import Storefront from "@/components/store/Storefront";
+import { Suspense } from "react";
+import { getSettings } from "@/lib/storage";
+import { areas as cfgAreas } from "@/lib/config";
+import BookingPage from "@/components/booking/BookingPage";
 
 export const metadata = { title: "Booking" };
 
-export default async function BookingPage() {
-  const data = await getServicesData();
+export default async function Page() {
   const settings = await getSettings();
-  const store = {
-    services: data?.services?.length ? data.services : cfgServices,
-    hairdo: data?.hairdo?.length ? data.hairdo : cfgHairdo,
-    nailArt: data?.nailArt?.length ? data.nailArt : cfgNailArt,
-    areas: data?.areas?.length ? data.areas : cfgAreas,
-  };
-
+  if (!settings.areas?.length) settings.areas = cfgAreas;
   return (
-    <div className="container-x py-16">
-      <SectionHeader
-        eyebrow="Booking"
-        title="Pilih layanan & checkout"
-        desc="Pilih item yang kamu mau (bisa makeup, hairdo, nails), lalu tekan Book untuk isi jadwal dan bayar DP. Konfirmasi otomatis lewat WhatsApp."
-      />
-      <div className="mt-10">
-        <Storefront data={store} settings={settings} />
-      </div>
-    </div>
+    <Suspense fallback={<div className="container-x py-16 text-center text-sm text-muted">Memuat…</div>}>
+      <BookingPage settings={settings} />
+    </Suspense>
   );
 }
