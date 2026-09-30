@@ -5,6 +5,94 @@ are Wayan's**. When unsure, ask first (keep it short). Casual Indonesian with
 Wayan. No fake content (reviews, captions, promises the site doesn't make) —
 prefer an empty state over invented data.
 
+## Cahyana standards (repo consistency, all repos)
+
+Shared across CUE, cahyanaui, ubud-private-villas and salia-makeup (Sep 2026).
+Where an older note below conflicts with these, THESE win - above all: never push to
+`main` without Wayan explicitly saying so. Repo-specific notes below that do not
+conflict still apply. Source of truth for style is CUE.
+
+### Working rules
+
+- [ ] Audit first, then fix. Never fix during an audit.
+- [ ] Report format: rule, hits/files, where most of it is, likely false positives or keep-as-is.
+- [ ] Delete nothing (files, endpoints, components) without Wayan's OK.
+- [ ] Push work-order commits to the feature branch `claude/work-tree-validation-vqexsf` as you go (standing approval, that branch is not live). Never push to `main` until Wayan explicitly says so.
+- [ ] When a rule cannot be applied cleanly (for example a loop with `return`/`break`), list it separately and do it in its own work order.
+- [ ] When a new feature or new site is built, walk Wayan through the QA checklist (QA checklist below) step by step and remind him of small items he may forget.
+
+### Syntax rules (from the finished CUE audit)
+
+- [ ] Standalone named helper functions: plain `function name() {}`. Not `const name = () => {}`.
+- [ ] Arrow functions stay for inline callbacks (`.map`, `.forEach`, `.filter`) and short inline event handlers (`onClick={() => {...}}`).
+- [ ] Components: `export default function ComponentName()`.
+- [ ] Strings: template literals. No `+` concatenation (skip false positives like a phone prefix or a CSS class string).
+- [ ] Loops: `forEach` and array methods (`filter`, `find`, `some`, `reduce`, `map`). Exception: `for...of` only when each item must `await` in sequence (for example stop on the first failed submission).
+- [ ] Destructure props and multi-property pulls in function parameters by default: `function Card({ title, price })`. Plain dot access is fine for a single simple value or an awkward deeply nested case.
+- [ ] Spread operator is the default for copying arrays and objects.
+- [ ] Async: `async`/`await`. No `.then()` chains. Exception: fire-and-forget calls that must not be awaited (for example the Resend email send); wrap those in an un-awaited async helper.
+- [ ] Conditions: `if`/`else`. No `switch`.
+- [ ] Try/catch: every `try` has a `catch`, and the error variable is always named `e`.
+- [ ] Naming: camelCase. Descriptive names. No cryptic single letters (`el`, `dt`, `mm`, `q`, `r`, `c`, `t`). Exception: `a`/`b` inside `.sort()` comparators.
+- [ ] Comments: one line maximum, placed directly above the tricky line, saying simply what it does. No paragraph or block comments.
+- [ ] Components with several props get default values (for example `included = []`) plus a friendly fallback message when data is missing ("Sorry, we could not load this information. Please try again.").
+- [ ] Files over about 300 lines: flag for splitting. Pure data files are exempt.
+
+### Stack
+
+Frontend:
+- [ ] React, Next.js, Tailwind
+- [ ] Zod (validation)
+- [ ] Framer Motion (animation)
+- [ ] Lucide React (icons)
+- [ ] clsx (conditional classes)
+- [ ] jspdf (Salia receipts)
+- [ ] Forms: hand-rolled validation. Do NOT add React Hook Form (tried and declined).
+- [ ] Do NOT install shadcn/ui. Study its structure only. Build Cahyana's own components.
+
+Backend (plain Express, kept simple on purpose):
+- [ ] Node, Express, PostgreSQL
+- [ ] Helmet, Morgan, Zod, cors
+
+Before adding any library not listed here: ask Wayan first.
+
+### Typography
+
+- [ ] Inter only, for headings and body. No second typeface.
+- [ ] Default for every repo and every future site. Follow CUE. Change only when Wayan explicitly asks.
+
+### Animation
+
+- [ ] Framer Motion is the only animation library. Popups, modals, dropdowns, page and section transitions must animate smoothly, not appear abruptly.
+- [ ] On every new feature with an interaction, check whether Framer Motion applies. If it does, ask Wayan once: "Should this use Framer Motion?" If yes, add it.
+- [ ] Audit `ubud-private-villas` and `salia-makeup` to confirm they consume Framer Motion consistently.
+- [ ] Known issue in CUE: some interactions (for example a popup on click) appear abruptly. Flag to Wayan; he will double-check CUE later.
+- [ ] Every popup locks background scroll.
+
+### QA checklist (draft: extend it from CUE, then ask Wayan to approve)
+
+Claude Code: read CUE, propose the full checklist, mark each item Must-have or Nice-to-have, and wait for approval. Starting list:
+
+Must-have
+- [ ] Payment flow works end to end and matches CUE
+- [ ] Favicon and browser tab icon present and correct
+- [ ] Font, colors and animation match CUE (typography and animation above)
+- [ ] Syntax matches section 3
+- [ ] Forms validated front and back (Zod on the backend)
+- [ ] Endpoints check ownership (locked, security-by-default)
+- [ ] `sitemap.xml` present and correct
+- [ ] `robots.txt` present and correct
+- [ ] Alt text on every image
+- [ ] Unique page title and meta description per page
+- [ ] No placeholder content left live (phone numbers, dummy reviews, wrong brand name)
+
+Nice-to-have
+- [ ] Structured data (schema) for search engines and AI systems (GEO)
+- [ ] Open Graph / social share preview
+- [ ] Image sizes set (width/height) to avoid layout shift; WebP images
+- [ ] Lighthouse check, mobile and desktop
+- [ ] Google Search Console verified
+
 ## Project
 - Booking site for **Salia Makeup** — make up, hairdo & nail art, Denpasar area.
 - This repo is the **frontend only**. The backend is a **separate repo**,
@@ -15,7 +103,10 @@ prefer an empty state over invented data.
 
 ## Stack & structure
 - **Frontend** (this repo) = Next.js 16 + React 19 (App Router), Tailwind 3,
-  react-hook-form, lucide-react. Pages in `app/`, components in `components/`,
+  react-hook-form, lucide-react.
+  Moving to the shared stack (Cahyana standards above): react-hook-form is being
+  removed, Tailwind 3 -> 4 is its own migration work order, and Framer Motion goes
+  in per popup only after Wayan says yes to each one. Pages in `app/`, components in `components/`,
   data/helpers in `lib/`.
 - **Backend** (`salia-makeup-api` repo) = Node + Express + Postgres (`pg`), JWT auth.
 - Frontend talks to the API only through **`lib/storage.js`** (the one place that
