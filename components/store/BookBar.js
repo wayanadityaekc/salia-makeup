@@ -5,9 +5,7 @@ import { X, ShoppingBag, ArrowRight } from "lucide-react";
 import { formatRupiah } from "@/lib/utils";
 import { useCart } from "./CartProvider";
 
-// Sticky bottom bar that appears once something is picked. Shows the selected
-// items + running subtotal and a Book button that goes to the full-screen
-// /booking page (the cart is persisted, so the selection carries over).
+// Sticky bar once something is picked: items, subtotal and Book to /booking (the cart is persisted).
 export default function BookBar() {
   const { items, subtotal, remove } = useCart();
   const router = useRouter();

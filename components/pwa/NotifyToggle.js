@@ -12,12 +12,10 @@ function urlB64ToUint8Array(base64String) {
   return Uint8Array.from(raw, (char) => char.charCodeAt(0));
 }
 
-// Owner toggle: turn on native push notifications for new bookings.
-// - Android/desktop: works in the browser or installed app.
-// - iOS: only inside the installed app (Apple requirement) — otherwise we ask
-//   the owner to install first.
+// Owner push toggle for new bookings; on iOS it only works inside the installed app, so we ask to install first.
 export default function NotifyToggle() {
-  const [status, setStatus] = useState("loading"); // loading|unsupported|need-install|blocked|off|on
+  // Status: loading | unsupported | need-install | blocked | off | on
+  const [status, setStatus] = useState("loading");
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
 

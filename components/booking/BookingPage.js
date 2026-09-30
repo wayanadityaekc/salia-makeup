@@ -33,8 +33,10 @@ export default function BookingPage({ settings }) {
   const { user } = useUser();
 
   const [cart, setCart] = useState({ items: [], orang: 1 });
-  const [tok, setTok] = useState({ status: "checking" }); // checking|valid|invalid
-  const [step, setStep] = useState("form"); // form|done
+  // Status: checking | valid | invalid
+  const [tok, setTok] = useState({ status: "checking" });
+  // Step: form | done
+  const [step, setStep] = useState("form");
   const [doneReceipt, setDoneReceipt] = useState(null);
 
   // Read the persisted cart (client only).

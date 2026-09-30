@@ -3,15 +3,7 @@
 import { useEffect, useState } from "react";
 import { Download, Share, Plus, X, MoreVertical } from "lucide-react";
 
-// Install bar shown in the BROWSER only (hidden once installed / in standalone).
-//
-// One tap does the most each platform allows:
-// - Android/Chrome: the button fires the native "Add to Home screen" dialog
-//   directly (beforeinstallprompt) — genuinely one tap.
-// - iOS Safari: Apple exposes NO install API, so nothing can open the Share sheet
-//   for the user. The button instead opens a short visual guide pointing at the
-//   Share → "Add to Home Screen" steps.
-// - Any other case (no prompt captured yet): same guide, with the browser-menu steps.
+// Browser-only install bar: Android fires the native dialog; iOS has no install API, so it opens a Share-steps guide.
 const DISMISS_KEY = "salia_install_dismissed";
 
 export default function InstallPrompt() {
@@ -25,7 +17,8 @@ export default function InstallPrompt() {
     const standalone =
       window.matchMedia?.("(display-mode: standalone)").matches ||
       window.navigator.standalone === true;
-    if (standalone) return; // already installed
+    // Already installed
+    if (standalone) return;
     try {
       if (localStorage.getItem(DISMISS_KEY) === "1") return;
     } catch (e) {}
@@ -37,12 +30,14 @@ export default function InstallPrompt() {
     const isSafari = /safari/i.test(userAgent) && !/(crios|fxios|chrome|android)/i.test(userAgent);
     setIos(isIOS);
     if (isIOS && isSafari) {
-      setShow(true); // iOS Safari can install (via the guide)
+      // iOS Safari can install (via the guide)
+      setShow(true);
       return;
     }
 
     function onBIP(e) {
-      e.preventDefault(); // stop Chrome's mini-infobar; we show our own button
+      // Stop Chrome's mini-infobar; we show our own button
+      e.preventDefault();
       setDeferred(e);
       setShow(true);
     }
@@ -69,7 +64,8 @@ export default function InstallPrompt() {
 
   async function onInstallClick() {
     if (deferred) {
-      deferred.prompt(); // native add-to-home-screen dialog — one tap
+      // Native add-to-home-screen dialog: one tap
+      deferred.prompt();
       try {
         await deferred.userChoice;
       } catch (e) {}
@@ -77,7 +73,8 @@ export default function InstallPrompt() {
       setShow(false);
       return;
     }
-    setGuide(true); // iOS / no native prompt → show the steps
+    // iOS / no native prompt: show the steps
+    setGuide(true);
   }
 
   function dismiss() {

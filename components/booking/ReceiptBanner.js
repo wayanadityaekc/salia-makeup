@@ -8,9 +8,7 @@ import { getUserBookings, getSettings } from "@/lib/storage";
 import { makeReceiptPdf } from "@/lib/receipt";
 import { useUser } from "@/components/auth/UserProvider";
 
-// Homepage banner for a logged-in customer: shows their latest booking's state
-// and, once approved, a receipt download. Download is login-gated by design —
-// this only renders for a signed-in user reading their own bookings.
+// Latest booking state + receipt download for a signed-in customer; login-gated by design (own bookings only).
 export default function ReceiptBanner() {
   const { user, ready } = useUser();
   const [booking, setBooking] = useState(null);

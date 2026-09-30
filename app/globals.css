@@ -50,9 +50,7 @@ body {
   }
 }
 
-/* PWA standalone (installed to home screen): respect the iPhone home-indicator
-   inset so bottom content isn't hidden. No effect in a normal browser tab, so
-   the public site (browsed, never installed) is unchanged. */
+/* Installed PWA only: keep bottom content clear of the iPhone home indicator; no effect in a browser tab. */
 @media (display-mode: standalone) {
   body {
     padding-bottom: env(safe-area-inset-bottom);

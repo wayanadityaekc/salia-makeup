@@ -4,11 +4,11 @@ import { useEffect, useRef, useState } from "react";
 import { X, Loader2, Mail, ArrowLeft } from "lucide-react";
 import { useUser } from "./UserProvider";
 
-// Passwordless login: enter email -> a 6-digit code is emailed -> type it in.
-// No password, no phone login. The account is created on first verify.
+// Passwordless login: a 6-digit code is emailed, and the account is created on first verify.
 export default function AuthModal({ onClose }) {
   const { requestCode, verifyCode } = useUser();
-  const [step, setStep] = useState("email"); // email | code
+  // Step: email | code
+  const [step, setStep] = useState("email");
   const [email, setEmail] = useState("");
   const [nama, setNama] = useState("");
   const [code, setCode] = useState("");

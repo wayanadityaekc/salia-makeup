@@ -9,8 +9,7 @@ const HARI = ["M", "S", "S", "R", "K", "J", "S"];
 function toStr(date) { return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`; }
 function startOfDay(date) { const start = new Date(date); start.setHours(0, 0, 0, 0); return start; }
 
-// Custom date picker (no native <input type=date>). value/onChange are "YYYY-MM-DD".
-// Dates before `min` (default: today) are disabled.
+// Custom date picker: value/onChange are "YYYY-MM-DD", and dates before `min` (default today) are disabled.
 export default function DatePicker({ value, onChange, invalid = false, placeholder = "Pilih tanggal" }) {
   const [open, setOpen] = useState(false);
   const ref = useRef(null);

@@ -38,7 +38,8 @@ function Body({ text, mine }) {
 export default function ChatWidget() {
   const { user } = useUser();
   const [open, setOpen] = useState(false);
-  const [view, setView] = useState("menu"); // menu | chat
+  // View: menu | chat
+  const [view, setView] = useState("menu");
   const [whatsapp, setWhatsapp] = useState(site.whatsapp || "");
   const [nama, setNama] = useState("");
   const [msgs, setMsgs] = useState([]);

@@ -5,8 +5,7 @@ import { Check, Plus, X } from "lucide-react";
 import { formatRupiah } from "@/lib/utils";
 import { useCart } from "./CartProvider";
 
-// One service = one card. Clicking the card opens a detail popup (photo,
-// description, details, price) with the Pilih button.
+// One service = one card; clicking it opens a detail popup with the Pilih button.
 export default function StoreCard({ item, big = false }) {
   const { pick, isSelected } = useCart();
   const [open, setOpen] = useState(false);

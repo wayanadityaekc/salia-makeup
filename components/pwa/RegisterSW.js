@@ -2,9 +2,7 @@
 
 import { useEffect } from "react";
 
-// Registers the service worker for the admin PWA, scoped to /dashboard only, so
-// the public marketing site is never controlled by it. Renders nothing.
-// Registration failure is non-fatal: the dashboard works normally without a SW.
+// Registers the admin SW scoped to /dashboard so the public site is never controlled by it; failure is non-fatal.
 export default function RegisterSW() {
   useEffect(() => {
     if (typeof navigator === "undefined" || !("serviceWorker" in navigator)) return;

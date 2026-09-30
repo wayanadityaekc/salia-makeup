@@ -2,10 +2,7 @@
 
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 
-// Checkout cart: at most one item per category (makeup / hairdo / nail) + a
-// people count. Picking another item in the same category replaces it.
-// Persisted to localStorage so the selection survives the trip to /booking
-// (a real route, not a modal). Read in an effect to keep SSR markup stable.
+// Cart: one item per category + people count, in localStorage; read in an effect to keep SSR markup stable.
 const Ctx = createContext(null);
 export const CART_KEY = "salia_cart";
 

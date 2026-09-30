@@ -3,8 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { ChevronDown, Check } from "lucide-react";
 
-// Custom dropdown (no native <select>). Matches the .field look.
-// options: [{ value, label }] or grouped [{ group, options: [{value,label}] }].
+// Custom dropdown: options are [{ value, label }] or grouped [{ group, options: [...] }].
 export default function Select({ value, onChange, options = [], placeholder = "Pilih…", invalid = false }) {
   const [open, setOpen] = useState(false);
   const ref = useRef(null);

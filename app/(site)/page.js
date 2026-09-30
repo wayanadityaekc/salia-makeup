@@ -25,8 +25,7 @@ export default async function Home() {
     areas: data?.areas?.length ? data.areas : cfgAreas,
   };
 
-  // Editable hero content (dashboard) with hardcoded fallbacks so nothing breaks
-  // before the owner sets anything / if the API is slow.
+  // Hero text is editable from the dashboard; fallbacks keep it working before it is set or if the API is slow.
   const content = settings.content || {};
   const heroKicker = content.heroKicker || site.tagline;
 

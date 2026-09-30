@@ -5,9 +5,7 @@ import { CartProvider } from "./CartProvider";
 import StoreCard from "./StoreCard";
 import BookBar from "./BookBar";
 
-// Pick-and-checkout storefront. A sticky category bar (Make Up / Hairdo / Nails)
-// switches which list is shown; items are big, one-per-screen cards you scroll
-// through vertically. Wrapped in the cart context.
+// Pick-and-checkout storefront: a sticky category bar switches the list; wrapped in the cart context.
 export default function Storefront({ data, settings }) {
   function withKind(arr, kind) { return (arr || []).map((item) => ({ ...item, kind })); }
   const cats = [

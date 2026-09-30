@@ -3,8 +3,7 @@ import { site } from "@/lib/config";
 import { getSettings } from "@/lib/storage";
 import { waLink, normalizeWa } from "@/lib/utils";
 
-// Link-in-bio page for IG/TikTok bio. Not linked anywhere on the site and not
-// indexed — reachable only by its URL (/links).
+// Link-in-bio page for IG/TikTok: not linked on the site and not indexed, reachable only at /links.
 export const metadata = {
   title: "Links",
   robots: { index: false, follow: false },
