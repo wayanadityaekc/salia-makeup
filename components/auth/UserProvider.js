@@ -12,9 +12,18 @@ export function UserProvider({ children }) {
 
   useEffect(() => {
     if (!getUserToken()) { setReady(true); return; }
-    getMe()
-      .then((u) => { if (!u) clearUserToken(); setUser(u); })
-      .finally(() => setReady(true));
+    async function loadUser() {
+      try {
+        const me = await getMe();
+        if (!me) clearUserToken();
+        setUser(me);
+      } catch (e) {
+        // getMe already returns null on failure; nothing else to do.
+      } finally {
+        setReady(true);
+      }
+    }
+    loadUser();
   }, []);
 
   function requestCode(email) { return requestLoginCode(email); }

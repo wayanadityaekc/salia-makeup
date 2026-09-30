@@ -20,13 +20,19 @@ export default function ReceiptBanner() {
   useEffect(() => {
     if (!ready || !user) return;
     let alive = true;
-    Promise.all([getUserBookings(), getSettings()]).then(([rows, s]) => {
-      if (!alive) return;
-      setDpPercent(s?.dpPercent || 50);
-      // Prefer the newest approved booking; else the newest pending one.
-      const approved = rows.find((b) => b.status === "konfirmasi" || b.status === "selesai");
-      setBooking(approved || rows[0] || null);
-    });
+    async function load() {
+      try {
+        const [rows, s] = await Promise.all([getUserBookings(), getSettings()]);
+        if (!alive) return;
+        setDpPercent(s?.dpPercent || 50);
+        // Prefer the newest approved booking; else the newest pending one.
+        const approved = rows.find((b) => b.status === "konfirmasi" || b.status === "selesai");
+        setBooking(approved || rows[0] || null);
+      } catch (e) {
+        // Both helpers return safe defaults, so the banner just stays hidden.
+      }
+    }
+    load();
     return () => { alive = false; };
   }, [ready, user]);
 

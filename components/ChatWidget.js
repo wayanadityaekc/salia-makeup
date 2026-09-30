@@ -52,7 +52,15 @@ export default function ChatWidget() {
   const cid = useMemo(() => chatCidFor(user), [user]);
 
   useEffect(() => {
-    getSettings().then((s) => s?.whatsapp && setWa(s.whatsapp)).catch(() => {});
+    async function loadWhatsapp() {
+      try {
+        const settings = await getSettings();
+        if (settings?.whatsapp) setWa(settings.whatsapp);
+      } catch (e) {
+        // Keep the default number if settings fail to load.
+      }
+    }
+    loadWhatsapp();
   }, []);
   useEffect(() => {
     if (user?.nama) setNama(user.nama);

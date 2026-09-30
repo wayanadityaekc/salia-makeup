@@ -50,10 +50,16 @@ export default function BookingPage({ settings }) {
   useEffect(() => {
     let alive = true;
     if (!token) { setTok({ status: "invalid", reason: "missing" }); return; }
-    getBookingToken(token).then((r) => {
-      if (!alive) return;
-      setTok(r?.valid ? { status: "valid", tanggal: r.tanggal } : { status: "invalid", reason: r?.reason || "invalid" });
-    });
+    async function check() {
+      try {
+        const r = await getBookingToken(token);
+        if (!alive) return;
+        setTok(r?.valid ? { status: "valid", tanggal: r.tanggal } : { status: "invalid", reason: r?.reason || "invalid" });
+      } catch (e) {
+        // getBookingToken already turns a failure into { valid: false }.
+      }
+    }
+    check();
     return () => { alive = false; };
   }, [token]);
 

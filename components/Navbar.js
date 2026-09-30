@@ -34,7 +34,15 @@ export default function Navbar() {
 
   // Editable logo (dashboard). Falls back to the brand wordmark until set.
   useEffect(() => {
-    getSettings().then((s) => s?.content?.logo && setLogo(s.content.logo)).catch(() => {});
+    async function loadLogo() {
+      try {
+        const settings = await getSettings();
+        if (settings?.content?.logo) setLogo(settings.content.logo);
+      } catch (e) {
+        // Keep the wordmark if settings fail to load.
+      }
+    }
+    loadLogo();
   }, []);
 
   useEffect(() => setOpen(false), [pathname]);
