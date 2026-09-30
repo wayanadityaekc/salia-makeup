@@ -1,4 +1,4 @@
-export default function SectionHeader({ eyebrow, title, desc, center }) {
+export default function SectionHeader({ eyebrow = "", title = "", desc = "", center = false }) {
   return (
     <div className={center ? "mx-auto max-w-2xl text-center" : "max-w-2xl"}>
       {eyebrow && <div className="eyebrow">{eyebrow}</div>}

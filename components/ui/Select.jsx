@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { ChevronDown, Check } from "lucide-react";
 
 // Custom dropdown: options are [{ value, label }] or grouped [{ group, options: [...] }].
-export default function Select({ value, onChange, options = [], placeholder = "Pilih…", invalid = false }) {
+export default function Select({ value = "", onChange = () => {}, options = [], placeholder = "Pilih…", invalid = false }) {
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
 
@@ -52,7 +52,8 @@ export default function Select({ value, onChange, options = [], placeholder = "P
   );
 }
 
-function Opt({ option, value, onPick }) {
+function Opt({ option = null, value = "", onPick = () => {} }) {
+  if (!option) return null;
   const sel = option.value === value;
   return (
     <button

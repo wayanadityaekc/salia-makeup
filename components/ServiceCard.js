@@ -1,8 +1,10 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { formatRupiah } from "@/lib/utils";
+import LoadFallback from "@/components/ui/LoadFallback";
 
-export default function ServiceCard({ item, badge }) {
+export default function ServiceCard({ item = null, badge = null }) {
+  if (!item) return <LoadFallback />;
   return (
     <div className="group flex flex-col overflow-hidden rounded-2xl border border-rose-line bg-white transition hover:shadow-[0_12px_40px_-18px_rgba(107,44,62,0.35)]">
       {item.foto ? (

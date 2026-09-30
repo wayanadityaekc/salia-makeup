@@ -179,7 +179,7 @@ export default function InstallPrompt() {
   );
 }
 
-function Step({ number, children }) {
+function Step({ number = null, children }) {
   return (
     <li className="flex gap-3">
       <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-rose-soft text-xs font-bold text-rose">

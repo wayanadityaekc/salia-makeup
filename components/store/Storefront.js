@@ -4,17 +4,20 @@ import { useState } from "react";
 import { CartProvider } from "./CartProvider";
 import StoreCard from "./StoreCard";
 import BookBar from "./BookBar";
+import LoadFallback from "@/components/ui/LoadFallback";
 
 // Pick-and-checkout storefront: a sticky category bar switches the list; wrapped in the cart context.
-export default function Storefront({ data, settings }) {
+export default function Storefront({ data = null, settings = null }) {
   function withKind(arr, kind) { return (arr || []).map((item) => ({ ...item, kind })); }
   const cats = [
-    { key: "makeup", label: "Make Up", items: withKind(data.services, "makeup") },
-    { key: "hairdo", label: "Hairdo", items: withKind(data.hairdo, "hairdo") },
-    { key: "nail", label: "Nails", items: withKind(data.nailArt, "nail") },
+    { key: "makeup", label: "Make Up", items: withKind(data?.services, "makeup") },
+    { key: "hairdo", label: "Hairdo", items: withKind(data?.hairdo, "hairdo") },
+    { key: "nail", label: "Nails", items: withKind(data?.nailArt, "nail") },
   ];
   const [cat, setCat] = useState("makeup");
   const active = cats.find((category) => category.key === cat) || cats[0];
+
+  if (!data) return <LoadFallback />;
 
   return (
     <CartProvider>

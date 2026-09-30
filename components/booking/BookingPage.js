@@ -126,7 +126,7 @@ export default function BookingPage({ settings }) {
 }
 
 // ---- Locked: no valid token -> check availability via WhatsApp ---------------
-function LockedPanel({ status, reason, cart, settings }) {
+function LockedPanel({ status = "invalid", reason = "", cart = { items: [], orang: 1 }, settings = null }) {
   const whatsappNumber = normalizeWa(settings?.whatsapp || site.whatsapp);
   const list = cart.items.map((i) => `- ${i.nama}`).join("\n");
   const msg =
@@ -178,7 +178,7 @@ function LockedPanel({ status, reason, cart, settings }) {
 }
 
 // ---- Unlocked: valid token -> real form + payment ---------------------------
-function UnlockedForm({ cart, areas, settings, token, tanggal, user, onDone }) {
+function UnlockedForm({ cart = { items: [], orang: 1 }, areas = [], settings = null, token = "", tanggal = "", user = null, onDone = () => {} }) {
   const [form, setForm] = useState({
     nama: "", telepon: "", email: "", instagram: "",
     areaId: areas[0]?.id || "dalam-kota", jam: "", lokasi: "", catatan: "",
@@ -261,7 +261,7 @@ function UnlockedForm({ cart, areas, settings, token, tanggal, user, onDone }) {
     onDone(receipt);
   }
 
-  function Row({ label, value, copyKey }) {
+  function Row({ label = "", value = "", copyKey = "" }) {
     return (
       <div className="flex items-center justify-between gap-3 border-b border-rose-line py-2.5 last:border-0">
         <div><div className="text-xs text-muted">{label}</div><div className="font-semibold text-ink">{value}</div></div>
@@ -356,7 +356,7 @@ function UnlockedForm({ cart, areas, settings, token, tanggal, user, onDone }) {
 }
 
 // ---- Done -------------------------------------------------------------------
-function DonePanel({ receipt, user }) {
+function DonePanel({ receipt = null, user = null }) {
   function download() {
     if (!receipt) return;
     const url = URL.createObjectURL(receipt.blob);

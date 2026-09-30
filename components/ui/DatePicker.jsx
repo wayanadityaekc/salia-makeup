@@ -10,7 +10,7 @@ function toStr(date) { return `${date.getFullYear()}-${String(date.getMonth() + 
 function startOfDay(date) { const start = new Date(date); start.setHours(0, 0, 0, 0); return start; }
 
 // Custom date picker: value/onChange are "YYYY-MM-DD", and dates before `min` (default today) are disabled.
-export default function DatePicker({ value, onChange, invalid = false, placeholder = "Pilih tanggal" }) {
+export default function DatePicker({ value = "", onChange = () => {}, invalid = false, placeholder = "Pilih tanggal" }) {
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
   const min = useMemo(() => startOfDay(new Date()), []);

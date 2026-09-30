@@ -12,7 +12,7 @@ const URL_RE = /(https?:\/\/[^\s]+)/g;
 function isReceipt(url) { return /\/receipt\/|struk-|\.pdf($|\?)/i.test(url); }
 
 // Render a message body with clickable links; receipt links get a download icon.
-function Body({ text, mine }) {
+function Body({ text = "", mine = false }) {
   const parts = String(text).split(URL_RE);
   return (
     <span className="whitespace-pre-wrap">

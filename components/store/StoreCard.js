@@ -4,12 +4,13 @@ import { useEffect, useState } from "react";
 import { Check, Plus, X } from "lucide-react";
 import { formatRupiah } from "@/lib/utils";
 import { useCart } from "./CartProvider";
+import LoadFallback from "@/components/ui/LoadFallback";
 
 // One service = one card; clicking it opens a detail popup with the Pilih button.
-export default function StoreCard({ item, big = false }) {
+export default function StoreCard({ item = null, big = false }) {
   const { pick, isSelected } = useCart();
   const [open, setOpen] = useState(false);
-  const selected = isSelected(item.id);
+  const selected = item ? isSelected(item.id) : false;
 
   useEffect(() => {
     if (!open) return;
@@ -17,6 +18,8 @@ export default function StoreCard({ item, big = false }) {
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [open]);
+
+  if (!item) return <LoadFallback />;
 
   const desc = item.deskripsi || item.ringkas || "";
   const details = String(item.detail || "")
