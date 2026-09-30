@@ -7,10 +7,7 @@ export const metadata = {
     default: `${site.brand} · ${site.tagline}`,
     template: `%s · ${site.brand}`,
   },
-  description:
-    "Jasa make up, hairdo, dan nail art profesional di " +
-    site.kota +
-    ". Booking mudah langsung via WhatsApp.",
+  description: `Jasa make up, hairdo, dan nail art profesional di ${site.kota}. Booking mudah langsung via WhatsApp.`,
   openGraph: {
     title: `${site.brand} · ${site.tagline}`,
     type: "website",

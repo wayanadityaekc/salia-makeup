@@ -15,7 +15,7 @@ export default function DatePicker({ value, onChange, invalid = false, placehold
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
   const min = useMemo(() => startOfDay(new Date()), []);
-  const selected = value ? startOfDay(new Date(value + "T00:00:00")) : null;
+  const selected = value ? startOfDay(new Date(`${value}T00:00:00`)) : null;
   const [view, setView] = useState(() => {
     const base = selected || min;
     return new Date(base.getFullYear(), base.getMonth(), 1);

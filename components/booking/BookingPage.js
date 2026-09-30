@@ -124,8 +124,7 @@ function LockedPanel({ status, reason, cart, settings }) {
   const wa = normalizeWa(settings?.whatsapp || site.whatsapp);
   const list = cart.items.map((i) => `- ${i.nama}`).join("\n");
   const msg =
-    `Halo ${site.brand}, saya mau cek ketersediaan tanggal untuk booking:\n${list}\n` +
-    `Jumlah orang: ${cart.orang}\n\nTanggal yang saya inginkan: ____\nMohon info ketersediaannya ya 🙏`;
+    `Halo ${site.brand}, saya mau cek ketersediaan tanggal untuk booking:\n${list}\nJumlah orang: ${cart.orang}\n\nTanggal yang saya inginkan: ____\nMohon info ketersediaannya ya 🙏`;
   const href = waLink(wa, msg);
 
   const expired = reason === "expired";

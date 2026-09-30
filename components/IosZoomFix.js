@@ -21,7 +21,7 @@ export default function IosZoomFix() {
     const meta = document.querySelector('meta[name="viewport"]');
     if (!meta) return;
     if (!/maximum-scale/.test(meta.content)) {
-      meta.content = meta.content.replace(/\s*$/, "") + ",maximum-scale=1";
+      meta.content = `${meta.content.replace(/\s*$/, "")},maximum-scale=1`;
     }
   }, []);
   return null;
