@@ -105,7 +105,7 @@ export default function ChatWidget() {
     if (!open || view !== "chat" || !cid) return;
     let alive = true;
     async function tick() {
-      try { const rows = await pollChatMessages(cid, lastId.current); if (alive) mergeNew(rows); } catch {}
+      try { const rows = await pollChatMessages(cid, lastId.current); if (alive) mergeNew(rows); } catch (e) {}
     }
     tick();
     const t = setInterval(tick, 3000);
@@ -123,7 +123,7 @@ export default function ChatWidget() {
       const msg = await sendChatMessage(cid, { nama, telepon: user?.telepon, body });
       setText("");
       if (msg) mergeNew([msg]);
-    } catch { setErr("Gagal mengirim. Coba lagi."); } finally { setBusy(false); }
+    } catch (e) { setErr("Gagal mengirim. Coba lagi."); } finally { setBusy(false); }
   }
 
   const waHref = waLink(normalizeWa(wa || site.whatsapp), `Halo ${site.brand}, saya mau tanya soal layanan make up / nail art.`);

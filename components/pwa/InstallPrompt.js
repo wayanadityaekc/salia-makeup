@@ -28,7 +28,7 @@ export default function InstallPrompt() {
     if (standalone) return; // already installed
     try {
       if (localStorage.getItem(DISMISS_KEY) === "1") return;
-    } catch {}
+    } catch (e) {}
 
     const ua = navigator.userAgent || "";
     const isIOS =
@@ -72,7 +72,7 @@ export default function InstallPrompt() {
       deferred.prompt(); // native add-to-home-screen dialog — one tap
       try {
         await deferred.userChoice;
-      } catch {}
+      } catch (e) {}
       setDeferred(null);
       setShow(false);
       return;
@@ -85,7 +85,7 @@ export default function InstallPrompt() {
     setGuide(false);
     try {
       localStorage.setItem(DISMISS_KEY, "1");
-    } catch {}
+    } catch (e) {}
   }
 
   if (!show) return null;

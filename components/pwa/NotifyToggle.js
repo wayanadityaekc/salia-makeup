@@ -40,7 +40,7 @@ export default function NotifyToggle() {
       const reg = await navigator.serviceWorker.ready;
       const sub = await reg.pushManager.getSubscription();
       setStatus(sub ? "on" : "off");
-    } catch {
+    } catch (e) {
       setStatus("off");
     }
   }
@@ -66,7 +66,7 @@ export default function NotifyToggle() {
       }
       await savePushSubscription(sub.toJSON());
       setStatus("on");
-    } catch {
+    } catch (e) {
       setErr("Gagal mengaktifkan notifikasi. Coba lagi.");
     } finally {
       setBusy(false);
@@ -84,7 +84,7 @@ export default function NotifyToggle() {
         await sub.unsubscribe();
       }
       setStatus("off");
-    } catch {
+    } catch (e) {
       setErr("Gagal menonaktifkan.");
     } finally {
       setBusy(false);

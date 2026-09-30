@@ -32,7 +32,7 @@ export default function AuthModal({ onClose }) {
       setNote(r?.delivered === false ? "Kode dibuat. (Pengiriman email belum aktif, hubungi admin.)" : `Kode dikirim ke ${email.trim()}. Cek inbox / spam.`);
       setStep("code");
       setTimeout(() => codeRef.current?.focus(), 50);
-    } catch {
+    } catch (e) {
       setErr("Gagal mengirim kode. Coba lagi.");
     } finally { setBusy(false); }
   }
@@ -44,7 +44,7 @@ export default function AuthModal({ onClose }) {
     try {
       await verifyCode(email.trim(), code.trim(), nama.trim() || undefined);
       onClose();
-    } catch {
+    } catch (e) {
       setErr("Kode salah atau kedaluwarsa.");
     } finally { setBusy(false); }
   }

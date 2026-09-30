@@ -43,7 +43,7 @@ export default function BookingPage({ settings }) {
       const v = JSON.parse(localStorage.getItem(CART_KEY) || "{}");
       const items = [v?.sel?.makeup, v?.sel?.hairdo, v?.sel?.nail].filter(Boolean);
       setCart({ items, orang: v?.orang || 1 });
-    } catch {}
+    } catch (e) {}
   }, []);
 
   // Validate the magic-link token (the whole form is locked without one).
@@ -204,23 +204,23 @@ function UnlockedForm({ cart, areas, settings, token, tanggal, user, onDone }) {
   function set(k, v) { setForm((f) => ({ ...f, [k]: v })); }
   const areaOptions = areas.map((a) => ({ value: a.id, label: `${a.nama} ${a.fee > 0 ? `(+ ${formatRupiah(a.fee)})` : "(Gratis)"}` }));
 
-  async function copy(key, text) { try { await navigator.clipboard.writeText(text); setCopied(key); setTimeout(() => setCopied(""), 1500); } catch {} }
+  async function copy(key, text) { try { await navigator.clipboard.writeText(text); setCopied(key); setTimeout(() => setCopied(""), 1500); } catch (e) {} }
 
-  async function onPickProof(e) {
-    const file = e.target.files?.[0];
+  async function onPickProof(event) {
+    const file = event.target.files?.[0];
     if (!file) return;
     setUploading(true); setUploadErr(""); setPct(0);
     try {
       const compressed = await compressImage(file);
       const url = await uploadProof(compressed, (p) => setPct(p));
       setProofUrl(url);
-    } catch (e2) {
-      setUploadErr(e2?.data?.error === "uploads_not_configured" ? "Upload belum aktif, kirim bukti via WhatsApp saja." : "Gagal upload. Coba lagi / kirim via WhatsApp.");
+    } catch (e) {
+      setUploadErr(e?.data?.error === "uploads_not_configured" ? "Upload belum aktif, kirim bukti via WhatsApp saja." : "Gagal upload. Coba lagi / kirim via WhatsApp.");
     } finally { setUploading(false); setPct(0); if (fileRef.current) fileRef.current.value = ""; }
   }
 
-  async function submit(e) {
-    e.preventDefault();
+  async function submit(event) {
+    event.preventDefault();
     if (!form.nama.trim() || !form.telepon.trim()) return setErr("Nama & No. WhatsApp wajib diisi.");
     if (!/^[0-9+]{9,15}$/.test(form.telepon.trim())) return setErr("Nomor WhatsApp tidak valid.");
     if (!form.jam) return setErr("Pilih jam ready.");
@@ -234,9 +234,9 @@ function UnlockedForm({ cart, areas, settings, token, tanggal, user, onDone }) {
         areaId: form.areaId, jam: form.jam, lokasi: form.lokasi, catatan: form.catatan,
         token, proofUrl,
       });
-    } catch (e2) {
+    } catch (e) {
       setBusy(false);
-      return setErr(e2?.data?.error === "invalid_token" ? "Link booking sudah tidak berlaku. Chat admin untuk link baru." : "Gagal menyimpan booking. Coba lagi atau chat admin.");
+      return setErr(e?.data?.error === "invalid_token" ? "Link booking sudah tidak berlaku. Chat admin untuk link baru." : "Gagal menyimpan booking. Coba lagi atau chat admin.");
     }
     // Best-effort receipt: PDF -> chat (+ email if logged in). Never blocks done.
     const ref = saved?.id ? `SALIA-${saved.id}` : "";
@@ -251,10 +251,10 @@ function UnlockedForm({ cart, areas, settings, token, tanggal, user, onDone }) {
       receipt = { blob: pdf.blob, filename: pdf.filename };
       const cid = chatCidFor(user);
       const file = new File([pdf.blob], pdf.filename, { type: "application/pdf" });
-      let url = ""; try { url = await uploadReceipt(file); } catch {}
+      let url = ""; try { url = await uploadReceipt(file); } catch (e) {}
       if (url) await sendReceiptToChat(cid, { nama: form.nama, telepon: form.telepon, ref, url }).catch(() => {});
       if (user) await emailReceipt({ ref, filename: pdf.filename, pdfBase64: pdf.base64 }).catch(() => {});
-    } catch {}
+    } catch (e) {}
     setBusy(false);
     onDone(receipt);
   }

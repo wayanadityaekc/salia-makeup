@@ -21,11 +21,11 @@ export function CartProvider({ children }) {
         if (v.sel) setSel({ makeup: v.sel.makeup || null, hairdo: v.sel.hairdo || null, nail: v.sel.nail || null });
         if (v.orang) setOrang(v.orang);
       }
-    } catch {}
+    } catch (e) {}
   }, []);
 
   useEffect(() => {
-    try { localStorage.setItem(CART_KEY, JSON.stringify({ sel, orang })); } catch {}
+    try { localStorage.setItem(CART_KEY, JSON.stringify({ sel, orang })); } catch (e) {}
   }, [sel, orang]);
 
   function pick(item) {
