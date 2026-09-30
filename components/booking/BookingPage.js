@@ -20,14 +20,12 @@ import { CART_KEY } from "@/components/store/CartProvider";
 import { chatCidFor } from "@/lib/chat";
 import { useUser } from "@/components/auth/UserProvider";
 
-const timeOptions = (() => {
-  const out = [];
-  for (let h = 6; h <= 21; h++) for (const m of [0, 30]) {
-    const t = `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
-    out.push({ value: t, label: t });
-  }
-  return out;
-})();
+const timeOptions = Array.from({ length: 16 }, (_, index) => index + 6).flatMap((hour) =>
+  [0, 30].map((minute) => {
+    const time = `${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`;
+    return { value: time, label: time };
+  }),
+);
 
 export default function BookingPage({ settings }) {
   const search = useSearchParams();

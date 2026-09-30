@@ -17,8 +17,7 @@ export default function Select({ value, onChange, options = [], placeholder = "P
     return () => { document.removeEventListener("mousedown", onDoc); document.removeEventListener("keydown", onKey); };
   }, []);
 
-  const flat = [];
-  for (const o of options) (o.options ? o.options : [o]).forEach((x) => flat.push(x));
+  const flat = options.flatMap((o) => (o.options ? o.options : [o]));
   const selected = flat.find((o) => o.value === value);
 
   function pick(v) { onChange(v); setOpen(false); }

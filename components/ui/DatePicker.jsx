@@ -33,9 +33,10 @@ export default function DatePicker({ value, onChange, invalid = false, placehold
   const month = view.getMonth();
   const firstDow = new Date(year, month, 1).getDay();
   const daysInMonth = new Date(year, month + 1, 0).getDate();
-  const cells = [];
-  for (let i = 0; i < firstDow; i++) cells.push(null);
-  for (let d = 1; d <= daysInMonth; d++) cells.push(new Date(year, month, d));
+  const cells = [
+    ...Array.from({ length: firstDow }, () => null),
+    ...Array.from({ length: daysInMonth }, (_, index) => new Date(year, month, index + 1)),
+  ];
 
   const label = selected
     ? selected.toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })
