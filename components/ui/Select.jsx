@@ -10,8 +10,8 @@ export default function Select({ value, onChange, options = [], placeholder = "P
   const ref = useRef(null);
 
   useEffect(() => {
-    const onDoc = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
-    const onKey = (e) => { if (e.key === "Escape") setOpen(false); };
+    function onDoc(e) { if (ref.current && !ref.current.contains(e.target)) setOpen(false); }
+    function onKey(e) { if (e.key === "Escape") setOpen(false); }
     document.addEventListener("mousedown", onDoc);
     document.addEventListener("keydown", onKey);
     return () => { document.removeEventListener("mousedown", onDoc); document.removeEventListener("keydown", onKey); };
@@ -21,7 +21,7 @@ export default function Select({ value, onChange, options = [], placeholder = "P
   for (const o of options) (o.options ? o.options : [o]).forEach((x) => flat.push(x));
   const selected = flat.find((o) => o.value === value);
 
-  const pick = (v) => { onChange(v); setOpen(false); };
+  function pick(v) { onChange(v); setOpen(false); }
 
   return (
     <div ref={ref} className="relative">

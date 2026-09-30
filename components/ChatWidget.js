@@ -9,7 +9,7 @@ import { chatCidFor, OPEN_CHAT_EVENT } from "@/lib/chat";
 import { useUser } from "@/components/auth/UserProvider";
 
 const URL_RE = /(https?:\/\/[^\s]+)/g;
-const isReceipt = (u) => /\/receipt\/|struk-|\.pdf($|\?)/i.test(u);
+function isReceipt(u) { return /\/receipt\/|struk-|\.pdf($|\?)/i.test(u); }
 
 // Render a message body with clickable links; receipt links get a download icon.
 function Body({ text, mine }) {
@@ -66,7 +66,7 @@ export default function ChatWidget() {
 
   // Opened from the navbar (menu view) or right after a booking (chat view).
   useEffect(() => {
-    const onOpen = (e) => { setOpen(true); setView(e?.detail?.view || "menu"); };
+    function onOpen(e) { setOpen(true); setView(e?.detail?.view || "menu"); }
     window.addEventListener(OPEN_CHAT_EVENT, onOpen);
     return () => window.removeEventListener(OPEN_CHAT_EVENT, onOpen);
   }, []);
@@ -74,14 +74,14 @@ export default function ChatWidget() {
   // Close on outside click / Escape.
   useEffect(() => {
     if (!open) return;
-    const onClick = (e) => panelRef.current && !panelRef.current.contains(e.target) && setOpen(false);
-    const onKey = (e) => e.key === "Escape" && setOpen(false);
+    function onClick(e) { if (panelRef.current && !panelRef.current.contains(e.target)) setOpen(false); }
+    function onKey(e) { if (e.key === "Escape") setOpen(false); }
     document.addEventListener("mousedown", onClick);
     document.addEventListener("keydown", onKey);
     return () => { document.removeEventListener("mousedown", onClick); document.removeEventListener("keydown", onKey); };
   }, [open]);
 
-  const mergeNew = (incoming) => {
+  function mergeNew(incoming) {
     if (!incoming.length) return;
     setMsgs((prev) => {
       const seen = new Set(prev.map((m) => m.id));
@@ -91,14 +91,14 @@ export default function ChatWidget() {
       lastId.current = Math.max(lastId.current, ...next.map((m) => m.id));
       return next;
     });
-  };
+  }
 
   useEffect(() => {
     if (!open || view !== "chat" || !cid) return;
     let alive = true;
-    const tick = async () => {
+    async function tick() {
       try { const rows = await pollChatMessages(cid, lastId.current); if (alive) mergeNew(rows); } catch {}
-    };
+    }
     tick();
     const t = setInterval(tick, 3000);
     return () => { alive = false; clearInterval(t); };
@@ -106,7 +106,7 @@ export default function ChatWidget() {
 
   useEffect(() => { bottomRef.current?.scrollIntoView({ block: "end" }); }, [msgs, view]);
 
-  const send = async (e) => {
+  async function send(e) {
     e.preventDefault();
     const body = text.trim();
     if (!body || !cid) return;
@@ -116,7 +116,7 @@ export default function ChatWidget() {
       setText("");
       if (msg) mergeNew([msg]);
     } catch { setErr("Gagal mengirim. Coba lagi."); } finally { setBusy(false); }
-  };
+  }
 
   const waHref = waLink(normalizeWa(wa || site.whatsapp), `Halo ${site.brand}, saya mau tanya soal layanan make up / nail art.`);
 

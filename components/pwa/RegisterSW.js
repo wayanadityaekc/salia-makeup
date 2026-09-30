@@ -8,13 +8,13 @@ import { useEffect } from "react";
 export default function RegisterSW() {
   useEffect(() => {
     if (typeof navigator === "undefined" || !("serviceWorker" in navigator)) return;
-    const register = () => {
+    function register() {
       navigator.serviceWorker
         .register("/sw.js", { scope: "/dashboard" })
         .catch(() => {
           /* no-op: PWA install is a progressive enhancement */
         });
-    };
+    }
     if (document.readyState === "complete") register();
     else {
       window.addEventListener("load", register, { once: true });

@@ -41,16 +41,16 @@ export default function InstallPrompt() {
       return;
     }
 
-    const onBIP = (e) => {
+    function onBIP(e) {
       e.preventDefault(); // stop Chrome's mini-infobar; we show our own button
       setDeferred(e);
       setShow(true);
-    };
-    const onInstalled = () => {
+    }
+    function onInstalled() {
       setShow(false);
       setGuide(false);
       setDeferred(null);
-    };
+    }
     window.addEventListener("beforeinstallprompt", onBIP);
     window.addEventListener("appinstalled", onInstalled);
     return () => {
@@ -62,12 +62,12 @@ export default function InstallPrompt() {
   // Close the guide with Escape.
   useEffect(() => {
     if (!guide) return;
-    const onKey = (e) => e.key === "Escape" && setGuide(false);
+    function onKey(e) { if (e.key === "Escape") setGuide(false); }
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [guide]);
 
-  const onInstallClick = async () => {
+  async function onInstallClick() {
     if (deferred) {
       deferred.prompt(); // native add-to-home-screen dialog — one tap
       try {
@@ -78,15 +78,15 @@ export default function InstallPrompt() {
       return;
     }
     setGuide(true); // iOS / no native prompt → show the steps
-  };
+  }
 
-  const dismiss = () => {
+  function dismiss() {
     setShow(false);
     setGuide(false);
     try {
       localStorage.setItem(DISMISS_KEY, "1");
     } catch {}
-  };
+  }
 
   if (!show) return null;
 

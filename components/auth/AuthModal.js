@@ -18,12 +18,12 @@ export default function AuthModal({ onClose }) {
   const codeRef = useRef(null);
 
   useEffect(() => {
-    const onKey = (e) => e.key === "Escape" && onClose();
+    function onKey(e) { if (e.key === "Escape") onClose(); }
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [onClose]);
 
-  const send = async (e) => {
+  async function send(e) {
     e?.preventDefault();
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) return setErr("Masukkan email yang valid.");
     setErr(""); setBusy(true);
@@ -35,9 +35,9 @@ export default function AuthModal({ onClose }) {
     } catch {
       setErr("Gagal mengirim kode. Coba lagi.");
     } finally { setBusy(false); }
-  };
+  }
 
-  const verify = async (e) => {
+  async function verify(e) {
     e?.preventDefault();
     if (!/^\d{6}$/.test(code.trim())) return setErr("Kode terdiri dari 6 angka.");
     setErr(""); setBusy(true);
@@ -47,7 +47,7 @@ export default function AuthModal({ onClose }) {
     } catch {
       setErr("Kode salah atau kedaluwarsa.");
     } finally { setBusy(false); }
-  };
+  }
 
   return (
     <div className="fixed inset-0 z-[70] flex items-end justify-center bg-ink/50 p-0 sm:items-center sm:p-4" onClick={onClose}>

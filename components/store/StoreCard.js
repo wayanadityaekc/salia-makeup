@@ -14,7 +14,7 @@ export default function StoreCard({ item, big = false }) {
 
   useEffect(() => {
     if (!open) return;
-    const onKey = (e) => e.key === "Escape" && setOpen(false);
+    function onKey(e) { if (e.key === "Escape") setOpen(false); }
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [open]);

@@ -28,13 +28,14 @@ export function CartProvider({ children }) {
     try { localStorage.setItem(CART_KEY, JSON.stringify({ sel, orang })); } catch {}
   }, [sel, orang]);
 
-  const pick = (item) =>
+  function pick(item) {
     setSel((s) => ({ ...s, [item.kind]: s[item.kind]?.id === item.id ? null : item }));
-  const remove = (kind) => setSel((s) => ({ ...s, [kind]: null }));
-  const clear = () => {
+  }
+  function remove(kind) { setSel((s) => ({ ...s, [kind]: null })); }
+  function clear() {
     setSel({ makeup: null, hairdo: null, nail: null });
     setOrang(1);
-  };
+  }
 
   const items = useMemo(() => [sel.makeup, sel.hairdo, sel.nail].filter(Boolean), [sel]);
   const subtotal = useMemo(() => items.reduce((a, b) => a + (b.base || 0), 0), [items]);
@@ -46,4 +47,4 @@ export function CartProvider({ children }) {
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }
 
-export const useCart = () => useContext(Ctx);
+export function useCart() { return useContext(Ctx); }

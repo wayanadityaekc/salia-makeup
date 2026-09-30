@@ -17,18 +17,18 @@ export function UserProvider({ children }) {
       .finally(() => setReady(true));
   }, []);
 
-  const requestCode = (email) => requestLoginCode(email);
-  const verifyCode = async (email, code, nama) => {
+  function requestCode(email) { return requestLoginCode(email); }
+  async function verifyCode(email, code, nama) {
     const u = await verifyLoginCode(email, code, nama);
     setUser(u);
     return u;
-  };
-  const logout = () => {
+  }
+  function logout() {
     clearUserToken();
     setUser(null);
-  };
+  }
 
   return <Ctx.Provider value={{ user, ready, requestCode, verifyCode, logout }}>{children}</Ctx.Provider>;
 }
 
-export const useUser = () => useContext(Ctx) || { user: null, ready: false };
+export function useUser() { return useContext(Ctx) || { user: null, ready: false }; }

@@ -198,12 +198,12 @@ function UnlockedForm({ cart, areas, settings, token, tanggal, user, onDone }) {
   const dpPercent = settings?.dpPercent || 50;
   const dp = Math.round((total * dpPercent) / 100);
   const bank = settings?.bank || {};
-  const set = (k, v) => setForm((f) => ({ ...f, [k]: v }));
+  function set(k, v) { setForm((f) => ({ ...f, [k]: v })); }
   const areaOptions = areas.map((a) => ({ value: a.id, label: `${a.nama} ${a.fee > 0 ? `(+ ${formatRupiah(a.fee)})` : "(Gratis)"}` }));
 
-  const copy = async (key, text) => { try { await navigator.clipboard.writeText(text); setCopied(key); setTimeout(() => setCopied(""), 1500); } catch {} };
+  async function copy(key, text) { try { await navigator.clipboard.writeText(text); setCopied(key); setTimeout(() => setCopied(""), 1500); } catch {} }
 
-  const onPickProof = async (e) => {
+  async function onPickProof(e) {
     const file = e.target.files?.[0];
     if (!file) return;
     setUploading(true); setUploadErr(""); setPct(0);
@@ -214,9 +214,9 @@ function UnlockedForm({ cart, areas, settings, token, tanggal, user, onDone }) {
     } catch (e2) {
       setUploadErr(e2?.data?.error === "uploads_not_configured" ? "Upload belum aktif, kirim bukti via WhatsApp saja." : "Gagal upload. Coba lagi / kirim via WhatsApp.");
     } finally { setUploading(false); setPct(0); if (fileRef.current) fileRef.current.value = ""; }
-  };
+  }
 
-  const submit = async (e) => {
+  async function submit(e) {
     e.preventDefault();
     if (!form.nama.trim() || !form.telepon.trim()) return setErr("Nama & No. WhatsApp wajib diisi.");
     if (!/^[0-9+]{9,15}$/.test(form.telepon.trim())) return setErr("Nomor WhatsApp tidak valid.");
@@ -254,18 +254,20 @@ function UnlockedForm({ cart, areas, settings, token, tanggal, user, onDone }) {
     } catch {}
     setBusy(false);
     onDone(receipt);
-  };
+  }
 
-  const Row = ({ label, value, copyKey }) => (
-    <div className="flex items-center justify-between gap-3 border-b border-rose-line py-2.5 last:border-0">
-      <div><div className="text-xs text-muted">{label}</div><div className="font-semibold text-ink">{value}</div></div>
-      {copyKey && (
-        <button type="button" onClick={() => copy(copyKey, value)} className="inline-flex items-center gap-1 rounded-lg border border-rose-line px-2.5 py-1.5 text-xs font-medium text-rose hover:bg-rose-soft">
-          {copied === copyKey ? <><Check size={13} /> Tersalin</> : <><Copy size={13} /> Salin</>}
-        </button>
-      )}
-    </div>
-  );
+  function Row({ label, value, copyKey }) {
+    return (
+      <div className="flex items-center justify-between gap-3 border-b border-rose-line py-2.5 last:border-0">
+        <div><div className="text-xs text-muted">{label}</div><div className="font-semibold text-ink">{value}</div></div>
+        {copyKey && (
+          <button type="button" onClick={() => copy(copyKey, value)} className="inline-flex items-center gap-1 rounded-lg border border-rose-line px-2.5 py-1.5 text-xs font-medium text-rose hover:bg-rose-soft">
+            {copied === copyKey ? <><Check size={13} /> Tersalin</> : <><Copy size={13} /> Salin</>}
+          </button>
+        )}
+      </div>
+    );
+  }
 
   return (
     <form onSubmit={submit} className="mt-5 space-y-4">
@@ -350,13 +352,13 @@ function UnlockedForm({ cart, areas, settings, token, tanggal, user, onDone }) {
 
 // ---- Done -------------------------------------------------------------------
 function DonePanel({ receipt, user }) {
-  const download = () => {
+  function download() {
     if (!receipt) return;
     const url = URL.createObjectURL(receipt.blob);
     const a = document.createElement("a");
     a.href = url; a.download = receipt.filename; a.click();
     setTimeout(() => URL.revokeObjectURL(url), 4000);
-  };
+  }
   return (
     <div className="container-x py-16">
       <div className="mx-auto max-w-md rounded-2xl border border-rose-line bg-white p-8 text-center">

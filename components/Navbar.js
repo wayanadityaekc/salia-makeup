@@ -26,7 +26,7 @@ export default function Navbar() {
   const [logo, setLogo] = useState("");
 
   useEffect(() => {
-    const onScroll = () => setSolid(window.scrollY > 12);
+    function onScroll() { setSolid(window.scrollY > 12); }
     onScroll();
     window.addEventListener("scroll", onScroll);
     return () => window.removeEventListener("scroll", onScroll);

@@ -37,7 +37,7 @@ export default function ReceiptBanner() {
     ? booking.items
     : (booking.serviceNama ? [{ nama: booking.serviceNama, base: booking.total }] : []);
 
-  const download = async () => {
+  async function download() {
     setBusy(true);
     try {
       const orang = booking.orang || 1;
@@ -54,7 +54,7 @@ export default function ReceiptBanner() {
       a.href = url; a.download = pdf.filename; a.click();
       setTimeout(() => URL.revokeObjectURL(url), 4000);
     } finally { setBusy(false); }
-  };
+  }
 
   return (
     <div className="border-b border-rose-line bg-rose-soft/70">

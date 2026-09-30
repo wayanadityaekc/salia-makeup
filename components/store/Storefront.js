@@ -9,7 +9,7 @@ import BookBar from "./BookBar";
 // switches which list is shown; items are big, one-per-screen cards you scroll
 // through vertically. Wrapped in the cart context.
 export default function Storefront({ data, settings }) {
-  const withKind = (arr, kind) => (arr || []).map((x) => ({ ...x, kind }));
+  function withKind(arr, kind) { return (arr || []).map((x) => ({ ...x, kind })); }
   const cats = [
     { key: "makeup", label: "Make Up", items: withKind(data.services, "makeup") },
     { key: "hairdo", label: "Hairdo", items: withKind(data.hairdo, "hairdo") },
