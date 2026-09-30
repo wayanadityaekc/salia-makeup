@@ -52,9 +52,9 @@ export default function BookingPage({ settings }) {
     if (!token) { setTok({ status: "invalid", reason: "missing" }); return; }
     async function check() {
       try {
-        const r = await getBookingToken(token);
+        const { valid, tanggal, reason } = (await getBookingToken(token)) || {};
         if (!alive) return;
-        setTok(r?.valid ? { status: "valid", tanggal: r.tanggal } : { status: "invalid", reason: r?.reason || "invalid" });
+        setTok(valid ? { status: "valid", tanggal } : { status: "invalid", reason: reason || "invalid" });
       } catch (e) {
         // getBookingToken already turns a failure into { valid: false }.
       }
