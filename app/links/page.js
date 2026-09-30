@@ -27,11 +27,11 @@ function GoogleIcon({ size = 20 }) {
 
 export default async function LinksPage() {
   const { social, whatsapp } = await getSettings();
-  const wa = waLink(normalizeWa(whatsapp || site.whatsapp), `Halo ${site.brand}, saya mau booking 😊`);
+  const whatsappHref = waLink(normalizeWa(whatsapp || site.whatsapp), `Halo ${site.brand}, saya mau booking 😊`);
   const webBase = `https://${site.domain}`;
 
   const links = [
-    { href: wa, label: "Booking via WhatsApp", Icon: MessageCircle, primary: true },
+    { href: whatsappHref, label: "Booking via WhatsApp", Icon: MessageCircle, primary: true },
     { href: `${webBase}/booking`, label: "Booking Online", Icon: CalendarHeart, primary: true },
     { href: webBase, label: "Website Resmi", Icon: Globe },
     social.instagram && { href: social.instagram, label: "Instagram", Icon: Instagram },

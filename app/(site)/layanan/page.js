@@ -21,8 +21,8 @@ export default async function LayananPage() {
       />
 
       <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {services.map((s) => (
-          <ServiceCard key={s.id} item={s} badge={s.hairdoIncluded ? "+ Hairdo" : null} />
+        {services.map((service) => (
+          <ServiceCard key={service.id} item={service} badge={service.hairdoIncluded ? "+ Hairdo" : null} />
         ))}
       </div>
 
@@ -40,11 +40,11 @@ export default async function LayananPage() {
         <div className="rounded-2xl border border-rose-line bg-white p-6">
           <h3 className="font-semibold text-ink">Biaya Area</h3>
           <ul className="mt-2 space-y-1.5 text-sm text-muted">
-            {areas.map((a) => (
-              <li key={a.id} className="flex justify-between">
-                <span>{a.nama}</span>
+            {areas.map((area) => (
+              <li key={area.id} className="flex justify-between">
+                <span>{area.nama}</span>
                 <span className="font-medium text-ink">
-                  {a.fee === 0 ? "Gratis" : `+ ${formatRupiah(a.fee)}`}
+                  {area.fee === 0 ? "Gratis" : `+ ${formatRupiah(area.fee)}`}
                 </span>
               </li>
             ))}

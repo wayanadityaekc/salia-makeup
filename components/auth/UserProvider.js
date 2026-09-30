@@ -14,9 +14,9 @@ export function UserProvider({ children }) {
     if (!getUserToken()) { setReady(true); return; }
     async function loadUser() {
       try {
-        const me = await getMe();
-        if (!me) clearUserToken();
-        setUser(me);
+        const currentUser = await getMe();
+        if (!currentUser) clearUserToken();
+        setUser(currentUser);
       } catch (e) {
         // getMe already returns null on failure; nothing else to do.
       } finally {
@@ -28,9 +28,9 @@ export function UserProvider({ children }) {
 
   function requestCode(email) { return requestLoginCode(email); }
   async function verifyCode(email, code, nama) {
-    const u = await verifyLoginCode(email, code, nama);
-    setUser(u);
-    return u;
+    const verifiedUser = await verifyLoginCode(email, code, nama);
+    setUser(verifiedUser);
+    return verifiedUser;
   }
   function logout() {
     clearUserToken();

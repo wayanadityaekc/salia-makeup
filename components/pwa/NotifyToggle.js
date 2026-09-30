@@ -30,8 +30,8 @@ export default function NotifyToggle() {
     if (typeof window === "undefined") return;
     const supported = "serviceWorker" in navigator && "PushManager" in window && "Notification" in window;
     if (!supported) return setStatus("unsupported");
-    const ua = navigator.userAgent || "";
-    const isIOS = /iphone|ipad|ipod/i.test(ua) || (/macintosh/i.test(ua) && navigator.maxTouchPoints > 1);
+    const userAgent = navigator.userAgent || "";
+    const isIOS = /iphone|ipad|ipod/i.test(userAgent) || (/macintosh/i.test(userAgent) && navigator.maxTouchPoints > 1);
     const standalone =
       window.matchMedia?.("(display-mode: standalone)").matches || window.navigator.standalone === true;
     if (isIOS && !standalone) return setStatus("need-install");

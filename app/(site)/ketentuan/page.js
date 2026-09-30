@@ -20,7 +20,7 @@ export default function KetentuanPage() {
       />
 
       <div className="mx-auto mt-12 max-w-2xl space-y-4">
-        {PREP_STEPS.map((s, i) => {
+        {PREP_STEPS.map((step, i) => {
           const Icon = ICONS[i] || Sparkles;
           return (
             <div key={i} className="flex gap-4 rounded-2xl border border-rose-line bg-white p-5">
@@ -29,9 +29,9 @@ export default function KetentuanPage() {
               </div>
               <div>
                 <h3 className="flex items-center gap-2 font-bold text-ink">
-                  <span className="text-rose">{i + 1}.</span> {s.title}
+                  <span className="text-rose">{i + 1}.</span> {step.title}
                 </h3>
-                <p className="mt-1 text-sm leading-relaxed text-muted">{s.body}</p>
+                <p className="mt-1 text-sm leading-relaxed text-muted">{step.body}</p>
               </div>
             </div>
           );
@@ -45,10 +45,10 @@ export default function KetentuanPage() {
           <div>
             <h3 className="font-bold text-ink">Pengingat</h3>
             <ul className="mt-2 space-y-1.5">
-              {PREP_REMINDER.map((r, i) => (
+              {PREP_REMINDER.map((reminder, i) => (
                 <li key={i} className="flex gap-2 text-sm leading-relaxed text-ink/80">
                   <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-rose" />
-                  <span>{r}</span>
+                  <span>{reminder}</span>
                 </li>
               ))}
             </ul>

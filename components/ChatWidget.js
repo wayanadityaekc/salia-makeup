@@ -9,26 +9,26 @@ import { chatCidFor, OPEN_CHAT_EVENT } from "@/lib/chat";
 import { useUser } from "@/components/auth/UserProvider";
 
 const URL_RE = /(https?:\/\/[^\s]+)/g;
-function isReceipt(u) { return /\/receipt\/|struk-|\.pdf($|\?)/i.test(u); }
+function isReceipt(url) { return /\/receipt\/|struk-|\.pdf($|\?)/i.test(url); }
 
 // Render a message body with clickable links; receipt links get a download icon.
 function Body({ text, mine }) {
   const parts = String(text).split(URL_RE);
   return (
     <span className="whitespace-pre-wrap">
-      {parts.map((p, i) =>
-        URL_RE.test(p) ? (
+      {parts.map((part, i) =>
+        URL_RE.test(part) ? (
           <a
             key={i}
-            href={p}
+            href={part}
             target="_blank"
             rel="noopener noreferrer"
             className={`inline-flex items-center gap-1 underline ${mine ? "text-white" : "text-rose"}`}
           >
-            {isReceipt(p) ? <><Download size={13} /> Download struk</> : p}
+            {isReceipt(part) ? <><Download size={13} /> Download struk</> : part}
           </a>
         ) : (
-          <span key={i}>{p}</span>
+          <span key={i}>{part}</span>
         )
       )}
     </span>
@@ -39,7 +39,7 @@ export default function ChatWidget() {
   const { user } = useUser();
   const [open, setOpen] = useState(false);
   const [view, setView] = useState("menu"); // menu | chat
-  const [wa, setWa] = useState(site.whatsapp || "");
+  const [whatsapp, setWhatsapp] = useState(site.whatsapp || "");
   const [nama, setNama] = useState("");
   const [msgs, setMsgs] = useState([]);
   const [text, setText] = useState("");
@@ -55,7 +55,7 @@ export default function ChatWidget() {
     async function loadWhatsapp() {
       try {
         const settings = await getSettings();
-        if (settings?.whatsapp) setWa(settings.whatsapp);
+        if (settings?.whatsapp) setWhatsapp(settings.whatsapp);
       } catch (e) {
         // Keep the default number if settings fail to load.
       }
@@ -92,11 +92,11 @@ export default function ChatWidget() {
   function mergeNew(incoming) {
     if (!incoming.length) return;
     setMsgs((prev) => {
-      const seen = new Set(prev.map((m) => m.id));
-      const add = incoming.filter((m) => !seen.has(m.id));
+      const seen = new Set(prev.map((message) => message.id));
+      const add = incoming.filter((message) => !seen.has(message.id));
       if (!add.length) return prev;
       const next = [...prev, ...add];
-      lastId.current = Math.max(lastId.current, ...next.map((m) => m.id));
+      lastId.current = Math.max(lastId.current, ...next.map((message) => message.id));
       return next;
     });
   }
@@ -108,8 +108,8 @@ export default function ChatWidget() {
       try { const rows = await pollChatMessages(cid, lastId.current); if (alive) mergeNew(rows); } catch (e) {}
     }
     tick();
-    const t = setInterval(tick, 3000);
-    return () => { alive = false; clearInterval(t); };
+    const timer = setInterval(tick, 3000);
+    return () => { alive = false; clearInterval(timer); };
   }, [open, view, cid]);
 
   useEffect(() => { bottomRef.current?.scrollIntoView({ block: "end" }); }, [msgs, view]);
@@ -126,7 +126,7 @@ export default function ChatWidget() {
     } catch (e) { setErr("Gagal mengirim. Coba lagi."); } finally { setBusy(false); }
   }
 
-  const waHref = waLink(normalizeWa(wa || site.whatsapp), `Halo ${site.brand}, saya mau tanya soal layanan make up / nail art.`);
+  const waHref = waLink(normalizeWa(whatsapp || site.whatsapp), `Halo ${site.brand}, saya mau tanya soal layanan make up / nail art.`);
 
   if (!open) return null;
 
@@ -181,10 +181,10 @@ export default function ChatWidget() {
             <>
               <div className="min-h-0 flex-1 space-y-2 overflow-y-auto bg-rose-soft/40 p-4">
                 {msgs.length === 0 && <p className="py-6 text-center text-xs text-muted">Tulis pesanmu, kami balas secepatnya. 💬</p>}
-                {msgs.map((m) => (
-                  <div key={m.id} className={`flex ${m.sender === "guest" ? "justify-end" : "justify-start"}`}>
-                    <div className={`max-w-[80%] rounded-2xl px-3 py-2 text-sm ${m.sender === "guest" ? "bg-rose text-white" : "border border-rose-line bg-white text-ink"}`}>
-                      <Body text={m.body} mine={m.sender === "guest"} />
+                {msgs.map((message) => (
+                  <div key={message.id} className={`flex ${message.sender === "guest" ? "justify-end" : "justify-start"}`}>
+                    <div className={`max-w-[80%] rounded-2xl px-3 py-2 text-sm ${message.sender === "guest" ? "bg-rose text-white" : "border border-rose-line bg-white text-ink"}`}>
+                      <Body text={message.body} mine={message.sender === "guest"} />
                     </div>
                   </div>
                 ))}

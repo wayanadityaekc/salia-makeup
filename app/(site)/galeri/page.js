@@ -21,12 +21,12 @@ export default async function GaleriPage() {
         </div>
       ) : (
         <div className="mt-12 columns-2 gap-4 sm:columns-3 [&>*]:mb-4">
-          {items.map((g) => (
+          {items.map((photo) => (
             // eslint-disable-next-line @next/next/no-img-element
             <img
-              key={g.id}
-              src={g.url}
-              alt={g.caption || "Portofolio Salia Makeup"}
+              key={photo.id}
+              src={photo.url}
+              alt={photo.caption || "Portofolio Salia Makeup"}
               loading="lazy"
               className="w-full rounded-2xl"
             />

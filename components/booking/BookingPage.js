@@ -40,9 +40,9 @@ export default function BookingPage({ settings }) {
   // Read the persisted cart (client only).
   useEffect(() => {
     try {
-      const v = JSON.parse(localStorage.getItem(CART_KEY) || "{}");
-      const items = [v?.sel?.makeup, v?.sel?.hairdo, v?.sel?.nail].filter(Boolean);
-      setCart({ items, orang: v?.orang || 1 });
+      const saved = JSON.parse(localStorage.getItem(CART_KEY) || "{}");
+      const items = [saved?.sel?.makeup, saved?.sel?.hairdo, saved?.sel?.nail].filter(Boolean);
+      setCart({ items, orang: saved?.orang || 1 });
     } catch (e) {}
   }, []);
 
@@ -64,7 +64,7 @@ export default function BookingPage({ settings }) {
   }, [token]);
 
   const areas = settings?.areas || [];
-  const subtotal = cart.items.reduce((a, b) => a + (b.base || 0), 0);
+  const subtotal = cart.items.reduce((sum, item) => sum + (item.base || 0), 0);
 
   if (step === "done") {
     return <DonePanel receipt={doneReceipt} user={user} />;
@@ -111,7 +111,7 @@ export default function BookingPage({ settings }) {
                 token={token}
                 tanggal={tok.tanggal}
                 user={user}
-                onDone={(r) => { setDoneReceipt(r); setStep("done"); }}
+                onDone={(receipt) => { setDoneReceipt(receipt); setStep("done"); }}
               />
             ) : (
               <LockedPanel status={tok.status} reason={tok.reason} cart={cart} settings={settings} />
@@ -125,11 +125,11 @@ export default function BookingPage({ settings }) {
 
 // ---- Locked: no valid token -> check availability via WhatsApp ---------------
 function LockedPanel({ status, reason, cart, settings }) {
-  const wa = normalizeWa(settings?.whatsapp || site.whatsapp);
+  const whatsappNumber = normalizeWa(settings?.whatsapp || site.whatsapp);
   const list = cart.items.map((i) => `- ${i.nama}`).join("\n");
   const msg =
     `Halo ${site.brand}, saya mau cek ketersediaan tanggal untuk booking:\n${list}\nJumlah orang: ${cart.orang}\n\nTanggal yang saya inginkan: ____\nMohon info ketersediaannya ya 🙏`;
-  const href = waLink(wa, msg);
+  const href = waLink(whatsappNumber, msg);
 
   const expired = reason === "expired";
   const used = reason === "used";
@@ -139,9 +139,9 @@ function LockedPanel({ status, reason, cart, settings }) {
       {/* The form, shown locked behind a frosted overlay. */}
       <div aria-hidden className="pointer-events-none select-none rounded-2xl border border-rose-line bg-white p-5 opacity-40 blur-[1px]">
         <div className="grid grid-cols-2 gap-3">
-          {["Nama", "No. WhatsApp", "Email", "Jumlah orang", "Tanggal", "Jam ready"].map((l) => (
-            <div key={l}>
-              <div className="mb-1 text-xs text-muted">{l}</div>
+          {["Nama", "No. WhatsApp", "Email", "Jumlah orang", "Tanggal", "Jam ready"].map((label) => (
+            <div key={label}>
+              <div className="mb-1 text-xs text-muted">{label}</div>
               <div className="h-9 rounded-xl border border-rose-line bg-rose-soft/40" />
             </div>
           ))}
@@ -192,17 +192,17 @@ function UnlockedForm({ cart, areas, settings, token, tanggal, user, onDone }) {
   const fileRef = useRef(null);
 
   useEffect(() => {
-    if (user) setForm((f) => ({ ...f, nama: f.nama || user.nama || "", email: f.email || user.email || "", telepon: f.telepon || user.telepon || "" }));
+    if (user) setForm((prev) => ({ ...prev, nama: prev.nama || user.nama || "", email: prev.email || user.email || "", telepon: prev.telepon || user.telepon || "" }));
   }, [user]);
 
-  const area = areas.find((a) => a.id === form.areaId) || areas[0] || { fee: 0, nama: "" };
-  const subtotal = cart.items.reduce((a, b) => a + (b.base || 0), 0);
+  const area = areas.find((area) => area.id === form.areaId) || areas[0] || { fee: 0, nama: "" };
+  const subtotal = cart.items.reduce((sum, item) => sum + (item.base || 0), 0);
   const total = subtotal * orang + (area.fee || 0);
   const dpPercent = settings?.dpPercent || 50;
-  const dp = Math.round((total * dpPercent) / 100);
+  const downPayment = Math.round((total * dpPercent) / 100);
   const bank = settings?.bank || {};
-  function set(k, v) { setForm((f) => ({ ...f, [k]: v })); }
-  const areaOptions = areas.map((a) => ({ value: a.id, label: `${a.nama} ${a.fee > 0 ? `(+ ${formatRupiah(a.fee)})` : "(Gratis)"}` }));
+  function set(field, value) { setForm((prev) => ({ ...prev, [field]: value })); }
+  const areaOptions = areas.map((area) => ({ value: area.id, label: `${area.nama} ${area.fee > 0 ? `(+ ${formatRupiah(area.fee)})` : "(Gratis)"}` }));
 
   async function copy(key, text) { try { await navigator.clipboard.writeText(text); setCopied(key); setTimeout(() => setCopied(""), 1500); } catch (e) {} }
 
@@ -212,7 +212,7 @@ function UnlockedForm({ cart, areas, settings, token, tanggal, user, onDone }) {
     setUploading(true); setUploadErr(""); setPct(0);
     try {
       const compressed = await compressImage(file);
-      const url = await uploadProof(compressed, (p) => setPct(p));
+      const url = await uploadProof(compressed, (percent) => setPct(percent));
       setProofUrl(url);
     } catch (e) {
       setUploadErr(e?.data?.error === "uploads_not_configured" ? "Upload belum aktif, kirim bukti via WhatsApp saja." : "Gagal upload. Coba lagi / kirim via WhatsApp.");
@@ -301,9 +301,9 @@ function UnlockedForm({ cart, areas, settings, token, tanggal, user, onDone }) {
               <button type="button" onClick={() => setOrang(Math.min(50, orang + 1))} className="flex h-8 w-8 items-center justify-center rounded-full text-rose hover:bg-rose-soft"><Plus size={16} /></button>
             </div>
           </div>
-          <div><label className="label">Jam ready</label><Select value={form.jam} onChange={(v) => set("jam", v)} options={timeOptions} placeholder="Pilih jam ready" /></div>
+          <div><label className="label">Jam ready</label><Select value={form.jam} onChange={(time) => set("jam", time)} options={timeOptions} placeholder="Pilih jam ready" /></div>
         </div>
-        <div><label className="label">Area</label><Select value={form.areaId} onChange={(v) => set("areaId", v)} options={areaOptions} placeholder="Pilih area" /></div>
+        <div><label className="label">Area</label><Select value={form.areaId} onChange={(areaId) => set("areaId", areaId)} options={areaOptions} placeholder="Pilih area" /></div>
         <div><label className="label">Alamat lengkap</label><textarea rows={3} className="field resize-none" value={form.lokasi} onChange={(e) => set("lokasi", e.target.value)} placeholder="Nama jalan, no. rumah, patokan, kecamatan…" /></div>
         <div><label className="label">Catatan (opsional)</label><input className="field" value={form.catatan} onChange={(e) => set("catatan", e.target.value)} placeholder="Referensi look, tema acara, dll." /></div>
       </div>
@@ -311,7 +311,7 @@ function UnlockedForm({ cart, areas, settings, token, tanggal, user, onDone }) {
       {/* Total + DP */}
       <div className="flex items-center justify-between rounded-xl bg-rose-soft px-4 py-3">
         <div><div className="text-xs text-muted">Total ({orang} orang{area.fee > 0 ? " + ongkir" : ""})</div><div className="text-xl font-bold text-rose">{formatRupiah(total)}</div></div>
-        <div className="text-right text-[11px] leading-tight text-muted">DP {dpPercent}%<br />{formatRupiah(dp)}</div>
+        <div className="text-right text-[11px] leading-tight text-muted">DP {dpPercent}%<br />{formatRupiah(downPayment)}</div>
       </div>
 
       {/* Payment */}
@@ -319,7 +319,7 @@ function UnlockedForm({ cart, areas, settings, token, tanggal, user, onDone }) {
         <div className="text-xs font-semibold uppercase tracking-wider text-rose">Bayar DP untuk kunci jadwal</div>
         <div className="mt-3 rounded-xl border border-rose-line p-4">
           {bank.number ? (
-            <><Row label="Bank" value={bank.name || "-"} /><Row label="No. Rekening" value={bank.number} copyKey="rek" /><Row label="Atas Nama" value={bank.holder || "-"} /><Row label={`DP ${dpPercent}%`} value={formatRupiah(dp)} copyKey="dp" /></>
+            <><Row label="Bank" value={bank.name || "-"} /><Row label="No. Rekening" value={bank.number} copyKey="rek" /><Row label="Atas Nama" value={bank.holder || "-"} /><Row label={`DP ${dpPercent}%`} value={formatRupiah(downPayment)} copyKey="dp" /></>
           ) : (
             <p className="text-sm text-muted">Nomor rekening belum diatur. Chat admin untuk detail pembayaran.</p>
           )}
@@ -358,8 +358,8 @@ function DonePanel({ receipt, user }) {
   function download() {
     if (!receipt) return;
     const url = URL.createObjectURL(receipt.blob);
-    const a = document.createElement("a");
-    a.href = url; a.download = receipt.filename; a.click();
+    const link = document.createElement("a");
+    link.href = url; link.download = receipt.filename; link.click();
     setTimeout(() => URL.revokeObjectURL(url), 4000);
   }
   return (

@@ -28,8 +28,8 @@ export default function AuthModal({ onClose }) {
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) return setErr("Masukkan email yang valid.");
     setErr(""); setBusy(true);
     try {
-      const r = await requestCode(email.trim());
-      setNote(r?.delivered === false ? "Kode dibuat. (Pengiriman email belum aktif, hubungi admin.)" : `Kode dikirim ke ${email.trim()}. Cek inbox / spam.`);
+      const result = await requestCode(email.trim());
+      setNote(result?.delivered === false ? "Kode dibuat. (Pengiriman email belum aktif, hubungi admin.)" : `Kode dikirim ke ${email.trim()}. Cek inbox / spam.`);
       setStep("code");
       setTimeout(() => codeRef.current?.focus(), 50);
     } catch (e) {

@@ -18,8 +18,8 @@ export default async function NailArtPage() {
       />
 
       <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-        {nailArt.map((n) => (
-          <ServiceCard key={n.id} item={n} />
+        {nailArt.map((design) => (
+          <ServiceCard key={design.id} item={design} />
         ))}
       </div>
 
@@ -28,9 +28,9 @@ export default async function NailArtPage() {
         <div className="mt-16">
           <SectionHeader eyebrow="Inspirasi" title="Beberapa karya" />
           <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
-            {gallery.slice(0, 6).map((g) => (
+            {gallery.slice(0, 6).map((photo) => (
               // eslint-disable-next-line @next/next/no-img-element
-              <img key={g.id} src={g.url} alt={g.caption || "Nail art"} loading="lazy" className="aspect-square w-full rounded-xl object-cover" />
+              <img key={photo.id} src={photo.url} alt={photo.caption || "Nail art"} loading="lazy" className="aspect-square w-full rounded-xl object-cover" />
             ))}
           </div>
         </div>

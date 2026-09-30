@@ -17,9 +17,9 @@ export function CartProvider({ children }) {
     try {
       const raw = localStorage.getItem(CART_KEY);
       if (raw) {
-        const v = JSON.parse(raw);
-        if (v.sel) setSel({ makeup: v.sel.makeup || null, hairdo: v.sel.hairdo || null, nail: v.sel.nail || null });
-        if (v.orang) setOrang(v.orang);
+        const saved = JSON.parse(raw);
+        if (saved.sel) setSel({ makeup: saved.sel.makeup || null, hairdo: saved.sel.hairdo || null, nail: saved.sel.nail || null });
+        if (saved.orang) setOrang(saved.orang);
       }
     } catch (e) {}
   }, []);
@@ -29,16 +29,16 @@ export function CartProvider({ children }) {
   }, [sel, orang]);
 
   function pick(item) {
-    setSel((s) => ({ ...s, [item.kind]: s[item.kind]?.id === item.id ? null : item }));
+    setSel((prev) => ({ ...prev, [item.kind]: prev[item.kind]?.id === item.id ? null : item }));
   }
-  function remove(kind) { setSel((s) => ({ ...s, [kind]: null })); }
+  function remove(kind) { setSel((prev) => ({ ...prev, [kind]: null })); }
   function clear() {
     setSel({ makeup: null, hairdo: null, nail: null });
     setOrang(1);
   }
 
   const items = useMemo(() => [sel.makeup, sel.hairdo, sel.nail].filter(Boolean), [sel]);
-  const subtotal = useMemo(() => items.reduce((a, b) => a + (b.base || 0), 0), [items]);
+  const subtotal = useMemo(() => items.reduce((sum, item) => sum + (item.base || 0), 0), [items]);
 
   const value = {
     sel, orang, setOrang, pick, remove, clear, items, subtotal,

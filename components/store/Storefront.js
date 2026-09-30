@@ -9,14 +9,14 @@ import BookBar from "./BookBar";
 // switches which list is shown; items are big, one-per-screen cards you scroll
 // through vertically. Wrapped in the cart context.
 export default function Storefront({ data, settings }) {
-  function withKind(arr, kind) { return (arr || []).map((x) => ({ ...x, kind })); }
+  function withKind(arr, kind) { return (arr || []).map((item) => ({ ...item, kind })); }
   const cats = [
     { key: "makeup", label: "Make Up", items: withKind(data.services, "makeup") },
     { key: "hairdo", label: "Hairdo", items: withKind(data.hairdo, "hairdo") },
     { key: "nail", label: "Nails", items: withKind(data.nailArt, "nail") },
   ];
   const [cat, setCat] = useState("makeup");
-  const active = cats.find((c) => c.key === cat) || cats[0];
+  const active = cats.find((category) => category.key === cat) || cats[0];
 
   return (
     <CartProvider>
@@ -24,15 +24,15 @@ export default function Storefront({ data, settings }) {
         {/* Category bar */}
         <div className="sticky top-16 z-30 -mx-5 border-y border-rose-line bg-white/95 px-5 backdrop-blur sm:mx-0 sm:rounded-full sm:border">
           <div className="mx-auto flex max-w-md gap-1 py-2">
-            {cats.map((c) => (
+            {cats.map((category) => (
               <button
-                key={c.key}
-                onClick={() => setCat(c.key)}
+                key={category.key}
+                onClick={() => setCat(category.key)}
                 className={`flex-1 rounded-full px-3 py-2 text-sm font-semibold transition ${
-                  cat === c.key ? "bg-rose text-white" : "text-ink hover:bg-rose-soft"
+                  cat === category.key ? "bg-rose text-white" : "text-ink hover:bg-rose-soft"
                 }`}
               >
-                {c.label}
+                {category.label}
               </button>
             ))}
           </div>

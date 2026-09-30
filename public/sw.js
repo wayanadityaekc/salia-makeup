@@ -113,8 +113,8 @@ self.addEventListener("notificationclick", (event) => {
   const target = (event.notification.data && event.notification.data.url) || "/dashboard";
   event.waitUntil(
     self.clients.matchAll({ type: "window", includeUncontrolled: true }).then((clients) => {
-      for (const c of clients) {
-        if (c.url.includes("/dashboard") && "focus" in c) return c.focus();
+      for (const client of clients) {
+        if (client.url.includes("/dashboard") && "focus" in client) return client.focus();
       }
       return self.clients.openWindow ? self.clients.openWindow(target) : undefined;
     })

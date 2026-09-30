@@ -6,8 +6,8 @@ import { Calendar, ChevronLeft, ChevronRight } from "lucide-react";
 const BULAN = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
 const HARI = ["M", "S", "S", "R", "K", "J", "S"];
 
-function toStr(d) { return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`; }
-function startOfDay(d) { const x = new Date(d); x.setHours(0, 0, 0, 0); return x; }
+function toStr(date) { return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`; }
+function startOfDay(date) { const start = new Date(date); start.setHours(0, 0, 0, 0); return start; }
 
 // Custom date picker (no native <input type=date>). value/onChange are "YYYY-MM-DD".
 // Dates before `min` (default: today) are disabled.
@@ -46,7 +46,7 @@ export default function DatePicker({ value, onChange, invalid = false, placehold
     <div ref={ref} className="relative">
       <button
         type="button"
-        onClick={() => setOpen((v) => !v)}
+        onClick={() => setOpen((wasOpen) => !wasOpen)}
         className={`field flex items-center justify-between gap-2 text-left ${selected ? "text-ink" : "text-muted"} ${invalid ? "!border-rose" : ""}`}
       >
         <span className="truncate">{label}</span>
@@ -61,24 +61,24 @@ export default function DatePicker({ value, onChange, invalid = false, placehold
             <button type="button" onClick={() => setView(new Date(year, month + 1, 1))} className="rounded-lg p-1.5 text-muted hover:bg-rose-soft"><ChevronRight size={18} /></button>
           </div>
           <div className="mt-2 grid grid-cols-7 gap-1 text-center text-xs text-muted">
-            {HARI.map((h, i) => <div key={i} className="py-1">{h}</div>)}
+            {HARI.map((dayName, i) => <div key={i} className="py-1">{dayName}</div>)}
           </div>
           <div className="grid grid-cols-7 gap-1">
-            {cells.map((d, i) => {
-              if (!d) return <div key={i} />;
-              const disabled = d < min;
-              const isSel = selected && toStr(d) === toStr(selected);
+            {cells.map((day, i) => {
+              if (!day) return <div key={i} />;
+              const disabled = day < min;
+              const isSel = selected && toStr(day) === toStr(selected);
               return (
                 <button
                   key={i}
                   type="button"
                   disabled={disabled}
-                  onClick={() => { onChange(toStr(d)); setOpen(false); }}
+                  onClick={() => { onChange(toStr(day)); setOpen(false); }}
                   className={`h-9 rounded-lg text-sm transition ${
                     isSel ? "bg-rose text-white" : disabled ? "text-muted/40" : "text-ink hover:bg-rose-soft"
                   }`}
                 >
-                  {d.getDate()}
+                  {day.getDate()}
                 </button>
               );
             })}

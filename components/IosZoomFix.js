@@ -12,10 +12,10 @@ import { useEffect } from "react";
 // first. Same reasoning as CUE's IosZoomFix.
 export default function IosZoomFix() {
   useEffect(() => {
-    const ua = navigator.userAgent || "";
-    const iOS = /iphone|ipad|ipod/i.test(ua);
+    const userAgent = navigator.userAgent || "";
+    const iOS = /iphone|ipad|ipod/i.test(userAgent);
     // iPadOS reports as Mac; detect via touch points (Mac has 0, no touchscreen).
-    const iPadOS = /macintosh/i.test(ua) && navigator.maxTouchPoints > 1;
+    const iPadOS = /macintosh/i.test(userAgent) && navigator.maxTouchPoints > 1;
     if (!iOS && !iPadOS) return;
 
     const meta = document.querySelector('meta[name="viewport"]');

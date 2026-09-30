@@ -27,8 +27,8 @@ export default async function Home() {
 
   // Editable hero content (dashboard) with hardcoded fallbacks so nothing breaks
   // before the owner sets anything / if the API is slow.
-  const c = settings.content || {};
-  const heroKicker = c.heroKicker || site.tagline;
+  const content = settings.content || {};
+  const heroKicker = content.heroKicker || site.tagline;
 
   return (
     <>
@@ -39,7 +39,7 @@ export default async function Home() {
         <div className="animate-rise">
           <div className="eyebrow">{heroKicker}</div>
           <h1 className="mt-4 text-4xl font-bold leading-[1.1] tracking-tight text-ink sm:text-5xl lg:text-6xl">
-            {c.heroTitle ? c.heroTitle : (<>Cantik di hari <span className="text-rose">spesialmu</span>.</>)}
+            {content.heroTitle ? content.heroTitle : (<>Cantik di hari <span className="text-rose">spesialmu</span>.</>)}
           </h1>
           <p className="mt-5 max-w-md text-lg leading-relaxed text-muted">
             Jasa make up, hairdo, dan nail art profesional di {site.kota}. Pilih
@@ -55,9 +55,9 @@ export default async function Home() {
           </div>
           <SocialLinks social={settings.social} className="mt-6" />
         </div>
-        {c.heroPhoto ? (
+        {content.heroPhoto ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={c.heroPhoto} alt="Portofolio Salia Makeup" className="aspect-[4/5] w-full rounded-3xl object-cover" />
+          <img src={content.heroPhoto} alt="Portofolio Salia Makeup" className="aspect-[4/5] w-full rounded-3xl object-cover" />
         ) : (
           <div className="foto-ph aspect-[4/5] rounded-3xl text-base">Foto portofolio Salia</div>
         )}
@@ -66,14 +66,14 @@ export default async function Home() {
       {/* Keunggulan */}
       <section className="container-x grid gap-5 sm:grid-cols-3">
         {[
-          { icon: Sparkles, t: "Produk premium", d: "Kosmetik berkualitas, aman, dan tahan lama." },
-          { icon: Heart, t: "Sesuai karakter", d: "Riasan disesuaikan dengan wajah dan acaramu." },
-          { icon: Clock, t: "Tepat waktu", d: "Datang on-time, bisa ke lokasi kamu." },
-        ].map((f) => (
-          <div key={f.t} className="rounded-2xl border border-rose-line bg-white p-6">
-            <f.icon className="text-rose" size={24} />
-            <h3 className="mt-4 font-semibold text-ink">{f.t}</h3>
-            <p className="mt-1.5 text-sm text-muted">{f.d}</p>
+          { icon: Sparkles, title: "Produk premium", text: "Kosmetik berkualitas, aman, dan tahan lama." },
+          { icon: Heart, title: "Sesuai karakter", text: "Riasan disesuaikan dengan wajah dan acaramu." },
+          { icon: Clock, title: "Tepat waktu", text: "Datang on-time, bisa ke lokasi kamu." },
+        ].map((feature) => (
+          <div key={feature.title} className="rounded-2xl border border-rose-line bg-white p-6">
+            <feature.icon className="text-rose" size={24} />
+            <h3 className="mt-4 font-semibold text-ink">{feature.title}</h3>
+            <p className="mt-1.5 text-sm text-muted">{feature.text}</p>
           </div>
         ))}
       </section>
@@ -88,13 +88,13 @@ export default async function Home() {
         <section className="container-x py-16">
           <SectionHeader eyebrow="Testimoni" title="Kata mereka" desc="Contoh tampilan, akan diganti dengan review asli." />
           <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {reviews.map((r, i) => (
+            {reviews.map((review, i) => (
               <figure key={i} className="flex flex-col rounded-2xl border border-rose-line bg-white p-6">
                 <Quote className="text-rose/40" size={28} />
-                <blockquote className="mt-3 flex-1 text-sm leading-relaxed text-ink/80">“{r.teks}”</blockquote>
+                <blockquote className="mt-3 flex-1 text-sm leading-relaxed text-ink/80">“{review.teks}”</blockquote>
                 <figcaption className="mt-5 border-t border-rose-line pt-4">
-                  <div className="text-sm font-semibold text-ink">{r.nama}</div>
-                  {r.layanan && <div className="text-xs text-muted">{r.layanan}</div>}
+                  <div className="text-sm font-semibold text-ink">{review.nama}</div>
+                  {review.layanan && <div className="text-xs text-muted">{review.layanan}</div>}
                 </figcaption>
               </figure>
             ))}

@@ -22,11 +22,11 @@ export default function ReceiptBanner() {
     let alive = true;
     async function load() {
       try {
-        const [rows, s] = await Promise.all([getUserBookings(), getSettings()]);
+        const [rows, settings] = await Promise.all([getUserBookings(), getSettings()]);
         if (!alive) return;
-        setDpPercent(s?.dpPercent || 50);
+        setDpPercent(settings?.dpPercent || 50);
         // Prefer the newest approved booking; else the newest pending one.
-        const approved = rows.find((b) => b.status === "konfirmasi" || b.status === "selesai");
+        const approved = rows.find((row) => row.status === "konfirmasi" || row.status === "selesai");
         setBooking(approved || rows[0] || null);
       } catch (e) {
         // Both helpers return safe defaults, so the banner just stays hidden.
@@ -47,7 +47,7 @@ export default function ReceiptBanner() {
     setBusy(true);
     try {
       const orang = booking.orang || 1;
-      const sub = items.reduce((s, i) => s + (i.base || 0) * orang, 0);
+      const sub = items.reduce((sum, item) => sum + (item.base || 0) * orang, 0);
       const areaFee = Math.max(0, (booking.total || 0) - sub);
       const pdf = await makeReceiptPdf({
         ref: `SALIA-${booking.id}`, nama: booking.nama, telepon: booking.telepon,
@@ -56,8 +56,8 @@ export default function ReceiptBanner() {
         dpPercent, brand: site.brand,
       });
       const url = URL.createObjectURL(pdf.blob);
-      const a = document.createElement("a");
-      a.href = url; a.download = pdf.filename; a.click();
+      const link = document.createElement("a");
+      link.href = url; link.download = pdf.filename; link.click();
       setTimeout(() => URL.revokeObjectURL(url), 4000);
     } finally { setBusy(false); }
   }

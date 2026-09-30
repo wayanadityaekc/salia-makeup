@@ -22,7 +22,7 @@ export default function StoreCard({ item, big = false }) {
   const desc = item.deskripsi || item.ringkas || "";
   const details = String(item.detail || "")
     .split("\n")
-    .map((s) => s.trim().replace(/^[-•]\s*/, ""))
+    .map((line) => line.trim().replace(/^[-•]\s*/, ""))
     .filter(Boolean);
 
   return (
@@ -96,10 +96,10 @@ export default function StoreCard({ item, big = false }) {
               {desc && <p className="mt-2 text-sm leading-relaxed text-muted">{desc}</p>}
               {details.length > 0 && (
                 <ul className="mt-4 space-y-2">
-                  {details.map((d, i) => (
+                  {details.map((detail, i) => (
                     <li key={i} className="flex gap-2 text-sm leading-snug text-ink/80">
                       <Check size={15} className="mt-0.5 shrink-0 text-rose" />
-                      <span>{d}</span>
+                      <span>{detail}</span>
                     </li>
                   ))}
                 </ul>

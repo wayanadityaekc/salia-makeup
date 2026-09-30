@@ -30,11 +30,11 @@ export default function InstallPrompt() {
       if (localStorage.getItem(DISMISS_KEY) === "1") return;
     } catch (e) {}
 
-    const ua = navigator.userAgent || "";
+    const userAgent = navigator.userAgent || "";
     const isIOS =
-      /iphone|ipad|ipod/i.test(ua) ||
-      (/macintosh/i.test(ua) && navigator.maxTouchPoints > 1);
-    const isSafari = /safari/i.test(ua) && !/(crios|fxios|chrome|android)/i.test(ua);
+      /iphone|ipad|ipod/i.test(userAgent) ||
+      (/macintosh/i.test(userAgent) && navigator.maxTouchPoints > 1);
+    const isSafari = /safari/i.test(userAgent) && !/(crios|fxios|chrome|android)/i.test(userAgent);
     setIos(isIOS);
     if (isIOS && isSafari) {
       setShow(true); // iOS Safari can install (via the guide)
@@ -144,28 +144,28 @@ export default function InstallPrompt() {
 
             {ios ? (
               <ol className="mt-4 space-y-3">
-                <Step n={1}>
+                <Step number={1}>
                   Ketuk ikon <b>Bagikan</b>{" "}
                   <Share size={15} className="mx-0.5 inline align-text-bottom text-rose" /> di bar Safari.
                 </Step>
-                <Step n={2}>
+                <Step number={2}>
                   Pilih <b>Add to Home Screen</b>{" "}
                   <Plus size={15} className="mx-0.5 inline align-text-bottom text-rose" />.
                 </Step>
-                <Step n={3}>
+                <Step number={3}>
                   Ketuk <b>Add</b> di kanan atas. Selesai, buka Salia dari ikonnya.
                 </Step>
               </ol>
             ) : (
               <ol className="mt-4 space-y-3">
-                <Step n={1}>
+                <Step number={1}>
                   Buka menu browser{" "}
                   <MoreVertical size={15} className="mx-0.5 inline align-text-bottom text-rose" /> (kanan atas).
                 </Step>
-                <Step n={2}>
+                <Step number={2}>
                   Pilih <b>Install app</b> atau <b>Add to Home screen</b>.
                 </Step>
-                <Step n={3}>Konfirmasi. Buka Salia dari ikonnya.</Step>
+                <Step number={3}>Konfirmasi. Buka Salia dari ikonnya.</Step>
               </ol>
             )}
 
@@ -182,11 +182,11 @@ export default function InstallPrompt() {
   );
 }
 
-function Step({ n, children }) {
+function Step({ number, children }) {
   return (
     <li className="flex gap-3">
       <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-rose-soft text-xs font-bold text-rose">
-        {n}
+        {number}
       </span>
       <span className="text-sm leading-relaxed text-ink">{children}</span>
     </li>

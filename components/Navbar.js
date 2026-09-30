@@ -66,15 +66,15 @@ export default function Navbar() {
         </Link>
 
         <nav className="hidden items-center gap-8 md:flex">
-          {nav.map((n) => (
+          {nav.map((link) => (
             <Link
-              key={n.href}
-              href={n.href}
+              key={link.href}
+              href={link.href}
               className={`text-sm transition hover:text-rose ${
-                pathname === n.href ? "font-semibold text-rose" : "text-ink"
+                pathname === link.href ? "font-semibold text-rose" : "text-ink"
               }`}
             >
-              {n.label}
+              {link.label}
             </Link>
           ))}
           <button
@@ -110,7 +110,7 @@ export default function Navbar() {
           </button>
           <button
             className="p-1.5 text-rose"
-            onClick={() => setOpen((v) => !v)}
+            onClick={() => setOpen((wasOpen) => !wasOpen)}
             aria-label="Menu"
           >
             {open ? <X size={24} /> : <Menu size={24} />}
@@ -121,15 +121,15 @@ export default function Navbar() {
       {open && (
         <nav className="border-t border-rose-line bg-white md:hidden">
           <div className="container-x flex flex-col py-3">
-            {nav.map((n) => (
+            {nav.map((link) => (
               <Link
-                key={n.href}
-                href={n.href}
+                key={link.href}
+                href={link.href}
                 className={`py-3 text-sm ${
-                  pathname === n.href ? "font-semibold text-rose" : "text-ink"
+                  pathname === link.href ? "font-semibold text-rose" : "text-ink"
                 }`}
               >
-                {n.label}
+                {link.label}
               </Link>
             ))}
             {user ? (
