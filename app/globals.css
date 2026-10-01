@@ -10,6 +10,11 @@ html {
   scroll-behavior: smooth;
 }
 
+/* Popup open: the page behind it does not scroll (useBodyLock). */
+.salia-locked {
+  overflow: hidden !important;
+}
+
 body {
   background: #ffffff;
   color: #241c1e;

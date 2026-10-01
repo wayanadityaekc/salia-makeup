@@ -5,12 +5,14 @@ import { Check, Plus, X } from "lucide-react";
 import { formatRupiah } from "@/lib/utils";
 import { useCart } from "./CartProvider";
 import LoadFallback from "@/components/ui/LoadFallback";
+import useBodyLock from "@/lib/useBodyLock";
 
 // One service = one card; clicking it opens a detail popup with the Pilih button.
 export default function StoreCard({ item = null, big = false }) {
   const { pick, isSelected } = useCart();
   const [open, setOpen] = useState(false);
   const selected = item ? isSelected(item.id) : false;
+  useBodyLock(open);
 
   useEffect(() => {
     if (!open) return;

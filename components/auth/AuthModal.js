@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { X, Loader2, Mail, ArrowLeft } from "lucide-react";
 import { useUser } from "./UserProvider";
+import useBodyLock from "@/lib/useBodyLock";
 
 // Passwordless login: a 6-digit code is emailed, and the account is created on first verify.
 export default function AuthModal({ onClose }) {
@@ -16,6 +17,8 @@ export default function AuthModal({ onClose }) {
   const [err, setErr] = useState("");
   const [note, setNote] = useState("");
   const codeRef = useRef(null);
+  // Mounted only while open, so it locks for its whole life.
+  useBodyLock(true);
 
   useEffect(() => {
     function onKey(e) { if (e.key === "Escape") onClose(); }

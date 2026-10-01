@@ -69,6 +69,12 @@ Before adding any library not listed here: ask Wayan first.
 - [ ] Known issue in CUE: some interactions (for example a popup on click) appear abruptly. Flag to Wayan; he will double-check CUE later.
 - [ ] Every popup locks background scroll.
 
+### Mobile inputs and popups (standing rules, Oct 2026, brief #16)
+
+- [ ] No iOS zoom when a field is tapped. Every page mounts the iOS-only viewport clamp (`IosZoomFix`: adds `maximum-scale=1` on iPhone and iPad only; Android keeps pinch-zoom; never `user-scalable=no`). Fields under 16px are allowed only while that clamp is mounted in the root layout.
+- [ ] Every popup, dialog, modal, drawer, bottom sheet, chat panel and full-screen overlay locks background scroll while open and releases it when closed (`useBodyLock`: a class on both html and body). A popup opened on top of another must not release the lock of the one underneath.
+- [ ] New popup = verify in a browser: open it, scroll over it, the page behind must not move; close it, the page scrolls again. Check the iOS clamp on a real iPhone (headless browsers cannot reproduce iOS focus zoom).
+
 ### QA checklist (draft: extend it from CUE, then ask Wayan to approve)
 
 Claude Code: read CUE, propose the full checklist, mark each item Must-have or Nice-to-have, and wait for approval. Starting list:

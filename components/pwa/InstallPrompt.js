@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import useBodyLock from "@/lib/useBodyLock";
 import { Download, Share, Plus, X, MoreVertical } from "lucide-react";
 
 // Browser-only install bar: Android fires the native dialog; iOS has no install API, so it opens a Share-steps guide.
@@ -11,6 +12,7 @@ export default function InstallPrompt() {
   const [show, setShow] = useState(false);
   const [ios, setIos] = useState(false);
   const [guide, setGuide] = useState(false);
+  useBodyLock(guide);
 
   useEffect(() => {
     if (typeof window === "undefined") return;

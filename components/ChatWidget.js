@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import useBodyLock from "@/lib/useBodyLock";
 import { MessageCircle, X, Send, Loader2, ArrowLeft, Download } from "lucide-react";
 import { site } from "@/lib/config";
 import { getSettings, sendChatMessage, pollChatMessages } from "@/lib/storage";
@@ -38,6 +39,7 @@ function Body({ text = "", mine = false }) {
 export default function ChatWidget() {
   const { user } = useUser();
   const [open, setOpen] = useState(false);
+  useBodyLock(open);
   // View: menu | chat
   const [view, setView] = useState("menu");
   const [whatsapp, setWhatsapp] = useState(site.whatsapp || "");
