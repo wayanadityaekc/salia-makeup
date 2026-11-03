@@ -1,14 +1,14 @@
-import { nailArt as cfgNailArt } from "@/lib/config";
-import { getServicesData, getGallery } from "@/lib/storage";
-import ServiceCard from "@/components/ServiceCard";
-import SectionHeader from "@/components/SectionHeader";
+import { nailArt as cfgNailArt } from '@/lib/config';
+import { fetchServicesData, fetchGallery } from '@/lib/storage';
+import ServiceCard from '@/components/ServiceCard';
+import SectionHeader from '@/components/SectionHeader';
 
-export const metadata = { title: "Nail Art" };
+export const metadata = { title: 'Nail Art' };
 
 export default async function NailArtPage() {
-  const data = await getServicesData();
+  const data = await fetchServicesData();
   const nailArt = data?.nailArt?.length ? data.nailArt : cfgNailArt;
-  const gallery = await getGallery();
+  const gallery = await fetchGallery();
   return (
     <div className="container-x py-16">
       <SectionHeader
@@ -23,14 +23,18 @@ export default async function NailArtPage() {
         ))}
       </div>
 
-      {/* Galeri kecil */}
       {gallery.length > 0 && (
         <div className="mt-16">
           <SectionHeader eyebrow="Inspirasi" title="Beberapa karya" />
           <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
             {gallery.slice(0, 6).map((photo) => (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img key={photo.id} src={photo.url} alt={photo.caption || "Nail art"} loading="lazy" className="aspect-square w-full rounded-xl object-cover" />
+              <img
+                key={photo.id}
+                src={photo.url}
+                alt={photo.caption || 'Nail art'}
+                loading="lazy"
+                className="aspect-square w-full rounded-xl object-cover"
+              />
             ))}
           </div>
         </div>

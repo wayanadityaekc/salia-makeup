@@ -1,13 +1,12 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import { Check, Plus, X } from "lucide-react";
-import { formatRupiah } from "@/lib/utils";
-import { useCart } from "./CartProvider";
-import LoadFallback from "@/components/ui/LoadFallback";
-import useBodyLock from "@/lib/useBodyLock";
+import { useEffect, useState } from 'react';
+import { Check, Plus, X } from 'lucide-react';
+import { formatRupiah } from '@/lib/utils';
+import { useCart } from './CartProvider';
+import LoadFallback from '@/components/ui/LoadFallback';
+import useBodyLock from '@/lib/useBodyLock';
 
-// One service = one card; clicking it opens a detail popup with the Pilih button.
 export default function StoreCard({ item = null, big = false }) {
   const { pick, isSelected } = useCart();
   const [open, setOpen] = useState(false);
@@ -16,29 +15,32 @@ export default function StoreCard({ item = null, big = false }) {
 
   useEffect(() => {
     if (!open) return;
-    function onKey(e) { if (e.key === "Escape") setOpen(false); }
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
+    function handleKeyDown(event) {
+      if (event.key === 'Escape') setOpen(false);
+    }
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
   }, [open]);
 
   if (!item) return <LoadFallback />;
 
-  const desc = item.deskripsi || item.ringkas || "";
-  const details = String(item.detail || "")
-    .split("\n")
-    .map((line) => line.trim().replace(/^[-•]\s*/, ""))
+  const desc = item.deskripsi || item.ringkas || '';
+  const details = String(item.detail || '')
+    .split('\n')
+    .map((line) => line.trim().replace(/^[-•]\s*/, ''))
     .filter(Boolean);
 
   return (
     <>
-      {/* Card */}
       <button
         type="button"
         onClick={() => setOpen(true)}
         className={`group relative flex w-full overflow-hidden rounded-2xl border bg-white text-left transition ${
-          big ? "flex-row sm:flex-col" : "flex-col"
+          big ? 'flex-row sm:flex-col' : 'flex-col'
         } ${
-          selected ? "border-rose ring-2 ring-rose" : "border-rose-line hover:shadow-[0_12px_40px_-18px_rgba(107,44,62,0.3)]"
+          selected
+            ? 'border-rose ring-2 ring-rose'
+            : 'border-rose-line hover:shadow-[0_12px_40px_-18px_rgba(107,44,62,0.3)]'
         }`}
       >
         {selected && (
@@ -47,38 +49,56 @@ export default function StoreCard({ item = null, big = false }) {
           </span>
         )}
         {item.foto ? (
-          // eslint-disable-next-line @next/next/no-img-element
           <img
             src={item.foto}
             alt={item.nama}
             loading="lazy"
-            className={`aspect-square object-cover ${big ? "w-28 shrink-0 sm:w-full" : "w-full aspect-[4/3]"}`}
+            className={`aspect-square object-cover ${big ? 'w-28 shrink-0 sm:w-full' : 'w-full aspect-[4/3]'}`}
           />
         ) : (
-          <div className={`foto-ph ${big ? "aspect-square w-28 shrink-0 text-xs sm:w-full sm:text-sm" : "aspect-[4/3] w-full text-xs"}`}>Foto {item.nama}</div>
+          <div
+            className={`foto-ph ${big ? 'aspect-square w-28 shrink-0 text-xs sm:w-full sm:text-sm' : 'aspect-[4/3] w-full text-xs'}`}
+          >
+            Foto {item.nama}
+          </div>
         )}
-        <div className={`flex min-w-0 flex-1 flex-col ${big ? "p-3 sm:p-5" : "p-3 sm:p-4"}`}>
-          <h3 className={`font-semibold leading-snug text-ink ${big ? "text-base sm:text-lg" : "text-sm sm:text-base"}`}>{item.nama}</h3>
-          {desc && <p className={`mt-1 leading-relaxed text-muted ${big ? "line-clamp-2 text-sm sm:line-clamp-none" : "line-clamp-2 text-xs sm:text-sm"}`}>{desc}</p>}
+        <div className={`flex min-w-0 flex-1 flex-col ${big ? 'p-3 sm:p-5' : 'p-3 sm:p-4'}`}>
+          <h3
+            className={`font-semibold leading-snug text-ink ${big ? 'text-base sm:text-lg' : 'text-sm sm:text-base'}`}
+          >
+            {item.nama}
+          </h3>
+          {desc && (
+            <p
+              className={`mt-1 leading-relaxed text-muted ${big ? 'line-clamp-2 text-sm sm:line-clamp-none' : 'line-clamp-2 text-xs sm:text-sm'}`}
+            >
+              {desc}
+            </p>
+          )}
           <div className="mt-3 flex-1" />
-          <div className={`font-bold text-rose ${big ? "text-lg sm:text-xl" : "text-base sm:text-lg"}`}>{formatRupiah(item.base)}</div>
-          <span className={`mt-3 inline-flex items-center justify-center gap-1.5 rounded-full bg-rose-soft font-semibold text-rose ${big ? "w-full px-4 py-2 text-sm sm:py-2.5" : "w-full px-4 py-2 text-sm"}`}>
+          <div className={`font-bold text-rose ${big ? 'text-lg sm:text-xl' : 'text-base sm:text-lg'}`}>
+            {formatRupiah(item.base)}
+          </div>
+          <span
+            className={`mt-3 inline-flex items-center justify-center gap-1.5 rounded-full bg-rose-soft font-semibold text-rose ${big ? 'w-full px-4 py-2 text-sm sm:py-2.5' : 'w-full px-4 py-2 text-sm'}`}
+          >
             Lihat detail
           </span>
         </div>
       </button>
 
-      {/* Detail popup */}
       {open && (
-        <div className="fixed inset-0 z-[60] flex items-end justify-center bg-ink/50 p-0 sm:items-center sm:p-4" onClick={() => setOpen(false)}>
+        <div
+          className="fixed inset-0 z-[60] flex items-end justify-center bg-ink/50 p-0 sm:items-center sm:p-4"
+          onClick={() => setOpen(false)}
+        >
           <div
             className="flex max-h-[92vh] w-full max-w-md flex-col overflow-hidden rounded-t-3xl bg-white sm:rounded-3xl"
-            style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
-            onClick={(e) => e.stopPropagation()}
+            style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
+            onClick={(event) => event.stopPropagation()}
           >
             <div className="relative">
               {item.foto ? (
-                // eslint-disable-next-line @next/next/no-img-element
                 <img src={item.foto} alt={item.nama} className="aspect-[4/3] w-full object-cover" />
               ) : (
                 <div className="foto-ph aspect-[4/3] text-sm">Foto {item.nama}</div>
@@ -100,8 +120,8 @@ export default function StoreCard({ item = null, big = false }) {
               {desc && <p className="mt-2 text-sm leading-relaxed text-muted">{desc}</p>}
               {details.length > 0 && (
                 <ul className="mt-4 space-y-2">
-                  {details.map((detail, i) => (
-                    <li key={i} className="flex gap-2 text-sm leading-snug text-ink/80">
+                  {details.map((detail, index) => (
+                    <li key={index} className="flex gap-2 text-sm leading-snug text-ink/80">
                       <Check size={15} className="mt-0.5 shrink-0 text-rose" />
                       <span>{detail}</span>
                     </li>
@@ -118,12 +138,23 @@ export default function StoreCard({ item = null, big = false }) {
 
             <div className="border-t border-rose-line p-4">
               <button
-                onClick={() => { pick(item); setOpen(false); }}
+                onClick={() => {
+                  pick(item);
+                  setOpen(false);
+                }}
                 className={`inline-flex w-full items-center justify-center gap-2 rounded-full px-4 py-3 text-sm font-semibold transition ${
-                  selected ? "bg-rose-soft text-rose" : "bg-rose text-white hover:bg-rose-deep"
+                  selected ? 'bg-rose-soft text-rose' : 'bg-rose text-white hover:bg-rose-deep'
                 }`}
               >
-                {selected ? (<><Check size={18} /> Batalkan pilihan</>) : (<><Plus size={18} /> Pilih layanan ini</>)}
+                {selected ? (
+                  <>
+                    <Check size={18} /> Batalkan pilihan
+                  </>
+                ) : (
+                  <>
+                    <Plus size={18} /> Pilih layanan ini
+                  </>
+                )}
               </button>
             </div>
           </div>

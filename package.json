@@ -9,7 +9,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint:code": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "check:comments": "node scripts/gates/css-comments.mjs"
   },
   "dependencies": {
     "jspdf": "^4.2.1",
@@ -21,7 +24,9 @@
   },
   "devDependencies": {
     "autoprefixer": "10.4.20",
+    "eslint": "^10.14.0",
     "postcss": "8.4.49",
+    "prettier": "^3.9.10",
     "tailwindcss": "3.4.17"
   }
 }

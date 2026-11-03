@@ -3,14 +3,12 @@
 @tailwind utilities;
 
 :root {
-  --font-body: "Inter", system-ui, -apple-system, sans-serif;
+  --font-body: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
 html {
   scroll-behavior: smooth;
 }
-
-/* Popup open: the page behind it does not scroll (useBodyLock). */
 .salia-locked {
   overflow: hidden !important;
 }
@@ -42,11 +40,17 @@ body {
   .label {
     @apply mb-1.5 block text-sm font-medium text-ink;
   }
-
-  /* Placeholder foto sebelum foto asli dipasang */
   .foto-ph {
     @apply flex items-center justify-center bg-rose-soft text-rose/40;
-    background-image: linear-gradient(135deg, #f7edef 25%, #f2e2e6 25%, #f2e2e6 50%, #f7edef 50%, #f7edef 75%, #f2e2e6 75%);
+    background-image: linear-gradient(
+      135deg,
+      #f7edef 25%,
+      #f2e2e6 25%,
+      #f2e2e6 50%,
+      #f7edef 50%,
+      #f7edef 75%,
+      #f2e2e6 75%
+    );
     background-size: 28px 28px;
   }
 
@@ -54,16 +58,16 @@ body {
     @apply text-xs font-semibold uppercase tracking-[0.2em] text-rose;
   }
 }
-
-/* Installed PWA only: keep bottom content clear of the iPhone home indicator; no effect in a browser tab. */
 @media (display-mode: standalone) {
   body {
     padding-bottom: env(safe-area-inset-bottom);
   }
 }
-
-/* Chat bottom sheet slide-up */
 @keyframes saliaSheetUp {
-  from { transform: translateY(100%); }
-  to { transform: translateY(0); }
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
 }

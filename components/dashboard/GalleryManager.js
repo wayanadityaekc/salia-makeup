@@ -1,60 +1,54 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import { Trash2 } from "lucide-react";
-import {
-  getGallery,
-  createGalleryItem,
-  deleteGalleryItem,
-  UnauthorizedError,
-} from "@/lib/storage";
-import ImageUpload from "./ImageUpload";
+import { useEffect, useState } from 'react';
+import { Trash2 } from 'lucide-react';
+import { fetchGallery, createGalleryItem, deleteGalleryItem, UnauthorizedError } from '@/lib/storage';
+import ImageUpload from './ImageUpload';
 
 export default function GalleryManager({ onUnauthorized }) {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [err, setErr] = useState("");
+  const [error, setError] = useState('');
 
-  const guard = (e) => {
-    if (e instanceof UnauthorizedError) onUnauthorized?.();
-    else setErr("Terjadi kesalahan. Coba lagi.");
-  };
+  function handleRequestError(requestError) {
+    if (requestError instanceof UnauthorizedError) onUnauthorized?.();
+    else setError('Terjadi kesalahan. Coba lagi.');
+  }
 
-  const refresh = async () => {
+  async function refresh() {
     setLoading(true);
-    setErr("");
+    setError('');
     try {
-      setItems(await getGallery());
+      setItems(await fetchGallery());
     } catch (e) {
-      guard(e);
+      handleRequestError(e);
     } finally {
       setLoading(false);
     }
-  };
+  }
 
   useEffect(() => {
     refresh();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const onUploaded = async (url) => {
+  async function onUploaded(url) {
     try {
       await createGalleryItem({ url });
       refresh();
     } catch (e) {
-      guard(e);
+      handleRequestError(e);
     }
-  };
+  }
 
-  const remove = async (id) => {
-    if (!confirm("Hapus foto ini?")) return;
+  async function remove(id) {
+    if (!confirm('Hapus foto ini?')) return;
     try {
       await deleteGalleryItem(id);
       refresh();
     } catch (e) {
-      guard(e);
+      handleRequestError(e);
     }
-  };
+  }
 
   return (
     <div>
@@ -63,7 +57,7 @@ export default function GalleryManager({ onUnauthorized }) {
         <ImageUpload onUploaded={onUploaded} onUnauthorized={onUnauthorized} label="Tambah foto" />
       </div>
 
-      {err && <p className="mt-3 text-sm text-rose">{err}</p>}
+      {error && <p className="mt-3 text-sm text-rose">{error}</p>}
 
       {items.length === 0 && !loading ? (
         <div className="mt-6 rounded-2xl border border-dashed border-rose-line bg-white py-16 text-center text-sm text-muted">
@@ -71,12 +65,15 @@ export default function GalleryManager({ onUnauthorized }) {
         </div>
       ) : (
         <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-          {items.map((g) => (
-            <div key={g.id} className="group relative overflow-hidden rounded-xl border border-rose-line">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={g.url} alt={g.caption || "Foto"} className="aspect-square w-full object-cover" />
+          {items.map((galleryItem) => (
+            <div key={galleryItem.id} className="group relative overflow-hidden rounded-xl border border-rose-line">
+              <img
+                src={galleryItem.url}
+                alt={galleryItem.caption || 'Foto'}
+                className="aspect-square w-full object-cover"
+              />
               <button
-                onClick={() => remove(g.id)}
+                onClick={() => remove(galleryItem.id)}
                 className="absolute right-2 top-2 inline-flex h-8 w-8 items-center justify-center rounded-full bg-white/90 text-rose shadow hover:bg-white"
                 aria-label="Hapus foto"
               >

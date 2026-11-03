@@ -1,71 +1,67 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import { Bell, BellRing, BellOff, Loader2, Check } from "lucide-react";
-import { getPushPublicKey, savePushSubscription, removePushSubscription } from "@/lib/storage";
+import { useEffect, useState } from 'react';
+import { Bell, BellRing, BellOff, Loader2, Check } from 'lucide-react';
+import { fetchPushPublicKey, savePushSubscription, removePushSubscription } from '@/lib/storage';
 
-// VAPID public key (base64url) -> Uint8Array for PushManager.subscribe.
 function urlB64ToUint8Array(base64String) {
-  const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
-  const base64 = `${base64String}${padding}`.replace(/-/g, "+").replace(/_/g, "/");
+  const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
+  const base64 = `${base64String}${padding}`.replace(/-/g, '+').replace(/_/g, '/');
   const raw = atob(base64);
   return Uint8Array.from(raw, (char) => char.charCodeAt(0));
 }
 
-// Owner push toggle for new bookings; on iOS it only works inside the installed app, so we ask to install first.
 export default function NotifyToggle() {
-  // Status: loading | unsupported | need-install | blocked | off | on
-  const [status, setStatus] = useState("loading");
+  const [status, setStatus] = useState('loading');
   const [busy, setBusy] = useState(false);
-  const [err, setErr] = useState("");
+  const [error, setError] = useState('');
 
   useEffect(() => {
     refresh();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   async function refresh() {
-    if (typeof window === "undefined") return;
-    const supported = "serviceWorker" in navigator && "PushManager" in window && "Notification" in window;
-    if (!supported) return setStatus("unsupported");
-    const userAgent = navigator.userAgent || "";
+    if (typeof window === 'undefined') return;
+    const supported = 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window;
+    if (!supported) return setStatus('unsupported');
+    const userAgent = navigator.userAgent || '';
     const isIOS = /iphone|ipad|ipod/i.test(userAgent) || (/macintosh/i.test(userAgent) && navigator.maxTouchPoints > 1);
     const standalone =
-      window.matchMedia?.("(display-mode: standalone)").matches || window.navigator.standalone === true;
-    if (isIOS && !standalone) return setStatus("need-install");
-    if (Notification.permission === "denied") return setStatus("blocked");
+      window.matchMedia?.('(display-mode: standalone)').matches || window.navigator.standalone === true;
+    if (isIOS && !standalone) return setStatus('need-install');
+    if (Notification.permission === 'denied') return setStatus('blocked');
     try {
       const reg = await navigator.serviceWorker.ready;
-      const sub = await reg.pushManager.getSubscription();
-      setStatus(sub ? "on" : "off");
+      const subscription = await reg.pushManager.getSubscription();
+      setStatus(subscription ? 'on' : 'off');
     } catch (e) {
-      setStatus("off");
+      setStatus('off');
     }
   }
 
   async function enable() {
     setBusy(true);
-    setErr("");
+    setError('');
     try {
       const perm = await Notification.requestPermission();
-      if (perm !== "granted") {
-        setStatus(perm === "denied" ? "blocked" : "off");
+      if (perm !== 'granted') {
+        setStatus(perm === 'denied' ? 'blocked' : 'off');
         return;
       }
-      const key = await getPushPublicKey();
-      if (!key) throw new Error("no_key");
+      const key = await fetchPushPublicKey();
+      if (!key) throw new Error('no_key');
       const reg = await navigator.serviceWorker.ready;
-      let sub = await reg.pushManager.getSubscription();
-      if (!sub) {
-        sub = await reg.pushManager.subscribe({
+      let subscription = await reg.pushManager.getSubscription();
+      if (!subscription) {
+        subscription = await reg.pushManager.subscribe({
           userVisibleOnly: true,
           applicationServerKey: urlB64ToUint8Array(key),
         });
       }
-      await savePushSubscription(sub.toJSON());
-      setStatus("on");
+      await savePushSubscription(subscription.toJSON());
+      setStatus('on');
     } catch (e) {
-      setErr("Gagal mengaktifkan notifikasi. Coba lagi.");
+      setError('Gagal mengaktifkan notifikasi. Coba lagi.');
     } finally {
       setBusy(false);
     }
@@ -73,17 +69,17 @@ export default function NotifyToggle() {
 
   async function disable() {
     setBusy(true);
-    setErr("");
+    setError('');
     try {
       const reg = await navigator.serviceWorker.ready;
-      const sub = await reg.pushManager.getSubscription();
-      if (sub) {
-        await removePushSubscription(sub.endpoint).catch(() => {});
-        await sub.unsubscribe();
+      const subscription = await reg.pushManager.getSubscription();
+      if (subscription) {
+        await removePushSubscription(subscription.endpoint).catch(() => {});
+        await subscription.unsubscribe();
       }
-      setStatus("off");
+      setStatus('off');
     } catch (e) {
-      setErr("Gagal menonaktifkan.");
+      setError('Gagal menonaktifkan.');
     } finally {
       setBusy(false);
     }
@@ -93,7 +89,7 @@ export default function NotifyToggle() {
     <div className="rounded-2xl border border-rose-line bg-white p-5">
       <div className="flex items-start gap-3">
         <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-rose-soft text-rose">
-          {status === "on" ? <BellRing size={20} /> : <Bell size={20} />}
+          {status === 'on' ? <BellRing size={20} /> : <Bell size={20} />}
         </div>
         <div className="min-w-0 flex-1">
           <h3 className="font-semibold text-ink">Notifikasi booking</h3>
@@ -101,30 +97,30 @@ export default function NotifyToggle() {
             Dapat notifikasi langsung di HP tiap ada booking baru masuk, walau app ketutup.
           </p>
 
-          {status === "loading" && (
+          {status === 'loading' && (
             <p className="mt-3 flex items-center gap-2 text-sm text-muted">
               <Loader2 size={15} className="animate-spin" /> Memeriksa…
             </p>
           )}
 
-          {status === "unsupported" && (
+          {status === 'unsupported' && (
             <p className="mt-3 text-sm text-muted">Browser ini belum mendukung notifikasi.</p>
           )}
 
-          {status === "need-install" && (
+          {status === 'need-install' && (
             <p className="mt-3 text-sm text-muted">
-              Di iPhone, pasang dulu app ke layar utama (tombol <b>Pasang</b>), buka dari ikonnya, baru
-              notifikasi bisa diaktifkan.
+              Di iPhone, pasang dulu app ke layar utama (tombol <b>Pasang</b>), buka dari ikonnya, baru notifikasi bisa
+              diaktifkan.
             </p>
           )}
 
-          {status === "blocked" && (
+          {status === 'blocked' && (
             <p className="mt-3 text-sm text-rose">
               Notifikasi diblokir. Izinkan lewat pengaturan situs di browser, lalu buka lagi halaman ini.
             </p>
           )}
 
-          {status === "off" && (
+          {status === 'off' && (
             <button
               onClick={enable}
               disabled={busy}
@@ -134,7 +130,7 @@ export default function NotifyToggle() {
             </button>
           )}
 
-          {status === "on" && (
+          {status === 'on' && (
             <div className="mt-3 flex flex-wrap items-center gap-3">
               <span className="inline-flex items-center gap-1.5 rounded-full bg-rose-soft px-3 py-1.5 text-sm font-semibold text-rose">
                 <Check size={15} /> Aktif di perangkat ini
@@ -149,7 +145,7 @@ export default function NotifyToggle() {
             </div>
           )}
 
-          {err && <p className="mt-2 text-xs text-rose">{err}</p>}
+          {error && <p className="mt-2 text-xs text-rose">{error}</p>}
         </div>
       </div>
     </div>

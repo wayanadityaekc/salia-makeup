@@ -1,11 +1,10 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import useBodyLock from "@/lib/useBodyLock";
-import { Download, Share, Plus, X, MoreVertical } from "lucide-react";
+import { useEffect, useState } from 'react';
+import useBodyLock from '@/lib/useBodyLock';
+import { Download, Share, Plus, X, MoreVertical } from 'lucide-react';
 
-// Browser-only install bar: Android fires the native dialog; iOS has no install API, so it opens a Share-steps guide.
-const DISMISS_KEY = "salia_install_dismissed";
+const DISMISS_KEY = 'salia_install_dismissed';
 
 export default function InstallPrompt() {
   const [deferred, setDeferred] = useState(null);
@@ -15,32 +14,26 @@ export default function InstallPrompt() {
   useBodyLock(guide);
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
+    if (typeof window === 'undefined') return;
     const standalone =
-      window.matchMedia?.("(display-mode: standalone)").matches ||
-      window.navigator.standalone === true;
-    // Already installed
+      window.matchMedia?.('(display-mode: standalone)').matches || window.navigator.standalone === true;
     if (standalone) return;
     try {
-      if (localStorage.getItem(DISMISS_KEY) === "1") return;
+      if (localStorage.getItem(DISMISS_KEY) === '1') return;
     } catch (e) {}
 
-    const userAgent = navigator.userAgent || "";
-    const isIOS =
-      /iphone|ipad|ipod/i.test(userAgent) ||
-      (/macintosh/i.test(userAgent) && navigator.maxTouchPoints > 1);
+    const userAgent = navigator.userAgent || '';
+    const isIOS = /iphone|ipad|ipod/i.test(userAgent) || (/macintosh/i.test(userAgent) && navigator.maxTouchPoints > 1);
     const isSafari = /safari/i.test(userAgent) && !/(crios|fxios|chrome|android)/i.test(userAgent);
     setIos(isIOS);
     if (isIOS && isSafari) {
-      // iOS Safari can install (via the guide)
       setShow(true);
       return;
     }
 
-    function onBIP(e) {
-      // Stop Chrome's mini-infobar; we show our own button
-      e.preventDefault();
-      setDeferred(e);
+    function handleBeforeInstallPrompt(event) {
+      event.preventDefault();
+      setDeferred(event);
       setShow(true);
     }
     function onInstalled() {
@@ -48,25 +41,25 @@ export default function InstallPrompt() {
       setGuide(false);
       setDeferred(null);
     }
-    window.addEventListener("beforeinstallprompt", onBIP);
-    window.addEventListener("appinstalled", onInstalled);
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    window.addEventListener('appinstalled', onInstalled);
     return () => {
-      window.removeEventListener("beforeinstallprompt", onBIP);
-      window.removeEventListener("appinstalled", onInstalled);
+      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+      window.removeEventListener('appinstalled', onInstalled);
     };
   }, []);
 
-  // Close the guide with Escape.
   useEffect(() => {
     if (!guide) return;
-    function onKey(e) { if (e.key === "Escape") setGuide(false); }
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
+    function handleKeyDown(event) {
+      if (event.key === 'Escape') setGuide(false);
+    }
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
   }, [guide]);
 
   async function onInstallClick() {
     if (deferred) {
-      // Native add-to-home-screen dialog: one tap
       deferred.prompt();
       try {
         await deferred.userChoice;
@@ -75,7 +68,6 @@ export default function InstallPrompt() {
       setShow(false);
       return;
     }
-    // iOS / no native prompt: show the steps
     setGuide(true);
   }
 
@@ -83,7 +75,7 @@ export default function InstallPrompt() {
     setShow(false);
     setGuide(false);
     try {
-      localStorage.setItem(DISMISS_KEY, "1");
+      localStorage.setItem(DISMISS_KEY, '1');
     } catch (e) {}
   }
 
@@ -93,7 +85,7 @@ export default function InstallPrompt() {
     <>
       <div
         className="fixed inset-x-0 bottom-0 z-50 border-t border-rose-line bg-white/95 backdrop-blur"
-        style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
+        style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
       >
         <div className="container-x flex items-center gap-3 py-3">
           <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-rose text-[#F7EDEF]">
@@ -119,7 +111,6 @@ export default function InstallPrompt() {
         </div>
       </div>
 
-      {/* Guide (iOS Safari, or any browser with no native prompt) */}
       {guide && (
         <div
           className="fixed inset-0 z-[60] flex items-end justify-center bg-ink/40 p-4 sm:items-center"
@@ -127,8 +118,8 @@ export default function InstallPrompt() {
         >
           <div
             className="w-full max-w-sm rounded-3xl border border-rose-line bg-white p-6"
-            style={{ marginBottom: "env(safe-area-inset-bottom)" }}
-            onClick={(e) => e.stopPropagation()}
+            style={{ marginBottom: 'env(safe-area-inset-bottom)' }}
+            onClick={(event) => event.stopPropagation()}
           >
             <div className="flex items-center justify-between">
               <h2 className="text-base font-bold text-ink">Pasang ke layar utama</h2>
@@ -144,11 +135,11 @@ export default function InstallPrompt() {
             {ios ? (
               <ol className="mt-4 space-y-3">
                 <Step number={1}>
-                  Ketuk ikon <b>Bagikan</b>{" "}
-                  <Share size={15} className="mx-0.5 inline align-text-bottom text-rose" /> di bar Safari.
+                  Ketuk ikon <b>Bagikan</b> <Share size={15} className="mx-0.5 inline align-text-bottom text-rose" /> di
+                  bar Safari.
                 </Step>
                 <Step number={2}>
-                  Pilih <b>Add to Home Screen</b>{" "}
+                  Pilih <b>Add to Home Screen</b>{' '}
                   <Plus size={15} className="mx-0.5 inline align-text-bottom text-rose" />.
                 </Step>
                 <Step number={3}>
@@ -158,8 +149,8 @@ export default function InstallPrompt() {
             ) : (
               <ol className="mt-4 space-y-3">
                 <Step number={1}>
-                  Buka menu browser{" "}
-                  <MoreVertical size={15} className="mx-0.5 inline align-text-bottom text-rose" /> (kanan atas).
+                  Buka menu browser <MoreVertical size={15} className="mx-0.5 inline align-text-bottom text-rose" />{' '}
+                  (kanan atas).
                 </Step>
                 <Step number={2}>
                   Pilih <b>Install app</b> atau <b>Add to Home screen</b>.

@@ -1,25 +1,40 @@
-"use client";
+'use client';
 
-import { useEffect, useRef, useState } from "react";
-import { ChevronDown, Check } from "lucide-react";
+import { useEffect, useRef, useState } from 'react';
+import { ChevronDown, Check } from 'lucide-react';
 
-// Custom dropdown: options are [{ value, label }] or grouped [{ group, options: [...] }].
-export default function Select({ value = "", onChange = () => {}, options = [], placeholder = "Pilih…", invalid = false }) {
+export default function Select({
+  value = '',
+  onChange = () => {},
+  options = [],
+  placeholder = 'Pilih…',
+  invalid = false,
+}) {
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
 
   useEffect(() => {
-    function onDoc(e) { if (ref.current && !ref.current.contains(e.target)) setOpen(false); }
-    function onKey(e) { if (e.key === "Escape") setOpen(false); }
-    document.addEventListener("mousedown", onDoc);
-    document.addEventListener("keydown", onKey);
-    return () => { document.removeEventListener("mousedown", onDoc); document.removeEventListener("keydown", onKey); };
+    function handleDocumentClick(event) {
+      if (ref.current && !ref.current.contains(event.target)) setOpen(false);
+    }
+    function handleKeyDown(event) {
+      if (event.key === 'Escape') setOpen(false);
+    }
+    document.addEventListener('mousedown', handleDocumentClick);
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('mousedown', handleDocumentClick);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
   }, []);
 
   const flat = options.flatMap((option) => (option.options ? option.options : [option]));
   const selected = flat.find((option) => option.value === value);
 
-  function pick(nextValue) { onChange(nextValue); setOpen(false); }
+  function pick(nextValue) {
+    onChange(nextValue);
+    setOpen(false);
+  }
 
   return (
     <div ref={ref} className="relative">
@@ -28,19 +43,26 @@ export default function Select({ value = "", onChange = () => {}, options = [], 
         onClick={() => setOpen((wasOpen) => !wasOpen)}
         aria-haspopup="listbox"
         aria-expanded={open}
-        className={`field flex items-center justify-between gap-2 text-left ${selected ? "text-ink" : "text-muted"} ${invalid ? "!border-rose" : ""}`}
+        className={`field flex items-center justify-between gap-2 text-left ${selected ? 'text-ink' : 'text-muted'} ${invalid ? '!border-rose' : ''}`}
       >
         <span className="truncate">{selected ? selected.label : placeholder}</span>
-        <ChevronDown size={16} className={`shrink-0 text-muted transition ${open ? "rotate-180" : ""}`} />
+        <ChevronDown size={16} className={`shrink-0 text-muted transition ${open ? 'rotate-180' : ''}`} />
       </button>
 
       {open && (
-        <div role="listbox" className="absolute z-40 mt-1 max-h-64 w-full overflow-auto rounded-xl border border-rose-line bg-white p-1 shadow-lg">
-          {options.map((option, i) =>
+        <div
+          role="listbox"
+          className="absolute z-40 mt-1 max-h-64 w-full overflow-auto rounded-xl border border-rose-line bg-white p-1 shadow-lg"
+        >
+          {options.map((option, index) =>
             option.options ? (
-              <div key={i}>
-                <div className="px-3 pb-1 pt-2 text-xs font-semibold uppercase tracking-wide text-muted">{option.group}</div>
-                {option.options.map((child) => <Opt key={child.value} option={child} value={value} onPick={pick} />)}
+              <div key={index}>
+                <div className="px-3 pb-1 pt-2 text-xs font-semibold uppercase tracking-wide text-muted">
+                  {option.group}
+                </div>
+                {option.options.map((child) => (
+                  <Opt key={child.value} option={child} value={value} onPick={pick} />
+                ))}
               </div>
             ) : (
               <Opt key={option.value} option={option} value={value} onPick={pick} />
@@ -52,7 +74,7 @@ export default function Select({ value = "", onChange = () => {}, options = [], 
   );
 }
 
-function Opt({ option = null, value = "", onPick = () => {} }) {
+function Opt({ option = null, value = '', onPick = () => {} }) {
   if (!option) return null;
   const sel = option.value === value;
   return (
@@ -61,7 +83,7 @@ function Opt({ option = null, value = "", onPick = () => {} }) {
       role="option"
       aria-selected={sel}
       onClick={() => onPick(option.value)}
-      className={`flex w-full items-center justify-between gap-2 rounded-lg px-3 py-2 text-left text-sm ${sel ? "bg-rose-soft text-rose" : "text-ink hover:bg-rose-soft/60"}`}
+      className={`flex w-full items-center justify-between gap-2 rounded-lg px-3 py-2 text-left text-sm ${sel ? 'bg-rose-soft text-rose' : 'text-ink hover:bg-rose-soft/60'}`}
     >
       <span>{option.label}</span>
       {sel && <Check size={15} className="shrink-0" />}

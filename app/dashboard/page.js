@@ -1,202 +1,206 @@
-"use client";
+'use client';
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
-  Lock, LogOut, Trash2, MessageCircle, CheckCheck, Check, Search,
-  CalendarDays, Wallet, Sparkles, Images, Settings, MessageSquare,
-} from "lucide-react";
-import { site } from "@/lib/config";
-import { formatRupiah, formatTanggal, normalizeWa, waLink } from "@/lib/utils";
+  Lock,
+  LogOut,
+  Trash2,
+  MessageCircle,
+  CheckCheck,
+  Check,
+  Search,
+  CalendarDays,
+  Wallet,
+  Sparkles,
+  Images,
+  Settings,
+  MessageSquare,
+} from 'lucide-react';
+import { site } from '@/lib/config';
+import { formatRupiah, formatTanggal, normalizeWa, waLink } from '@/lib/utils';
 import {
-  getBookings,
+  fetchBookings,
   updateBooking,
   deleteBooking,
   login as apiLogin,
   getToken,
   clearToken,
   UnauthorizedError,
-} from "@/lib/storage";
-import ServicesManager from "@/components/dashboard/ServicesManager";
-import GalleryManager from "@/components/dashboard/GalleryManager";
-import SettingsManager from "@/components/dashboard/SettingsManager";
-import IncomeTracker from "@/components/dashboard/IncomeTracker";
-import ChatManager from "@/components/dashboard/ChatManager";
-import BookingLinks from "@/components/dashboard/BookingLinks";
-import NotifyToggle from "@/components/pwa/NotifyToggle";
+} from '@/lib/storage';
+import ServicesManager from '@/components/dashboard/ServicesManager';
+import GalleryManager from '@/components/dashboard/GalleryManager';
+import SettingsManager from '@/components/dashboard/SettingsManager';
+import IncomeTracker from '@/components/dashboard/IncomeTracker';
+import ChatManager from '@/components/dashboard/ChatManager';
+import BookingLinks from '@/components/dashboard/BookingLinks';
+import NotifyToggle from '@/components/pwa/NotifyToggle';
 
 const STATUS = {
-  baru: { label: "Baru", cls: "bg-rose text-white" },
-  konfirmasi: { label: "Dikonfirmasi", cls: "bg-rose-soft text-rose" },
-  selesai: { label: "Selesai", cls: "bg-ink/10 text-ink" },
+  baru: { label: 'Baru', cls: 'bg-rose text-white' },
+  konfirmasi: { label: 'Dikonfirmasi', cls: 'bg-rose-soft text-rose' },
+  selesai: { label: 'Selesai', cls: 'bg-ink/10 text-ink' },
 };
 
-// One source of truth for the dashboard sections — used by the top tabs (browser)
-// and the bottom bar (installed app). "short" is the compact label for the bar.
 const TABS = [
-  { key: "booking", label: "Booking", short: "Booking", Icon: CalendarDays },
-  { key: "chat", label: "Chat", short: "Chat", Icon: MessageSquare },
-  { key: "income", label: "Income", short: "Income", Icon: Wallet },
-  { key: "layanan", label: "Layanan", short: "Layanan", Icon: Sparkles },
-  { key: "galeri", label: "Galeri", short: "Galeri", Icon: Images },
-  { key: "pengaturan", label: "Pengaturan", short: "Atur", Icon: Settings },
+  { key: 'booking', label: 'Booking', short: 'Booking', Icon: CalendarDays },
+  { key: 'chat', label: 'Chat', short: 'Chat', Icon: MessageSquare },
+  { key: 'income', label: 'Income', short: 'Income', Icon: Wallet },
+  { key: 'layanan', label: 'Layanan', short: 'Layanan', Icon: Sparkles },
+  { key: 'galeri', label: 'Galeri', short: 'Galeri', Icon: Images },
+  { key: 'pengaturan', label: 'Pengaturan', short: 'Atur', Icon: Settings },
 ];
 
 export default function DashboardPage() {
   const [authed, setAuthed] = useState(false);
-  const [pass, setPass] = useState("");
-  const [err, setErr] = useState("");
+  const [pass, setPass] = useState('');
+  const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
   const [list, setList] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [loadErr, setLoadErr] = useState("");
-  const [filter, setFilter] = useState("semua");
-  const [range, setRange] = useState("semua"); // semua | minggu | bulan | tahun
-  const [q, setQ] = useState("");
-  const [tab, setTab] = useState("booking"); // booking | layanan | galeri
-  const [standalone, setStandalone] = useState(false); // true when launched as installed PWA
+  const [loadError, setLoadError] = useState('');
+  const [filter, setFilter] = useState('semua');
+  const [range, setRange] = useState('semua');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [tab, setTab] = useState('booking');
+  const [standalone, setStandalone] = useState(false);
   const topRef = useRef(null);
-  const [topH, setTopH] = useState(0); // sticky header + tabs height, for the full-height chat pane
+  const [topBarHeight, setTopBarHeight] = useState(0);
 
   useEffect(() => {
     if (getToken()) setAuthed(true);
   }, []);
 
-  // Detect installed-app (standalone) launch so we can show the bottom bar there
-  // and the top tabs in the browser. Read after mount to keep SSR markup stable.
   useEffect(() => {
-    const check = () =>
-      setStandalone(
-        window.matchMedia?.("(display-mode: standalone)").matches ||
-          window.navigator.standalone === true
+    function check() {
+      return setStandalone(
+        window.matchMedia?.('(display-mode: standalone)').matches || window.navigator.standalone === true,
       );
+    }
     check();
-    const mq = window.matchMedia?.("(display-mode: standalone)");
-    mq?.addEventListener?.("change", check);
-    return () => mq?.removeEventListener?.("change", check);
+    const standaloneQuery = window.matchMedia?.('(display-mode: standalone)');
+    standaloneQuery?.addEventListener?.('change', check);
+    return () => standaloneQuery?.removeEventListener?.('change', check);
   }, []);
 
-  // Measure the sticky header/tabs so the chat pane can fill the rest of the
-  // viewport exactly (only the messages inside scroll, not the page).
   useEffect(() => {
     if (!authed) return;
-    const el = topRef.current;
-    if (!el) return;
-    const measure = () => setTopH(el.offsetHeight);
+    const element = topRef.current;
+    if (!element) return;
+    function measure() {
+      return setTopBarHeight(element.offsetHeight);
+    }
     measure();
-    const ro = new ResizeObserver(measure);
-    ro.observe(el);
-    return () => ro.disconnect();
+    const resizeObserver = new ResizeObserver(measure);
+    resizeObserver.observe(element);
+    return () => resizeObserver.disconnect();
   }, [authed, standalone]);
 
-  // Any 401 means the token is gone/expired: drop back to the login gate.
-  const handleUnauthorized = () => {
+  function handleUnauthorized() {
     clearToken();
     setAuthed(false);
-    setErr("Sesi berakhir. Masuk lagi ya.");
-  };
+    setError('Sesi berakhir. Masuk lagi ya.');
+  }
 
-  const refresh = async () => {
+  async function refresh() {
     setLoading(true);
-    setLoadErr("");
+    setLoadError('');
     try {
-      setList(await getBookings());
+      setList(await fetchBookings());
     } catch (e) {
       if (e instanceof UnauthorizedError) handleUnauthorized();
-      else setLoadErr("Gagal memuat data. Coba muat ulang.");
+      else setLoadError('Gagal memuat data. Coba muat ulang.');
     } finally {
       setLoading(false);
     }
-  };
+  }
 
   useEffect(() => {
     if (authed) refresh();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authed]);
 
-  const login = async (e) => {
-    e.preventDefault();
+  async function handleLogin(event) {
+    event.preventDefault();
     setBusy(true);
-    setErr("");
+    setError('');
     try {
       await apiLogin(pass);
-      setPass("");
+      setPass('');
       setAuthed(true);
     } catch (e) {
-      setErr(e instanceof UnauthorizedError ? "Password salah." : "Gagal masuk. Coba lagi.");
+      setError(e instanceof UnauthorizedError ? 'Password salah.' : 'Gagal masuk. Coba lagi.');
     } finally {
       setBusy(false);
     }
-  };
+  }
 
-  const logout = () => {
+  function logout() {
     clearToken();
     setAuthed(false);
-    setPass("");
-  };
+    setPass('');
+  }
 
-  const setStatus = async (id, status) => {
+  async function setStatus(id, status) {
     try {
       await updateBooking(id, { status });
       await refresh();
     } catch (e) {
       if (e instanceof UnauthorizedError) handleUnauthorized();
     }
-  };
-  const hapus = async (id) => {
-    if (!confirm("Hapus booking ini?")) return;
+  }
+  async function hapus(id) {
+    if (!confirm('Hapus booking ini?')) return;
     try {
       await deleteBooking(id);
       await refresh();
     } catch (e) {
       if (e instanceof UnauthorizedError) handleUnauthorized();
     }
-  };
+  }
 
-  // Bookings within the selected time window (by when they were created).
-  const inRange = (b) => {
-    if (range === "semua") return true;
-    const t = b.createdAt ? new Date(b.createdAt) : null;
-    if (!t || isNaN(t)) return false;
+  function inRange(booking) {
+    if (range === 'semua') return true;
+    const createdDate = booking.createdAt ? new Date(booking.createdAt) : null;
+    if (!createdDate || isNaN(createdDate)) return false;
     const now = new Date();
-    if (range === "tahun") return t.getFullYear() === now.getFullYear();
-    if (range === "bulan")
-      return t.getFullYear() === now.getFullYear() && t.getMonth() === now.getMonth();
-    if (range === "minggu") {
-      // Current week, Monday as the first day.
+    if (range === 'tahun') return createdDate.getFullYear() === now.getFullYear();
+    if (range === 'bulan')
+      return createdDate.getFullYear() === now.getFullYear() && createdDate.getMonth() === now.getMonth();
+    if (range === 'minggu') {
       const start = new Date(now);
-      const dow = (start.getDay() + 6) % 7; // Mon=0 … Sun=6
+      const dow = (start.getDay() + 6) % 7;
       start.setHours(0, 0, 0, 0);
       start.setDate(start.getDate() - dow);
-      return t >= start;
+      return createdDate >= start;
     }
     return true;
-  };
+  }
 
   const ranged = useMemo(() => list.filter(inRange), [list, range]);
 
   const shown = useMemo(() => {
     return ranged
-      .filter((b) => (filter === "semua" ? true : b.status === filter))
-      .filter((b) =>
-        q
-          ? (b.nama + b.telepon + (b.serviceNama || "")).toLowerCase().includes(q.toLowerCase())
-          : true
+      .filter((booking) => (filter === 'semua' ? true : booking.status === filter))
+      .filter((booking) =>
+        searchQuery
+          ? (booking.nama + booking.telepon + (booking.serviceNama || ''))
+              .toLowerCase()
+              .includes(searchQuery.toLowerCase())
+          : true,
       );
-  }, [ranged, filter, q]);
+  }, [ranged, filter, searchQuery]);
 
   const stats = useMemo(() => {
-    const baru = ranged.filter((b) => b.status === "baru").length;
+    const baru = ranged.filter((booking) => booking.status === 'baru').length;
     const pendapatan = ranged
-      .filter((b) => b.status === "selesai")
-      .reduce((s, b) => s + (b.total || 0), 0);
+      .filter((booking) => booking.status === 'selesai')
+      .reduce((sum, booking) => sum + (booking.total || 0), 0);
     return { total: ranged.length, baru, pendapatan };
   }, [ranged]);
 
-  // Gate
   if (!authed) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-rose-soft px-5">
-        <form onSubmit={login} className="w-full max-w-sm rounded-2xl border border-rose-line bg-white p-8">
+        <form onSubmit={handleLogin} className="w-full max-w-sm rounded-2xl border border-rose-line bg-white p-8">
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-rose-soft">
             <Lock className="text-rose" size={22} />
           </div>
@@ -205,28 +209,24 @@ export default function DashboardPage() {
           <input
             type="password"
             value={pass}
-            onChange={(e) => setPass(e.target.value)}
+            onChange={(event) => setPass(event.target.value)}
             placeholder="Password"
             className="field mt-6"
           />
-          {err && <p className="mt-2 text-xs text-rose">{err}</p>}
+          {error && <p className="mt-2 text-xs text-rose">{error}</p>}
           <button type="submit" disabled={busy} className="btn-primary mt-4 w-full disabled:opacity-60">
-            {busy ? "Memeriksa…" : "Masuk"}
+            {busy ? 'Memeriksa…' : 'Masuk'}
           </button>
         </form>
       </div>
     );
   }
 
-  // Dashboard
   return (
     <div
       className="min-h-screen bg-rose-soft/40"
-      // In the installed app, leave room for the fixed bottom bar (+ iPhone inset).
-      // The chat tab fills the viewport itself, so it opts out of this padding.
-      style={standalone && tab !== "chat" ? { paddingBottom: "calc(68px + env(safe-area-inset-bottom))" } : undefined}
+      style={standalone && tab !== 'chat' ? { paddingBottom: 'calc(68px + env(safe-area-inset-bottom))' } : undefined}
     >
-      {/* Sticky header (+ tabs in browser) */}
       <div ref={topRef} className="sticky top-0 z-30">
         <header className="border-b border-rose-line bg-white">
           <div className="container-x flex h-16 items-center justify-between">
@@ -237,7 +237,6 @@ export default function DashboardPage() {
           </div>
         </header>
 
-        {/* Top tabs — browser only; the app uses the bottom bar instead */}
         {!standalone && (
           <div className="border-b border-rose-line bg-white">
             <div className="container-x flex gap-1 overflow-x-auto overflow-y-hidden overscroll-x-contain [touch-action:pan-x] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
@@ -246,7 +245,7 @@ export default function DashboardPage() {
                   key={key}
                   onClick={() => setTab(key)}
                   className={`-mb-px shrink-0 whitespace-nowrap border-b-2 px-4 py-3 text-sm font-medium transition ${
-                    tab === key ? "border-rose text-rose" : "border-transparent text-muted hover:text-ink"
+                    tab === key ? 'border-rose text-rose' : 'border-transparent text-muted hover:text-ink'
                   }`}
                 >
                   {label}
@@ -257,68 +256,65 @@ export default function DashboardPage() {
         )}
       </div>
 
-      {tab === "layanan" && (
+      {tab === 'layanan' && (
         <div className="container-x py-8">
           <ServicesManager onUnauthorized={handleUnauthorized} />
         </div>
       )}
 
-      {tab === "galeri" && (
+      {tab === 'galeri' && (
         <div className="container-x py-8">
           <GalleryManager onUnauthorized={handleUnauthorized} />
         </div>
       )}
 
-      {tab === "chat" && (
+      {tab === 'chat' && (
         <div
           className="container-x py-4"
           style={{
-            height: `calc(100dvh - ${topH}px${standalone ? " - 68px - env(safe-area-inset-bottom)" : ""})`,
+            height: `calc(100dvh - ${topBarHeight}px${standalone ? ' - 68px - env(safe-area-inset-bottom)' : ''})`,
           }}
         >
           <ChatManager onUnauthorized={handleUnauthorized} />
         </div>
       )}
 
-      {tab === "income" && (
+      {tab === 'income' && (
         <div className="container-x py-8">
           <IncomeTracker onUnauthorized={handleUnauthorized} />
         </div>
       )}
 
-      {tab === "pengaturan" && (
+      {tab === 'pengaturan' && (
         <div className="container-x space-y-8 py-8">
           <NotifyToggle />
           <SettingsManager onUnauthorized={handleUnauthorized} />
         </div>
       )}
 
-      <div className={`container-x py-8 ${tab === "booking" ? "" : "hidden"}`}>
-        {/* Magic-link generator */}
+      <div className={`container-x py-8 ${tab === 'booking' ? '' : 'hidden'}`}>
         <div className="mb-6">
           <BookingLinks onUnauthorized={handleUnauthorized} />
         </div>
 
-        {/* Stats */}
         <div className="grid gap-4 sm:grid-cols-3">
           <Stat label="Total booking" value={stats.total} />
           <Stat label="Perlu ditangani" value={stats.baru} />
           <Stat label="Pendapatan (selesai)" value={formatRupiah(stats.pendapatan)} />
         </div>
 
-        {/* Filter periode */}
         <div className="mt-6 flex flex-wrap gap-2">
           {[
-            ["semua", "Semua"],
-            ["minggu", "Minggu ini"],
-            ["bulan", "Bulan ini"],
-            ["tahun", "Tahun ini"],
+            ['semua', 'Semua'],
+            ['minggu', 'Minggu ini'],
+            ['bulan', 'Bulan ini'],
+            ['tahun', 'Tahun ini'],
           ].map(([key, label]) => (
             <button
               key={key}
               onClick={() => setRange(key)}
               className={`rounded-full px-4 py-1.5 text-sm transition ${
-                range === key ? "bg-rose text-white" : "border border-rose-line bg-white text-ink hover:bg-rose-soft"
+                range === key ? 'bg-rose text-white' : 'border border-rose-line bg-white text-ink hover:bg-rose-soft'
               }`}
             >
               {label}
@@ -326,37 +322,37 @@ export default function DashboardPage() {
           ))}
         </div>
 
-        {/* Kontrol */}
         <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
           <div className="flex flex-wrap gap-2">
-            {["semua", "baru", "konfirmasi", "selesai"].map((f) => (
+            {['semua', 'baru', 'konfirmasi', 'selesai'].map((statusFilter) => (
               <button
-                key={f}
-                onClick={() => setFilter(f)}
+                key={statusFilter}
+                onClick={() => setFilter(statusFilter)}
                 className={`rounded-full px-4 py-1.5 text-sm capitalize transition ${
-                  filter === f ? "bg-rose text-white" : "border border-rose-line bg-white text-ink hover:bg-rose-soft"
+                  filter === statusFilter
+                    ? 'bg-rose text-white'
+                    : 'border border-rose-line bg-white text-ink hover:bg-rose-soft'
                 }`}
               >
-                {f}
+                {statusFilter}
               </button>
             ))}
           </div>
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" size={16} />
             <input
-              value={q}
-              onChange={(e) => setQ(e.target.value)}
+              value={searchQuery}
+              onChange={(event) => setSearchQuery(event.target.value)}
               placeholder="Cari nama / layanan…"
               className="field w-64 pl-9"
             />
           </div>
         </div>
 
-        {/* List */}
         <div className="mt-6 space-y-3">
-          {loadErr && (
+          {loadError && (
             <div className="rounded-2xl border border-rose-line bg-white py-4 text-center text-sm text-rose">
-              {loadErr}
+              {loadError}
             </div>
           )}
           {loading && list.length === 0 && (
@@ -381,17 +377,23 @@ export default function DashboardPage() {
                     </span>
                   </div>
                   <p className="mt-1 text-sm text-muted">
-                    {b.serviceNama}{b.hairdo ? " + Hairdo" : ""}
-                    {b.orang > 1 ? ` · ${b.orang} orang` : ""} · {b.areaNama}
+                    {b.serviceNama}
+                    {b.hairdo ? ' + Hairdo' : ''}
+                    {b.orang > 1 ? ` · ${b.orang} orang` : ''} · {b.areaNama}
                   </p>
                   <p className="mt-0.5 text-sm text-muted">
                     {formatTanggal(b.tanggal)} · ready {b.jam} · {b.telepon}
-                    {b.instagram ? ` · IG @${b.instagram}` : ""}
-                    {b.email ? ` · ${b.email}` : ""}
+                    {b.instagram ? ` · IG @${b.instagram}` : ''}
+                    {b.email ? ` · ${b.email}` : ''}
                   </p>
                   {b.catatan && <p className="mt-1 text-sm text-ink/70">“{b.catatan}”</p>}
                   {b.proofUrl && (
-                    <a href={b.proofUrl} target="_blank" rel="noopener noreferrer" className="mt-1 inline-block text-sm font-medium text-rose hover:underline">
+                    <a
+                      href={b.proofUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mt-1 inline-block text-sm font-medium text-rose hover:underline"
+                    >
                       Lihat bukti transfer →
                     </a>
                   )}
@@ -410,17 +412,26 @@ export default function DashboardPage() {
                 >
                   <MessageCircle size={14} /> Chat klien
                 </a>
-                {b.status !== "konfirmasi" && b.status !== "selesai" && (
-                  <button onClick={() => setStatus(b.id, "konfirmasi")} className="inline-flex items-center gap-1.5 rounded-lg border border-rose-line px-3 py-1.5 text-xs font-medium text-ink hover:bg-rose-soft">
+                {b.status !== 'konfirmasi' && b.status !== 'selesai' && (
+                  <button
+                    onClick={() => setStatus(b.id, 'konfirmasi')}
+                    className="inline-flex items-center gap-1.5 rounded-lg border border-rose-line px-3 py-1.5 text-xs font-medium text-ink hover:bg-rose-soft"
+                  >
                     <Check size={14} /> Konfirmasi
                   </button>
                 )}
-                {b.status !== "selesai" && (
-                  <button onClick={() => setStatus(b.id, "selesai")} className="inline-flex items-center gap-1.5 rounded-lg border border-rose-line px-3 py-1.5 text-xs font-medium text-ink hover:bg-rose-soft">
+                {b.status !== 'selesai' && (
+                  <button
+                    onClick={() => setStatus(b.id, 'selesai')}
+                    className="inline-flex items-center gap-1.5 rounded-lg border border-rose-line px-3 py-1.5 text-xs font-medium text-ink hover:bg-rose-soft"
+                  >
                     <CheckCheck size={14} /> Selesai
                   </button>
                 )}
-                <button onClick={() => hapus(b.id)} className="ml-auto inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-muted hover:text-rose">
+                <button
+                  onClick={() => hapus(b.id)}
+                  className="ml-auto inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-muted hover:text-rose"
+                >
                   <Trash2 size={14} /> Hapus
                 </button>
               </div>
@@ -429,12 +440,10 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* Bottom bar — installed app only. Drives the same tab state, so no logic
-          changes; hidden in the browser so the web layout is untouched. */}
       {standalone && (
         <nav
           className="fixed inset-x-0 bottom-0 z-40 border-t border-rose-line bg-white/95 backdrop-blur"
-          style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
+          style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
           aria-label="Navigasi dashboard"
         >
           <div className="mx-auto flex max-w-content items-stretch justify-around px-2">
@@ -444,9 +453,9 @@ export default function DashboardPage() {
                 <button
                   key={key}
                   onClick={() => setTab(key)}
-                  aria-current={active ? "page" : undefined}
+                  aria-current={active ? 'page' : undefined}
                   className={`flex flex-1 flex-col items-center gap-0.5 py-2 text-[11px] font-medium transition ${
-                    active ? "text-rose" : "text-muted"
+                    active ? 'text-rose' : 'text-muted'
                   }`}
                 >
                   <Icon size={22} strokeWidth={active ? 2.4 : 1.9} />

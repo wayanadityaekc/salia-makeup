@@ -1,20 +1,20 @@
-"use client";
+'use client';
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
-import { Menu, X, User, LogOut, MessageCircle } from "lucide-react";
-import { site } from "@/lib/config";
-import { getSettings } from "@/lib/storage";
-import { useUser } from "@/components/auth/UserProvider";
-import AuthModal from "@/components/auth/AuthModal";
-import { openChat } from "@/lib/chat";
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { Menu, X, User, LogOut, MessageCircle } from 'lucide-react';
+import { site } from '@/lib/config';
+import { fetchSettings } from '@/lib/storage';
+import { useUser } from '@/components/auth/UserProvider';
+import AuthModal from '@/components/auth/AuthModal';
+import { openChat } from '@/lib/chat';
 
 const nav = [
-  { href: "/", label: "Beranda" },
-  { href: "/layanan", label: "Make Up" },
-  { href: "/nail-art", label: "Nail Art" },
-  { href: "/galeri", label: "Galeri" },
+  { href: '/', label: 'Beranda' },
+  { href: '/layanan', label: 'Make Up' },
+  { href: '/nail-art', label: 'Nail Art' },
+  { href: '/galeri', label: 'Galeri' },
 ];
 
 export default function Navbar() {
@@ -23,24 +23,23 @@ export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [solid, setSolid] = useState(false);
   const [auth, setAuth] = useState(false);
-  const [logo, setLogo] = useState("");
+  const [logo, setLogo] = useState('');
 
   useEffect(() => {
-    function onScroll() { setSolid(window.scrollY > 12); }
+    function onScroll() {
+      setSolid(window.scrollY > 12);
+    }
     onScroll();
-    window.addEventListener("scroll", onScroll);
-    return () => window.removeEventListener("scroll", onScroll);
+    window.addEventListener('scroll', onScroll);
+    return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  // Editable logo (dashboard). Falls back to the brand wordmark until set.
   useEffect(() => {
     async function loadLogo() {
       try {
-        const settings = await getSettings();
+        const settings = await fetchSettings();
         if (settings?.content?.logo) setLogo(settings.content.logo);
-      } catch (e) {
-        // Keep the wordmark if settings fail to load.
-      }
+      } catch (e) {}
     }
     loadLogo();
   }, []);
@@ -50,19 +49,12 @@ export default function Navbar() {
   return (
     <header
       className={`sticky top-0 z-50 border-b transition ${
-        solid
-          ? "border-rose-line bg-white/90 backdrop-blur"
-          : "border-transparent bg-white"
+        solid ? 'border-rose-line bg-white/90 backdrop-blur' : 'border-transparent bg-white'
       }`}
     >
       <div className="container-x flex h-16 items-center justify-between">
         <Link href="/" className="flex items-center text-lg font-bold tracking-tight text-rose" aria-label={site.brand}>
-          {logo ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={logo} alt={site.brand} className="h-8 w-auto max-w-[160px] object-contain" />
-          ) : (
-            site.brand
-          )}
+          {logo ? <img src={logo} alt={site.brand} className="h-8 w-auto max-w-[160px] object-contain" /> : site.brand}
         </Link>
 
         <nav className="hidden items-center gap-8 md:flex">
@@ -71,7 +63,7 @@ export default function Navbar() {
               key={link.href}
               href={link.href}
               className={`text-sm transition hover:text-rose ${
-                pathname === link.href ? "font-semibold text-rose" : "text-ink"
+                pathname === link.href ? 'font-semibold text-rose' : 'text-ink'
               }`}
             >
               {link.label}
@@ -87,9 +79,13 @@ export default function Navbar() {
           {user ? (
             <div className="flex items-center gap-3">
               <span className="inline-flex items-center gap-1.5 text-sm font-medium text-ink">
-                <User size={16} className="text-rose" /> {user.nama?.split(" ")[0]}
+                <User size={16} className="text-rose" /> {user.nama?.split(' ')[0]}
               </span>
-              <button onClick={logout} className="inline-flex items-center gap-1 text-sm text-muted hover:text-rose" aria-label="Keluar">
+              <button
+                onClick={logout}
+                className="inline-flex items-center gap-1 text-sm text-muted hover:text-rose"
+                aria-label="Keluar"
+              >
                 <LogOut size={15} /> Keluar
               </button>
             </div>
@@ -101,18 +97,10 @@ export default function Navbar() {
         </nav>
 
         <div className="flex items-center gap-1 md:hidden">
-          <button
-            onClick={() => openChat()}
-            aria-label="Chat"
-            className="p-1.5 text-rose"
-          >
+          <button onClick={() => openChat()} aria-label="Chat" className="p-1.5 text-rose">
             <MessageCircle size={22} />
           </button>
-          <button
-            className="p-1.5 text-rose"
-            onClick={() => setOpen((wasOpen) => !wasOpen)}
-            aria-label="Menu"
-          >
+          <button className="p-1.5 text-rose" onClick={() => setOpen((wasOpen) => !wasOpen)} aria-label="Menu">
             {open ? <X size={24} /> : <Menu size={24} />}
           </button>
         </div>
@@ -125,9 +113,7 @@ export default function Navbar() {
               <Link
                 key={link.href}
                 href={link.href}
-                className={`py-3 text-sm ${
-                  pathname === link.href ? "font-semibold text-rose" : "text-ink"
-                }`}
+                className={`py-3 text-sm ${pathname === link.href ? 'font-semibold text-rose' : 'text-ink'}`}
               >
                 {link.label}
               </Link>
@@ -142,7 +128,13 @@ export default function Navbar() {
                 </button>
               </div>
             ) : (
-              <button onClick={() => { setOpen(false); setAuth(true); }} className="btn-primary mt-2">
+              <button
+                onClick={() => {
+                  setOpen(false);
+                  setAuth(true);
+                }}
+                className="btn-primary mt-2"
+              >
                 Login
               </button>
             )}

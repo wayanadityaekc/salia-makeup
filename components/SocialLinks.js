@@ -1,6 +1,5 @@
-import { Instagram } from "lucide-react";
+import { Instagram } from 'lucide-react';
 
-// Brand glyphs Lucide doesn't ship. Monochrome (currentColor).
 function TikTokIcon({ size = 18 }) {
   return (
     <svg viewBox="0 0 24 24" width={size} height={size} fill="currentColor" aria-hidden="true">
@@ -16,12 +15,11 @@ function GoogleIcon({ size = 18 }) {
   );
 }
 
-// Shared clickable social icon row. Hidden entirely when no links are set.
-export default function SocialLinks({ social = {}, size = 18, className = "" }) {
+export default function SocialLinks({ social = {}, size = 18, className = '' }) {
   const links = [
-    social.instagram && { href: social.instagram, label: "Instagram", Icon: Instagram },
-    social.tiktok && { href: social.tiktok, label: "TikTok", Icon: TikTokIcon },
-    social.google && { href: social.google, label: "Google Business Profile", Icon: GoogleIcon },
+    social.instagram && { href: social.instagram, label: 'Instagram', Icon: Instagram },
+    social.tiktok && { href: social.tiktok, label: 'TikTok', Icon: TikTokIcon },
+    social.google && { href: social.google, label: 'Google Business Profile', Icon: GoogleIcon },
   ].filter(Boolean);
   if (links.length === 0) return null;
   return (

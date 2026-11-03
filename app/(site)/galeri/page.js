@@ -1,19 +1,14 @@
-import SectionHeader from "@/components/SectionHeader";
-import { getGallery } from "@/lib/storage";
+import SectionHeader from '@/components/SectionHeader';
+import { fetchGallery } from '@/lib/storage';
 
-export const metadata = { title: "Galeri" };
+export const metadata = { title: 'Galeri' };
 
 export default async function GaleriPage() {
-  const items = await getGallery();
+  const items = await fetchGallery();
 
   return (
     <div className="container-x py-16">
-      <SectionHeader
-        eyebrow="Galeri"
-        title="Portofolio"
-        desc="Kumpulan hasil riasan dan nail art."
-        center
-      />
+      <SectionHeader eyebrow="Galeri" title="Portofolio" desc="Kumpulan hasil riasan dan nail art." center />
 
       {items.length === 0 ? (
         <div className="mt-12 rounded-2xl border border-dashed border-rose-line bg-white py-20 text-center text-sm text-muted">
@@ -22,11 +17,10 @@ export default async function GaleriPage() {
       ) : (
         <div className="mt-12 columns-2 gap-4 sm:columns-3 [&>*]:mb-4">
           {items.map((photo) => (
-            // eslint-disable-next-line @next/next/no-img-element
             <img
               key={photo.id}
               src={photo.url}
-              alt={photo.caption || "Portofolio Salia Makeup"}
+              alt={photo.caption || 'Portofolio Salia Makeup'}
               loading="lazy"
               className="w-full rounded-2xl"
             />

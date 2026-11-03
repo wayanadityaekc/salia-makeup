@@ -1,10 +1,9 @@
-"use client";
+'use client';
 
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 
-// Cart: one item per category + people count, in localStorage; read in an effect to keep SSR markup stable.
-const Ctx = createContext(null);
-export const CART_KEY = "salia_cart";
+const CartContext = createContext(null);
+export const CART_KEY = 'salia_cart';
 
 export function CartProvider({ children }) {
   const [sel, setSel] = useState({ makeup: null, hairdo: null, nail: null });
@@ -15,20 +14,25 @@ export function CartProvider({ children }) {
       const raw = localStorage.getItem(CART_KEY);
       if (raw) {
         const saved = JSON.parse(raw);
-        if (saved.sel) setSel({ makeup: saved.sel.makeup || null, hairdo: saved.sel.hairdo || null, nail: saved.sel.nail || null });
+        if (saved.sel)
+          setSel({ makeup: saved.sel.makeup || null, hairdo: saved.sel.hairdo || null, nail: saved.sel.nail || null });
         if (saved.orang) setOrang(saved.orang);
       }
     } catch (e) {}
   }, []);
 
   useEffect(() => {
-    try { localStorage.setItem(CART_KEY, JSON.stringify({ sel, orang })); } catch (e) {}
+    try {
+      localStorage.setItem(CART_KEY, JSON.stringify({ sel, orang }));
+    } catch (e) {}
   }, [sel, orang]);
 
   function pick(item) {
     setSel((prev) => ({ ...prev, [item.kind]: prev[item.kind]?.id === item.id ? null : item }));
   }
-  function remove(kind) { setSel((prev) => ({ ...prev, [kind]: null })); }
+  function remove(kind) {
+    setSel((prev) => ({ ...prev, [kind]: null }));
+  }
   function clear() {
     setSel({ makeup: null, hairdo: null, nail: null });
     setOrang(1);
@@ -38,10 +42,19 @@ export function CartProvider({ children }) {
   const subtotal = useMemo(() => items.reduce((sum, item) => sum + (item.base || 0), 0), [items]);
 
   const value = {
-    sel, orang, setOrang, pick, remove, clear, items, subtotal,
+    sel,
+    orang,
+    setOrang,
+    pick,
+    remove,
+    clear,
+    items,
+    subtotal,
     isSelected: (id) => items.some((i) => i.id === id),
   };
-  return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
+  return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 }
 
-export function useCart() { return useContext(Ctx); }
+export function useCart() {
+  return useContext(CartContext);
+}

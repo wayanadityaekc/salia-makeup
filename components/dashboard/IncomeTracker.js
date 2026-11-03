@@ -1,73 +1,80 @@
-"use client";
+'use client';
 
-import { useEffect, useMemo, useState } from "react";
-import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip } from "recharts";
-import { formatRupiah } from "@/lib/utils";
-import { getBookings, getSettings, UnauthorizedError } from "@/lib/storage";
+import { useEffect, useMemo, useState } from 'react';
+import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
+import { formatRupiah } from '@/lib/utils';
+import { fetchBookings, fetchSettings, UnauthorizedError } from '@/lib/storage';
 
-const ROSE = "#6B2C3E";
-const LINE = "#EAD9DD";
-const MUTED = "#8A7B7F";
+const ROSE = '#6B2C3E';
+const LINE = '#EAD9DD';
+const MUTED = '#8A7B7F';
 
-// Compact IDR for the y-axis (1.5jt / 250rb).
-function compact(v) {
-  if (v >= 1_000_000) return `${(v / 1_000_000).toLocaleString("id-ID", { maximumFractionDigits: 1 })}jt`;
-  if (v >= 1_000) return `${Math.round(v / 1_000)}rb`;
-  return String(v);
+const MONTHS_SHOWN = 12;
+
+function buildMonthKey(date) {
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+}
+
+function compact(value) {
+  if (value >= 1_000_000) return `${(value / 1_000_000).toLocaleString('id-ID', { maximumFractionDigits: 1 })}jt`;
+  if (value >= 1_000) return `${Math.round(value / 1_000)}rb`;
+  return String(value);
 }
 
 export default function IncomeTracker({ onUnauthorized }) {
   const [bookings, setBookings] = useState([]);
   const [areaFee, setAreaFee] = useState({});
   const [loading, setLoading] = useState(true);
-  const [err, setErr] = useState("");
+  const [error, setError] = useState('');
 
   useEffect(() => {
     (async () => {
       try {
-        const [list, s] = await Promise.all([getBookings(), getSettings()]);
+        const [list, siteSettings] = await Promise.all([fetchBookings(), fetchSettings()]);
         setBookings(list);
         const map = {};
-        (s.areas || []).forEach((a) => { map[a.id] = a.fee || 0; });
+        (siteSettings.areas || []).forEach((area) => {
+          map[area.id] = area.fee || 0;
+        });
         setAreaFee(map);
       } catch (e) {
         if (e instanceof UnauthorizedError) onUnauthorized?.();
-        else setErr("Gagal memuat data.");
+        else setError('Gagal memuat data.');
       } finally {
         setLoading(false);
       }
     })();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const { monthly, stats } = useMemo(() => {
-    // "selesai" = realized income. Build the last 12 months.
-    const months = [];
     const now = new Date();
-    for (let i = 11; i >= 0; i--) {
-      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-      months.push({ key: `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`, label: d.toLocaleDateString("id-ID", { month: "short" }), income: 0 });
-    }
-    const byKey = Object.fromEntries(months.map((m) => [m.key, m]));
-    const thisKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
-
-    let totalRealized = 0, thisMonth = 0, countRealized = 0, upcoming = 0, ongkir = 0;
-    for (const b of bookings) {
-      if (b.status === "konfirmasi") upcoming += b.total || 0;
-      if (b.status !== "selesai") continue;
-      countRealized++;
-      totalRealized += b.total || 0;
-      ongkir += areaFee[b.areaId] || 0;
-      const d = new Date(b.createdAt);
-      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
-      if (byKey[key]) byKey[key].income += b.total || 0;
-      if (key === thisKey) thisMonth += b.total || 0;
-    }
-    return { monthly: months, stats: { totalRealized, thisMonth, countRealized, upcoming, ongkir } };
+    const months = Array.from({ length: MONTHS_SHOWN }, (_, position) => {
+      const monthStart = new Date(now.getFullYear(), now.getMonth() - (MONTHS_SHOWN - 1 - position), 1);
+      return {
+        key: buildMonthKey(monthStart),
+        label: monthStart.toLocaleDateString('id-ID', { month: 'short' }),
+        income: 0,
+      };
+    });
+    const byKey = Object.fromEntries(months.map((month) => [month.key, month]));
+    const thisKey = buildMonthKey(now);
+    const totals = { totalRealized: 0, thisMonth: 0, countRealized: 0, upcoming: 0, ongkir: 0 };
+    bookings.forEach((booking) => {
+      const amount = booking.total || 0;
+      if (booking.status === 'konfirmasi') totals.upcoming += amount;
+      if (booking.status !== 'selesai') return;
+      totals.countRealized += 1;
+      totals.totalRealized += amount;
+      totals.ongkir += areaFee[booking.areaId] || 0;
+      const key = buildMonthKey(new Date(booking.createdAt));
+      if (byKey[key]) byKey[key].income += amount;
+      if (key === thisKey) totals.thisMonth += amount;
+    });
+    return { monthly: months, stats: totals };
   }, [bookings, areaFee]);
 
   if (loading) return <p className="text-sm text-muted">Memuat…</p>;
-  if (err) return <p className="text-sm text-rose">{err}</p>;
+  if (error) return <p className="text-sm text-rose">{error}</p>;
 
   const empty = stats.countRealized === 0;
 
@@ -95,10 +102,16 @@ export default function IncomeTracker({ onUnauthorized }) {
               <BarChart data={monthly} margin={{ top: 8, right: 8, bottom: 0, left: 0 }}>
                 <CartesianGrid vertical={false} stroke={LINE} />
                 <XAxis dataKey="label" tickLine={false} axisLine={false} tick={{ fill: MUTED, fontSize: 12 }} />
-                <YAxis tickFormatter={compact} tickLine={false} axisLine={false} width={44} tick={{ fill: MUTED, fontSize: 12 }} />
+                <YAxis
+                  tickFormatter={compact}
+                  tickLine={false}
+                  axisLine={false}
+                  width={44}
+                  tick={{ fill: MUTED, fontSize: 12 }}
+                />
                 <Tooltip
-                  cursor={{ fill: "rgba(107,44,62,0.06)" }}
-                  formatter={(v) => [formatRupiah(v), "Pendapatan"]}
+                  cursor={{ fill: 'rgba(107,44,62,0.06)' }}
+                  formatter={(value) => [formatRupiah(value), 'Pendapatan']}
                   contentStyle={{ borderRadius: 12, border: `1px solid ${LINE}`, fontSize: 13 }}
                 />
                 <Bar dataKey="income" fill={ROSE} radius={[4, 4, 0, 0]} maxBarSize={40} />
@@ -106,7 +119,9 @@ export default function IncomeTracker({ onUnauthorized }) {
             </ResponsiveContainer>
           </div>
         )}
-        <p className="mt-3 text-xs text-muted">Ongkir terkumpul (selesai): <span className="font-semibold text-ink">{formatRupiah(stats.ongkir)}</span></p>
+        <p className="mt-3 text-xs text-muted">
+          Ongkir terkumpul (selesai): <span className="font-semibold text-ink">{formatRupiah(stats.ongkir)}</span>
+        </p>
       </div>
     </div>
   );

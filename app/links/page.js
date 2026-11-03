@@ -1,11 +1,10 @@
-import { Globe, MessageCircle, Instagram, CalendarHeart } from "lucide-react";
-import { site } from "@/lib/config";
-import { getSettings } from "@/lib/storage";
-import { waLink, normalizeWa } from "@/lib/utils";
+import { Globe, MessageCircle, Instagram, CalendarHeart } from 'lucide-react';
+import { site } from '@/lib/config';
+import { fetchSettings } from '@/lib/storage';
+import { waLink, normalizeWa } from '@/lib/utils';
 
-// Link-in-bio page for IG/TikTok: not linked on the site and not indexed, reachable only at /links.
 export const metadata = {
-  title: "Links",
+  title: 'Links',
   robots: { index: false, follow: false },
 };
 
@@ -25,17 +24,17 @@ function GoogleIcon({ size = 20 }) {
 }
 
 export default async function LinksPage() {
-  const { social, whatsapp } = await getSettings();
+  const { social, whatsapp } = await fetchSettings();
   const whatsappHref = waLink(normalizeWa(whatsapp || site.whatsapp), `Halo ${site.brand}, saya mau booking 😊`);
   const webBase = `https://${site.domain}`;
 
   const links = [
-    { href: whatsappHref, label: "Booking via WhatsApp", Icon: MessageCircle, primary: true },
-    { href: `${webBase}/booking`, label: "Booking Online", Icon: CalendarHeart, primary: true },
-    { href: webBase, label: "Website Resmi", Icon: Globe },
-    social.instagram && { href: social.instagram, label: "Instagram", Icon: Instagram },
-    social.tiktok && { href: social.tiktok, label: "TikTok", Icon: TikTokIcon },
-    social.google && { href: social.google, label: "Google Business", Icon: GoogleIcon },
+    { href: whatsappHref, label: 'Booking via WhatsApp', Icon: MessageCircle, primary: true },
+    { href: `${webBase}/booking`, label: 'Booking Online', Icon: CalendarHeart, primary: true },
+    { href: webBase, label: 'Website Resmi', Icon: Globe },
+    social.instagram && { href: social.instagram, label: 'Instagram', Icon: Instagram },
+    social.tiktok && { href: social.tiktok, label: 'TikTok', Icon: TikTokIcon },
+    social.google && { href: social.google, label: 'Google Business', Icon: GoogleIcon },
   ].filter(Boolean);
 
   return (
@@ -45,7 +44,9 @@ export default async function LinksPage() {
           SM
         </div>
         <h1 className="mt-4 text-2xl font-bold text-ink">{site.brand}</h1>
-        <p className="mt-1 text-sm text-muted">{site.tagline} · {site.kota}</p>
+        <p className="mt-1 text-sm text-muted">
+          {site.tagline} · {site.kota}
+        </p>
 
         <div className="mt-8 grid gap-3">
           {links.map(({ href, label, Icon, primary }) => (
@@ -56,18 +57,20 @@ export default async function LinksPage() {
               rel="noopener noreferrer"
               className={`flex items-center gap-3 rounded-2xl border px-5 py-3.5 text-sm font-semibold transition active:scale-[0.99] ${
                 primary
-                  ? "border-rose bg-rose text-white hover:bg-rose-deep"
-                  : "border-rose-line bg-white text-ink hover:bg-white/70"
+                  ? 'border-rose bg-rose text-white hover:bg-rose-deep'
+                  : 'border-rose-line bg-white text-ink hover:bg-white/70'
               }`}
             >
-              <Icon size={20} className={primary ? "text-white" : "text-rose"} />
+              <Icon size={20} className={primary ? 'text-white' : 'text-rose'} />
               <span className="flex-1 text-center">{label}</span>
               <span className="w-5" />
             </a>
           ))}
         </div>
 
-        <p className="mt-10 text-xs text-muted">© {new Date().getFullYear()} {site.brand}</p>
+        <p className="mt-10 text-xs text-muted">
+          © {new Date().getFullYear()} {site.brand}
+        </p>
       </div>
     </main>
   );

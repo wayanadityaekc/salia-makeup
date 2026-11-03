@@ -1,6 +1,6 @@
-import "./globals.css";
-import { site } from "@/lib/config";
-import IosZoomFix from "@/components/IosZoomFix";
+import './globals.css';
+import { site } from '@/lib/config';
+import IosZoomFix from '@/components/IosZoomFix';
 
 export const metadata = {
   title: {
@@ -10,7 +10,7 @@ export const metadata = {
   description: `Jasa make up, hairdo, dan nail art profesional di ${site.kota}. Booking mudah langsung via WhatsApp.`,
   openGraph: {
     title: `${site.brand} · ${site.tagline}`,
-    type: "website",
+    type: 'website',
     url: `https://${site.domain}`,
   },
 };

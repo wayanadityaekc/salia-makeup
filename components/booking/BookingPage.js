@@ -1,82 +1,98 @@
-"use client";
+'use client';
 
-import { useEffect, useMemo, useRef, useState } from "react";
-import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useEffect, useMemo, useRef, useState } from 'react';
+import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import {
-  Lock, ShieldCheck, CalendarCheck, MessageCircle, Send, Copy, Check, Upload,
-  Loader2, CheckCircle2, Minus, Plus, Download, ArrowLeft, Clock,
-} from "lucide-react";
-import Select from "@/components/ui/Select";
-import { site } from "@/lib/config";
-import { formatRupiah, formatTanggal, waLink, normalizeWa } from "@/lib/utils";
+  Lock,
+  ShieldCheck,
+  CalendarCheck,
+  MessageCircle,
+  Send,
+  Copy,
+  Check,
+  Upload,
+  Loader2,
+  CheckCircle2,
+  Minus,
+  Plus,
+  Download,
+  ArrowLeft,
+  Clock,
+} from 'lucide-react';
+import Select from '@/components/ui/Select';
+import { site } from '@/lib/config';
+import { formatRupiah, formatTanggal, waLink, normalizeWa } from '@/lib/utils';
 import {
-  getBookingToken, saveCartBooking, uploadProof, uploadReceipt,
-  sendReceiptToChat, emailReceipt,
-} from "@/lib/storage";
-import { compressImage } from "@/lib/image";
-import { makeReceiptPdf } from "@/lib/receipt";
-import { CART_KEY } from "@/components/store/CartProvider";
-import { chatCidFor } from "@/lib/chat";
-import { useUser } from "@/components/auth/UserProvider";
+  fetchBookingToken,
+  saveCartBooking,
+  uploadProof,
+  uploadReceipt,
+  sendReceiptToChat,
+  emailReceipt,
+} from '@/lib/storage';
+import { compressImage } from '@/lib/image';
+import { makeReceiptPdf } from '@/lib/receipt';
+import { CART_KEY } from '@/components/store/CartProvider';
+import { chatCidFor } from '@/lib/chat';
+import { useUser } from '@/components/auth/UserProvider';
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const BOOKING_ERROR_MESSAGES = {
-  invalid_token: "Link booking sudah tidak berlaku. Chat admin untuk link baru.",
-  invalid_email: "Email tidak valid.",
-  too_long: "Ada isian yang terlalu panjang. Persingkat lalu coba lagi.",
-  invalid_proof_url: "Bukti transfer gagal dibaca. Upload ulang atau kirim via WhatsApp.",
+  invalid_token: 'Link booking sudah tidak berlaku. Chat admin untuk link baru.',
+  invalid_email: 'Email tidak valid.',
+  too_long: 'Ada isian yang terlalu panjang. Persingkat lalu coba lagi.',
+  invalid_proof_url: 'Bukti transfer gagal dibaca. Upload ulang atau kirim via WhatsApp.',
 };
 
 const timeOptions = Array.from({ length: 16 }, (_, index) => index + 6).flatMap((hour) =>
   [0, 30].map((minute) => {
-    const time = `${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`;
+    const time = `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
     return { value: time, label: time };
   }),
 );
 
 export default function BookingPage({ settings }) {
   const search = useSearchParams();
-  const token = search.get("token") || "";
+  const token = search.get('token') || '';
   const { user } = useUser();
 
   const [cart, setCart] = useState({ items: [], orang: 1 });
-  // Status: checking | valid | invalid
-  const [tok, setTok] = useState({ status: "checking" });
-  // Step: form | done
-  const [step, setStep] = useState("form");
+  const [tok, setTok] = useState({ status: 'checking' });
+  const [step, setStep] = useState('form');
   const [doneReceipt, setDoneReceipt] = useState(null);
 
-  // Read the persisted cart (client only).
   useEffect(() => {
     try {
-      const saved = JSON.parse(localStorage.getItem(CART_KEY) || "{}");
+      const saved = JSON.parse(localStorage.getItem(CART_KEY) || '{}');
       const items = [saved?.sel?.makeup, saved?.sel?.hairdo, saved?.sel?.nail].filter(Boolean);
       setCart({ items, orang: saved?.orang || 1 });
     } catch (e) {}
   }, []);
 
-  // Validate the magic-link token (the whole form is locked without one).
   useEffect(() => {
     let alive = true;
-    if (!token) { setTok({ status: "invalid", reason: "missing" }); return; }
+    if (!token) {
+      setTok({ status: 'invalid', reason: 'missing' });
+      return;
+    }
     async function check() {
       try {
-        const { valid, tanggal, reason } = (await getBookingToken(token)) || {};
+        const { valid, tanggal, reason } = (await fetchBookingToken(token)) || {};
         if (!alive) return;
-        setTok(valid ? { status: "valid", tanggal } : { status: "invalid", reason: reason || "invalid" });
-      } catch (e) {
-        // getBookingToken already turns a failure into { valid: false }.
-      }
+        setTok(valid ? { status: 'valid', tanggal } : { status: 'invalid', reason: reason || 'invalid' });
+      } catch (e) {}
     }
     check();
-    return () => { alive = false; };
+    return () => {
+      alive = false;
+    };
   }, [token]);
 
   const areas = settings?.areas || [];
   const subtotal = cart.items.reduce((sum, item) => sum + (item.base || 0), 0);
 
-  if (step === "done") {
+  if (step === 'done') {
     return <DonePanel receipt={doneReceipt} user={user} />;
   }
 
@@ -91,18 +107,19 @@ export default function BookingPage({ settings }) {
         {cart.items.length === 0 ? (
           <div className="mt-6 rounded-2xl border border-dashed border-rose-line bg-white p-8 text-center">
             <p className="text-sm text-muted">Belum ada layanan dipilih.</p>
-            <Link href="/#pilih" className="btn-primary mt-4 inline-flex">Pilih layanan</Link>
+            <Link href="/#pilih" className="btn-primary mt-4 inline-flex">
+              Pilih layanan
+            </Link>
           </div>
         ) : (
           <>
-            {/* Selected items summary */}
             <div className="mt-5 rounded-2xl border border-rose-line bg-white p-5">
               <div className="text-xs font-semibold uppercase tracking-wider text-rose">Layanan dipilih</div>
               <ul className="mt-3 space-y-2">
-                {cart.items.map((i) => (
-                  <li key={i.id} className="flex items-center justify-between text-sm">
-                    <span className="text-ink">{i.nama}</span>
-                    <span className="font-semibold text-ink">{formatRupiah(i.base)}</span>
+                {cart.items.map((item) => (
+                  <li key={item.id} className="flex items-center justify-between text-sm">
+                    <span className="text-ink">{item.nama}</span>
+                    <span className="font-semibold text-ink">{formatRupiah(item.base)}</span>
                   </li>
                 ))}
               </ul>
@@ -110,10 +127,12 @@ export default function BookingPage({ settings }) {
                 <span className="text-muted">Perkiraan / orang</span>
                 <span className="font-bold text-rose">{formatRupiah(subtotal)}</span>
               </div>
-              <p className="mt-1 text-[11px] text-muted">Total final dihitung otomatis (× jumlah orang + ongkir) di langkah berikutnya.</p>
+              <p className="mt-1 text-[11px] text-muted">
+                Total final dihitung otomatis (× jumlah orang + ongkir) di langkah berikutnya.
+              </p>
             </div>
 
-            {tok.status === "valid" ? (
+            {tok.status === 'valid' ? (
               <UnlockedForm
                 cart={cart}
                 areas={areas}
@@ -121,7 +140,10 @@ export default function BookingPage({ settings }) {
                 token={token}
                 tanggal={tok.tanggal}
                 user={user}
-                onDone={(receipt) => { setDoneReceipt(receipt); setStep("done"); }}
+                onDone={(receipt) => {
+                  setDoneReceipt(receipt);
+                  setStep('done');
+                }}
               />
             ) : (
               <LockedPanel status={tok.status} reason={tok.reason} cart={cart} settings={settings} />
@@ -133,23 +155,23 @@ export default function BookingPage({ settings }) {
   );
 }
 
-// ---- Locked: no valid token -> check availability via WhatsApp ---------------
-function LockedPanel({ status = "invalid", reason = "", cart = { items: [], orang: 1 }, settings = null }) {
+function LockedPanel({ status = 'invalid', reason = '', cart = { items: [], orang: 1 }, settings = null }) {
   const whatsappNumber = normalizeWa(settings?.whatsapp || site.whatsapp);
-  const list = cart.items.map((i) => `- ${i.nama}`).join("\n");
-  const msg =
-    `Halo ${site.brand}, saya mau cek ketersediaan tanggal untuk booking:\n${list}\nJumlah orang: ${cart.orang}\n\nTanggal yang saya inginkan: ____\nMohon info ketersediaannya ya 🙏`;
-  const href = waLink(whatsappNumber, msg);
+  const list = cart.items.map((item) => `- ${item.nama}`).join('\n');
+  const message = `Halo ${site.brand}, saya mau cek ketersediaan tanggal untuk booking:\n${list}\nJumlah orang: ${cart.orang}\n\nTanggal yang saya inginkan: ____\nMohon info ketersediaannya ya 🙏`;
+  const href = waLink(whatsappNumber, message);
 
-  const expired = reason === "expired";
-  const used = reason === "used";
+  const expired = reason === 'expired';
+  const used = reason === 'used';
 
   return (
     <div className="relative mt-5">
-      {/* The form, shown locked behind a frosted overlay. */}
-      <div aria-hidden className="pointer-events-none select-none rounded-2xl border border-rose-line bg-white p-5 opacity-40 blur-[1px]">
+      <div
+        aria-hidden
+        className="pointer-events-none select-none rounded-2xl border border-rose-line bg-white p-5 opacity-40 blur-[1px]"
+      >
         <div className="grid grid-cols-2 gap-3">
-          {["Nama", "No. WhatsApp", "Email", "Jumlah orang", "Tanggal", "Jam ready"].map((label) => (
+          {['Nama', 'No. WhatsApp', 'Email', 'Jumlah orang', 'Tanggal', 'Jam ready'].map((label) => (
             <div key={label}>
               <div className="mb-1 text-xs text-muted">{label}</div>
               <div className="h-9 rounded-xl border border-rose-line bg-rose-soft/40" />
@@ -159,110 +181,170 @@ function LockedPanel({ status = "invalid", reason = "", cart = { items: [], oran
         <div className="mt-3 h-20 rounded-xl border border-rose-line bg-rose-soft/40" />
       </div>
 
-      {/* Overlay */}
       <div className="absolute inset-0 flex items-center justify-center p-4">
         <div className="w-full max-w-sm rounded-2xl border border-rose-line bg-white p-6 text-center shadow-lg">
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-rose-soft">
             <Lock className="text-rose" size={22} />
           </div>
           <h2 className="mt-4 text-lg font-bold text-ink">
-            {expired ? "Link sudah kedaluwarsa" : used ? "Link sudah dipakai" : "Cek ketersediaan dulu"}
+            {expired ? 'Link sudah kedaluwarsa' : used ? 'Link sudah dipakai' : 'Cek ketersediaan dulu'}
           </h2>
           <p className="mt-2 text-sm text-muted">
             {expired
-              ? "Link booking ini sudah lewat masa berlakunya. Chat admin lagi untuk link baru."
+              ? 'Link booking ini sudah lewat masa berlakunya. Chat admin lagi untuk link baru.'
               : used
-              ? "Link booking ini sudah dipakai. Kalau perlu booking lagi, chat admin untuk link baru."
-              : "Booking dibuka setelah admin konfirmasi tanggalnya available. Chat admin untuk cek, nanti kamu dikirim link untuk lanjut booking."}
+                ? 'Link booking ini sudah dipakai. Kalau perlu booking lagi, chat admin untuk link baru.'
+                : 'Booking dibuka setelah admin konfirmasi tanggalnya available. Chat admin untuk cek, nanti kamu dikirim link untuk lanjut booking.'}
           </p>
           <a href={href} target="_blank" rel="noopener noreferrer" className="btn-primary mt-5 w-full justify-center">
             <MessageCircle size={18} /> Cek ketersediaan via WhatsApp
           </a>
-          <p className="mt-3 text-[11px] text-muted">Tanpa biaya. Admin balas dengan tanggal yang tersedia + link booking.</p>
+          <p className="mt-3 text-[11px] text-muted">
+            Tanpa biaya. Admin balas dengan tanggal yang tersedia + link booking.
+          </p>
         </div>
       </div>
     </div>
   );
 }
 
-// ---- Unlocked: valid token -> real form + payment ---------------------------
-function UnlockedForm({ cart = { items: [], orang: 1 }, areas = [], settings = null, token = "", tanggal = "", user = null, onDone = () => {} }) {
+function UnlockedForm({
+  cart = { items: [], orang: 1 },
+  areas = [],
+  settings = null,
+  token = '',
+  tanggal = '',
+  user = null,
+  onDone = () => {},
+}) {
   const [form, setForm] = useState({
-    nama: "", telepon: "", email: "", instagram: "",
-    areaId: areas[0]?.id || "dalam-kota", jam: "", lokasi: "", catatan: "",
+    nama: '',
+    telepon: '',
+    email: '',
+    instagram: '',
+    areaId: areas[0]?.id || 'dalam-kota',
+    jam: '',
+    lokasi: '',
+    catatan: '',
   });
   const [orang, setOrang] = useState(cart.orang || 1);
-  const [proofUrl, setProofUrl] = useState("");
+  const [proofUrl, setProofUrl] = useState('');
   const [uploading, setUploading] = useState(false);
-  const [uploadErr, setUploadErr] = useState("");
-  const [pct, setPct] = useState(0);
-  const [copied, setCopied] = useState("");
+  const [uploadError, setUploadError] = useState('');
+  const [uploadPercent, setUploadPercent] = useState(0);
+  const [copied, setCopied] = useState('');
   const [busy, setBusy] = useState(false);
-  const [err, setErr] = useState("");
+  const [error, setError] = useState('');
   const fileRef = useRef(null);
 
   useEffect(() => {
-    if (user) setForm((prev) => ({ ...prev, nama: prev.nama || user.nama || "", email: prev.email || user.email || "", telepon: prev.telepon || user.telepon || "" }));
+    if (user)
+      setForm((prev) => ({
+        ...prev,
+        nama: prev.nama || user.nama || '',
+        email: prev.email || user.email || '',
+        telepon: prev.telepon || user.telepon || '',
+      }));
   }, [user]);
 
-  const area = areas.find((area) => area.id === form.areaId) || areas[0] || { fee: 0, nama: "" };
+  const area = areas.find((area) => area.id === form.areaId) || areas[0] || { fee: 0, nama: '' };
   const subtotal = cart.items.reduce((sum, item) => sum + (item.base || 0), 0);
   const total = subtotal * orang + (area.fee || 0);
   const dpPercent = settings?.dpPercent || 50;
   const downPayment = Math.round((total * dpPercent) / 100);
   const bank = settings?.bank || {};
-  function set(field, value) { setForm((prev) => ({ ...prev, [field]: value })); }
-  const areaOptions = areas.map((area) => ({ value: area.id, label: `${area.nama} ${area.fee > 0 ? `(+ ${formatRupiah(area.fee)})` : "(Gratis)"}` }));
+  function set(field, value) {
+    setForm((prev) => ({ ...prev, [field]: value }));
+  }
+  const areaOptions = areas.map((area) => ({
+    value: area.id,
+    label: `${area.nama} ${area.fee > 0 ? `(+ ${formatRupiah(area.fee)})` : '(Gratis)'}`,
+  }));
 
-  async function copy(key, text) { try { await navigator.clipboard.writeText(text); setCopied(key); setTimeout(() => setCopied(""), 1500); } catch (e) {} }
-
-  async function onPickProof(event) {
-    const file = event.target.files?.[0];
-    if (!file) return;
-    setUploading(true); setUploadErr(""); setPct(0);
+  async function copy(key, text) {
     try {
-      const compressed = await compressImage(file);
-      const url = await uploadProof(compressed, (percent) => setPct(percent));
-      setProofUrl(url);
-    } catch (e) {
-      setUploadErr(e?.data?.error === "uploads_not_configured" ? "Upload belum aktif, kirim bukti via WhatsApp saja." : "Gagal upload. Coba lagi / kirim via WhatsApp.");
-    } finally { setUploading(false); setPct(0); if (fileRef.current) fileRef.current.value = ""; }
+      await navigator.clipboard.writeText(text);
+      setCopied(key);
+      setTimeout(() => setCopied(''), 1500);
+    } catch (e) {}
   }
 
-  async function submit(event) {
+  async function handleProofPick(event) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    setUploadError('');
+    setUploadPercent(0);
+    try {
+      const compressed = await compressImage(file);
+      const url = await uploadProof(compressed, (percent) => setUploadPercent(percent));
+      setProofUrl(url);
+    } catch (e) {
+      setUploadError(
+        e?.data?.error === 'uploads_not_configured'
+          ? 'Upload belum aktif, kirim bukti via WhatsApp saja.'
+          : 'Gagal upload. Coba lagi / kirim via WhatsApp.',
+      );
+    } finally {
+      setUploading(false);
+      setUploadPercent(0);
+      if (fileRef.current) fileRef.current.value = '';
+    }
+  }
+
+  async function handleSubmit(event) {
     event.preventDefault();
-    if (!form.nama.trim() || !form.telepon.trim()) return setErr("Nama & No. WhatsApp wajib diisi.");
-    if (!/^[0-9+]{9,15}$/.test(form.telepon.trim())) return setErr("Nomor WhatsApp tidak valid.");
-    if (!form.jam) return setErr("Pilih jam ready.");
-    if (!form.lokasi.trim()) return setErr("Alamat wajib diisi.");
-    if (form.email.trim() && !EMAIL_RE.test(form.email.trim())) return setErr("Email tidak valid.");
-    setErr(""); setBusy(true);
+    if (!form.nama.trim() || !form.telepon.trim()) return setError('Nama & No. WhatsApp wajib diisi.');
+    if (!/^[0-9+]{9,15}$/.test(form.telepon.trim())) return setError('Nomor WhatsApp tidak valid.');
+    if (!form.jam) return setError('Pilih jam ready.');
+    if (!form.lokasi.trim()) return setError('Alamat wajib diisi.');
+    if (form.email.trim() && !EMAIL_RE.test(form.email.trim())) return setError('Email tidak valid.');
+    setError('');
+    setBusy(true);
     let saved;
     try {
       saved = await saveCartBooking({
-        nama: form.nama, telepon: form.telepon, instagram: form.instagram, email: form.email,
-        items: cart.items.map((i) => i.id), orang,
-        areaId: form.areaId, jam: form.jam, lokasi: form.lokasi, catatan: form.catatan,
-        token, proofUrl,
+        nama: form.nama,
+        telepon: form.telepon,
+        instagram: form.instagram,
+        email: form.email,
+        items: cart.items.map((item) => item.id),
+        orang,
+        areaId: form.areaId,
+        jam: form.jam,
+        lokasi: form.lokasi,
+        catatan: form.catatan,
+        token,
+        proofUrl,
       });
     } catch (e) {
       setBusy(false);
-      return setErr(BOOKING_ERROR_MESSAGES[e?.data?.error] || "Gagal menyimpan booking. Coba lagi atau chat admin.");
+      return setError(BOOKING_ERROR_MESSAGES[e?.data?.error] || 'Gagal menyimpan booking. Coba lagi atau chat admin.');
     }
-    // Best-effort receipt: PDF -> chat (+ email if logged in). Never blocks done.
-    const ref = saved?.id ? `SALIA-${saved.id}` : "";
+    const ref = saved?.id ? `SALIA-${saved.id}` : '';
     let receipt = null;
     try {
       const pdf = await makeReceiptPdf({
-        ref, nama: form.nama, telepon: form.telepon,
-        items: cart.items.map((i) => ({ nama: i.nama, base: i.base })), orang,
-        areaNama: area.nama, areaFee: area.fee || 0, tanggal, jam: form.jam,
-        total: saved?.total ?? total, dpPercent, brand: site.brand,
+        ref,
+        nama: form.nama,
+        telepon: form.telepon,
+        items: cart.items.map((item) => ({ nama: item.nama, base: item.base })),
+        orang,
+        areaNama: area.nama,
+        areaFee: area.fee || 0,
+        tanggal,
+        jam: form.jam,
+        total: saved?.total ?? total,
+        dpPercent,
+        brand: site.brand,
       });
       receipt = { blob: pdf.blob, filename: pdf.filename };
       const cid = chatCidFor(user);
-      const file = new File([pdf.blob], pdf.filename, { type: "application/pdf" });
-      let url = ""; try { url = await uploadReceipt(file); } catch (e) {}
+      const file = new File([pdf.blob], pdf.filename, { type: 'application/pdf' });
+      let url = '';
+      try {
+        url = await uploadReceipt(file);
+      } catch (e) {}
       if (url) await sendReceiptToChat(cid, { nama: form.nama, telepon: form.telepon, ref, url }).catch(() => {});
       if (user) await emailReceipt({ ref, filename: pdf.filename, pdfBase64: pdf.base64 }).catch(() => {});
     } catch (e) {}
@@ -270,13 +352,28 @@ function UnlockedForm({ cart = { items: [], orang: 1 }, areas = [], settings = n
     onDone(receipt);
   }
 
-  function Row({ label = "", value = "", copyKey = "" }) {
+  function Row({ label = '', value = '', copyKey = '' }) {
     return (
       <div className="flex items-center justify-between gap-3 border-b border-rose-line py-2.5 last:border-0">
-        <div><div className="text-xs text-muted">{label}</div><div className="font-semibold text-ink">{value}</div></div>
+        <div>
+          <div className="text-xs text-muted">{label}</div>
+          <div className="font-semibold text-ink">{value}</div>
+        </div>
         {copyKey && (
-          <button type="button" onClick={() => copy(copyKey, value)} className="inline-flex items-center gap-1 rounded-lg border border-rose-line px-2.5 py-1.5 text-xs font-medium text-rose hover:bg-rose-soft">
-            {copied === copyKey ? <><Check size={13} /> Tersalin</> : <><Copy size={13} /> Salin</>}
+          <button
+            type="button"
+            onClick={() => copy(copyKey, value)}
+            className="inline-flex items-center gap-1 rounded-lg border border-rose-line px-2.5 py-1.5 text-xs font-medium text-rose hover:bg-rose-soft"
+          >
+            {copied === copyKey ? (
+              <>
+                <Check size={13} /> Tersalin
+              </>
+            ) : (
+              <>
+                <Copy size={13} /> Salin
+              </>
+            )}
           </button>
         )}
       </div>
@@ -284,8 +381,7 @@ function UnlockedForm({ cart = { items: [], orang: 1 }, areas = [], settings = n
   }
 
   return (
-    <form onSubmit={submit} className="mt-5 space-y-4">
-      {/* Approved date banner */}
+    <form onSubmit={handleSubmit} className="mt-5 space-y-4">
       <div className="flex items-center gap-3 rounded-2xl border border-green-200 bg-green-50 p-4">
         <CalendarCheck className="shrink-0 text-green-600" size={20} />
         <div className="text-sm">
@@ -296,64 +392,168 @@ function UnlockedForm({ cart = { items: [], orang: 1 }, areas = [], settings = n
 
       <div className="rounded-2xl border border-rose-line bg-white p-5 space-y-3">
         <div className="grid grid-cols-2 gap-2.5">
-          <div><label className="label">Nama</label><input className="field" value={form.nama} onChange={(e) => set("nama", e.target.value)} placeholder="Nama kamu" /></div>
-          <div><label className="label">No. WhatsApp</label><input className="field" inputMode="numeric" value={form.telepon} onChange={(e) => set("telepon", e.target.value)} placeholder="08xxxx" /></div>
+          <div>
+            <label className="label">Nama</label>
+            <input
+              className="field"
+              value={form.nama}
+              onChange={(event) => set('nama', event.target.value)}
+              placeholder="Nama kamu"
+            />
+          </div>
+          <div>
+            <label className="label">No. WhatsApp</label>
+            <input
+              className="field"
+              inputMode="numeric"
+              value={form.telepon}
+              onChange={(event) => set('telepon', event.target.value)}
+              placeholder="08xxxx"
+            />
+          </div>
         </div>
         <div className="grid grid-cols-2 gap-2.5">
-          <div><label className="label">Email {user ? "" : "(opsional)"}</label><input className="field" type="email" value={form.email} onChange={(e) => set("email", e.target.value)} placeholder="email@kamu.com" /></div>
-          <div><label className="label">Instagram</label><input className="field" value={form.instagram} onChange={(e) => set("instagram", e.target.value)} placeholder="@username" /></div>
+          <div>
+            <label className="label">Email {user ? '' : '(opsional)'}</label>
+            <input
+              className="field"
+              type="email"
+              value={form.email}
+              onChange={(event) => set('email', event.target.value)}
+              placeholder="email@kamu.com"
+            />
+          </div>
+          <div>
+            <label className="label">Instagram</label>
+            <input
+              className="field"
+              value={form.instagram}
+              onChange={(event) => set('instagram', event.target.value)}
+              placeholder="@username"
+            />
+          </div>
         </div>
         <div className="grid grid-cols-2 items-end gap-2.5">
           <div>
             <label className="label">Jumlah orang</label>
             <div className="flex items-center justify-between rounded-xl border border-rose-line px-2 py-1">
-              <button type="button" onClick={() => setOrang(Math.max(1, orang - 1))} className="flex h-8 w-8 items-center justify-center rounded-full text-rose hover:bg-rose-soft"><Minus size={16} /></button>
+              <button
+                type="button"
+                onClick={() => setOrang(Math.max(1, orang - 1))}
+                className="flex h-8 w-8 items-center justify-center rounded-full text-rose hover:bg-rose-soft"
+              >
+                <Minus size={16} />
+              </button>
               <span className="text-base font-bold text-ink">{orang}</span>
-              <button type="button" onClick={() => setOrang(Math.min(50, orang + 1))} className="flex h-8 w-8 items-center justify-center rounded-full text-rose hover:bg-rose-soft"><Plus size={16} /></button>
+              <button
+                type="button"
+                onClick={() => setOrang(Math.min(50, orang + 1))}
+                className="flex h-8 w-8 items-center justify-center rounded-full text-rose hover:bg-rose-soft"
+              >
+                <Plus size={16} />
+              </button>
             </div>
           </div>
-          <div><label className="label">Jam ready</label><Select value={form.jam} onChange={(time) => set("jam", time)} options={timeOptions} placeholder="Pilih jam ready" /></div>
+          <div>
+            <label className="label">Jam ready</label>
+            <Select
+              value={form.jam}
+              onChange={(time) => set('jam', time)}
+              options={timeOptions}
+              placeholder="Pilih jam ready"
+            />
+          </div>
         </div>
-        <div><label className="label">Area</label><Select value={form.areaId} onChange={(areaId) => set("areaId", areaId)} options={areaOptions} placeholder="Pilih area" /></div>
-        <div><label className="label">Alamat lengkap</label><textarea rows={3} className="field resize-none" value={form.lokasi} onChange={(e) => set("lokasi", e.target.value)} placeholder="Nama jalan, no. rumah, patokan, kecamatan…" /></div>
-        <div><label className="label">Catatan (opsional)</label><input className="field" value={form.catatan} onChange={(e) => set("catatan", e.target.value)} placeholder="Referensi look, tema acara, dll." /></div>
+        <div>
+          <label className="label">Area</label>
+          <Select
+            value={form.areaId}
+            onChange={(areaId) => set('areaId', areaId)}
+            options={areaOptions}
+            placeholder="Pilih area"
+          />
+        </div>
+        <div>
+          <label className="label">Alamat lengkap</label>
+          <textarea
+            rows={3}
+            className="field resize-none"
+            value={form.lokasi}
+            onChange={(event) => set('lokasi', event.target.value)}
+            placeholder="Nama jalan, no. rumah, patokan, kecamatan…"
+          />
+        </div>
+        <div>
+          <label className="label">Catatan (opsional)</label>
+          <input
+            className="field"
+            value={form.catatan}
+            onChange={(event) => set('catatan', event.target.value)}
+            placeholder="Referensi look, tema acara, dll."
+          />
+        </div>
       </div>
 
-      {/* Total + DP */}
       <div className="flex items-center justify-between rounded-xl bg-rose-soft px-4 py-3">
-        <div><div className="text-xs text-muted">Total ({orang} orang{area.fee > 0 ? " + ongkir" : ""})</div><div className="text-xl font-bold text-rose">{formatRupiah(total)}</div></div>
-        <div className="text-right text-[11px] leading-tight text-muted">DP {dpPercent}%<br />{formatRupiah(downPayment)}</div>
+        <div>
+          <div className="text-xs text-muted">
+            Total ({orang} orang{area.fee > 0 ? ' + ongkir' : ''})
+          </div>
+          <div className="text-xl font-bold text-rose">{formatRupiah(total)}</div>
+        </div>
+        <div className="text-right text-[11px] leading-tight text-muted">
+          DP {dpPercent}%<br />
+          {formatRupiah(downPayment)}
+        </div>
       </div>
 
-      {/* Payment */}
       <div className="rounded-2xl border border-rose-line bg-white p-5">
         <div className="text-xs font-semibold uppercase tracking-wider text-rose">Bayar DP untuk kunci jadwal</div>
         <div className="mt-3 rounded-xl border border-rose-line p-4">
           {bank.number ? (
-            <><Row label="Bank" value={bank.name || "-"} /><Row label="No. Rekening" value={bank.number} copyKey="rek" /><Row label="Atas Nama" value={bank.holder || "-"} /><Row label={`DP ${dpPercent}%`} value={formatRupiah(downPayment)} copyKey="dp" /></>
+            <>
+              <Row label="Bank" value={bank.name || '-'} />
+              <Row label="No. Rekening" value={bank.number} copyKey="rek" />
+              <Row label="Atas Nama" value={bank.holder || '-'} />
+              <Row label={`DP ${dpPercent}%`} value={formatRupiah(downPayment)} copyKey="dp" />
+            </>
           ) : (
             <p className="text-sm text-muted">Nomor rekening belum diatur. Chat admin untuk detail pembayaran.</p>
           )}
         </div>
         <div className="mt-3">
           <label className="label">Bukti transfer</label>
-          <input ref={fileRef} type="file" accept="image/*" hidden onChange={onPickProof} />
+          <input ref={fileRef} type="file" accept="image/*" hidden onChange={handleProofPick} />
           {proofUrl ? (
             <div className="flex items-center gap-3">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={proofUrl} alt="Bukti transfer" className="h-16 w-16 rounded-lg border border-rose-line object-cover" />
-              <button type="button" onClick={() => fileRef.current?.click()} className="text-sm text-rose hover:underline">Ganti</button>
+              <img
+                src={proofUrl}
+                alt="Bukti transfer"
+                className="h-16 w-16 rounded-lg border border-rose-line object-cover"
+              />
+              <button
+                type="button"
+                onClick={() => fileRef.current?.click()}
+                className="text-sm text-rose hover:underline"
+              >
+                Ganti
+              </button>
             </div>
           ) : (
-            <button type="button" onClick={() => fileRef.current?.click()} disabled={uploading} className="inline-flex items-center gap-2 rounded-lg border border-rose-line px-4 py-2.5 text-sm font-medium text-ink hover:bg-rose-soft disabled:opacity-60">
-              <Upload size={16} /> {uploading ? `Mengupload… ${pct}%` : "Upload bukti transfer"}
+            <button
+              type="button"
+              onClick={() => fileRef.current?.click()}
+              disabled={uploading}
+              className="inline-flex items-center gap-2 rounded-lg border border-rose-line px-4 py-2.5 text-sm font-medium text-ink hover:bg-rose-soft disabled:opacity-60"
+            >
+              <Upload size={16} /> {uploading ? `Mengupload… ${uploadPercent}%` : 'Upload bukti transfer'}
             </button>
           )}
-          {uploadErr && <p className="mt-1 text-xs text-rose">{uploadErr}</p>}
+          {uploadError && <p className="mt-1 text-xs text-rose">{uploadError}</p>}
         </div>
       </div>
 
-      {err && <p className="text-sm text-rose">{err}</p>}
+      {error && <p className="text-sm text-rose">{error}</p>}
       <button type="submit" disabled={busy} className="btn-primary w-full justify-center disabled:opacity-60">
         {busy ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />} Kirim booking
       </button>
@@ -364,13 +564,14 @@ function UnlockedForm({ cart = { items: [], orang: 1 }, areas = [], settings = n
   );
 }
 
-// ---- Done -------------------------------------------------------------------
 function DonePanel({ receipt = null, user = null }) {
   function download() {
     if (!receipt) return;
     const url = URL.createObjectURL(receipt.blob);
-    const link = document.createElement("a");
-    link.href = url; link.download = receipt.filename; link.click();
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = receipt.filename;
+    link.click();
     setTimeout(() => URL.revokeObjectURL(url), 4000);
   }
   return (
@@ -379,12 +580,20 @@ function DonePanel({ receipt = null, user = null }) {
         <CheckCircle2 className="mx-auto text-rose" size={44} />
         <h1 className="mt-4 text-xl font-bold text-ink">Terima kasih! 🎉</h1>
         <p className="mx-auto mt-2 max-w-xs text-sm text-muted">
-          Booking kamu tercatat & sedang diproses admin. Struk sudah dikirim ke <b>chat</b>{user ? " & email kamu" : ""}.
-          Setelah dikonfirmasi, kamu bisa download struk final dari beranda.
+          Booking kamu tercatat & sedang diproses admin. Struk sudah dikirim ke <b>chat</b>
+          {user ? ' & email kamu' : ''}. Setelah dikonfirmasi, kamu bisa download struk final dari beranda.
         </p>
         <div className="mt-6 flex flex-col gap-2">
-          <button onClick={download} disabled={!receipt} className="btn-primary w-full justify-center disabled:opacity-60"><Download size={18} /> Download struk</button>
-          <Link href="/" className="btn-outline w-full justify-center">Kembali ke beranda</Link>
+          <button
+            onClick={download}
+            disabled={!receipt}
+            className="btn-primary w-full justify-center disabled:opacity-60"
+          >
+            <Download size={18} /> Download struk
+          </button>
+          <Link href="/" className="btn-outline w-full justify-center">
+            Kembali ke beranda
+          </Link>
         </div>
       </div>
     </div>

@@ -1,5 +1,5 @@
-import Link from "next/link";
-import { ArrowRight, Sparkles, Heart, Clock, Quote } from "lucide-react";
+import Link from 'next/link';
+import { ArrowRight, Sparkles, Heart, Clock, Quote } from 'lucide-react';
 import {
   services as cfgServices,
   hairdo as cfgHairdo,
@@ -7,17 +7,16 @@ import {
   areas as cfgAreas,
   site,
   reviews,
-} from "@/lib/config";
-import { getServicesData, getSettings } from "@/lib/storage";
-import SectionHeader from "@/components/SectionHeader";
-import SocialLinks from "@/components/SocialLinks";
-import Storefront from "@/components/store/Storefront";
-import ReceiptBanner from "@/components/booking/ReceiptBanner";
+} from '@/lib/config';
+import { fetchServicesData, fetchSettings } from '@/lib/storage';
+import SectionHeader from '@/components/SectionHeader';
+import SocialLinks from '@/components/SocialLinks';
+import Storefront from '@/components/store/Storefront';
+import ReceiptBanner from '@/components/booking/ReceiptBanner';
 
 export default async function Home() {
-  // Live catalog from the API; fall back to the static table if the API is down.
-  const data = await getServicesData();
-  const settings = await getSettings();
+  const data = await fetchServicesData();
+  const settings = await fetchSettings();
   const store = {
     services: data?.services?.length ? data.services : cfgServices,
     hairdo: data?.hairdo?.length ? data.hairdo : cfgHairdo,
@@ -25,7 +24,6 @@ export default async function Home() {
     areas: data?.areas?.length ? data.areas : cfgAreas,
   };
 
-  // Hero text is editable from the dashboard; fallbacks keep it working before it is set or if the API is slow.
   const content = settings.content || {};
   const heroKicker = content.heroKicker || site.tagline;
 
@@ -33,16 +31,21 @@ export default async function Home() {
     <>
       <ReceiptBanner />
 
-      {/* Hero */}
       <section className="container-x grid items-center gap-10 py-16 lg:grid-cols-2 lg:py-24">
         <div className="animate-rise">
           <div className="eyebrow">{heroKicker}</div>
           <h1 className="mt-4 text-4xl font-bold leading-[1.1] tracking-tight text-ink sm:text-5xl lg:text-6xl">
-            {content.heroTitle ? content.heroTitle : (<>Cantik di hari <span className="text-rose">spesialmu</span>.</>)}
+            {content.heroTitle ? (
+              content.heroTitle
+            ) : (
+              <>
+                Cantik di hari <span className="text-rose">spesialmu</span>.
+              </>
+            )}
           </h1>
           <p className="mt-5 max-w-md text-lg leading-relaxed text-muted">
-            Jasa make up, hairdo, dan nail art profesional di {site.kota}. Pilih
-            layananmu di bawah, langsung checkout tanpa ribet.
+            Jasa make up, hairdo, dan nail art profesional di {site.kota}. Pilih layananmu di bawah, langsung checkout
+            tanpa ribet.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Link href="#pilih" className="btn-primary">
@@ -55,19 +58,21 @@ export default async function Home() {
           <SocialLinks social={settings.social} className="mt-6" />
         </div>
         {content.heroPhoto ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={content.heroPhoto} alt="Portofolio Salia Makeup" className="aspect-[4/5] w-full rounded-3xl object-cover" />
+          <img
+            src={content.heroPhoto}
+            alt="Portofolio Salia Makeup"
+            className="aspect-[4/5] w-full rounded-3xl object-cover"
+          />
         ) : (
           <div className="foto-ph aspect-[4/5] rounded-3xl text-base">Foto portofolio Salia</div>
         )}
       </section>
 
-      {/* Keunggulan */}
       <section className="container-x grid gap-5 sm:grid-cols-3">
         {[
-          { icon: Sparkles, title: "Produk premium", text: "Kosmetik berkualitas, aman, dan tahan lama." },
-          { icon: Heart, title: "Sesuai karakter", text: "Riasan disesuaikan dengan wajah dan acaramu." },
-          { icon: Clock, title: "Tepat waktu", text: "Datang on-time, bisa ke lokasi kamu." },
+          { icon: Sparkles, title: 'Produk premium', text: 'Kosmetik berkualitas, aman, dan tahan lama.' },
+          { icon: Heart, title: 'Sesuai karakter', text: 'Riasan disesuaikan dengan wajah dan acaramu.' },
+          { icon: Clock, title: 'Tepat waktu', text: 'Datang on-time, bisa ke lokasi kamu.' },
         ].map((feature) => (
           <div key={feature.title} className="rounded-2xl border border-rose-line bg-white p-6">
             <feature.icon className="text-rose" size={24} />
@@ -77,18 +82,20 @@ export default async function Home() {
         ))}
       </section>
 
-      {/* Storefront: Make Up / Hairdo / Nails — pilih & checkout */}
       <section className="container-x py-16">
         <Storefront data={store} settings={settings} />
       </section>
 
-      {/* Testimoni */}
       {reviews.length > 0 && (
         <section className="container-x py-16">
-          <SectionHeader eyebrow="Testimoni" title="Kata mereka" desc="Contoh tampilan, akan diganti dengan review asli." />
+          <SectionHeader
+            eyebrow="Testimoni"
+            title="Kata mereka"
+            desc="Contoh tampilan, akan diganti dengan review asli."
+          />
           <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {reviews.map((review, i) => (
-              <figure key={i} className="flex flex-col rounded-2xl border border-rose-line bg-white p-6">
+            {reviews.map((review, index) => (
+              <figure key={index} className="flex flex-col rounded-2xl border border-rose-line bg-white p-6">
                 <Quote className="text-rose/40" size={28} />
                 <blockquote className="mt-3 flex-1 text-sm leading-relaxed text-ink/80">“{review.teks}”</blockquote>
                 <figcaption className="mt-5 border-t border-rose-line pt-4">
