@@ -20,6 +20,14 @@ import { CART_KEY } from "@/components/store/CartProvider";
 import { chatCidFor } from "@/lib/chat";
 import { useUser } from "@/components/auth/UserProvider";
 
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const BOOKING_ERROR_MESSAGES = {
+  invalid_token: "Link booking sudah tidak berlaku. Chat admin untuk link baru.",
+  invalid_email: "Email tidak valid.",
+  too_long: "Ada isian yang terlalu panjang. Persingkat lalu coba lagi.",
+  invalid_proof_url: "Bukti transfer gagal dibaca. Upload ulang atau kirim via WhatsApp.",
+};
+
 const timeOptions = Array.from({ length: 16 }, (_, index) => index + 6).flatMap((hour) =>
   [0, 30].map((minute) => {
     const time = `${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`;
@@ -227,6 +235,7 @@ function UnlockedForm({ cart = { items: [], orang: 1 }, areas = [], settings = n
     if (!/^[0-9+]{9,15}$/.test(form.telepon.trim())) return setErr("Nomor WhatsApp tidak valid.");
     if (!form.jam) return setErr("Pilih jam ready.");
     if (!form.lokasi.trim()) return setErr("Alamat wajib diisi.");
+    if (form.email.trim() && !EMAIL_RE.test(form.email.trim())) return setErr("Email tidak valid.");
     setErr(""); setBusy(true);
     let saved;
     try {
@@ -238,7 +247,7 @@ function UnlockedForm({ cart = { items: [], orang: 1 }, areas = [], settings = n
       });
     } catch (e) {
       setBusy(false);
-      return setErr(e?.data?.error === "invalid_token" ? "Link booking sudah tidak berlaku. Chat admin untuk link baru." : "Gagal menyimpan booking. Coba lagi atau chat admin.");
+      return setErr(BOOKING_ERROR_MESSAGES[e?.data?.error] || "Gagal menyimpan booking. Coba lagi atau chat admin.");
     }
     // Best-effort receipt: PDF -> chat (+ email if logged in). Never blocks done.
     const ref = saved?.id ? `SALIA-${saved.id}` : "";

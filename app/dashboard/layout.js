@@ -8,6 +8,7 @@ import InstallPrompt from "@/components/pwa/InstallPrompt";
 export const metadata = {
   applicationName: "Salia Admin",
   title: "Salia Admin",
+  robots: { index: false, follow: false },
   manifest: "/manifest.webmanifest",
   appleWebApp: {
     capable: true,

@@ -9,16 +9,17 @@ import { waLink, normalizeWa } from "@/lib/utils";
 import { chatCidFor, OPEN_CHAT_EVENT } from "@/lib/chat";
 import { useUser } from "@/components/auth/UserProvider";
 
-const URL_RE = /(https?:\/\/[^\s]+)/g;
+const URL_SPLIT_RE = /(https?:\/\/[^\s]+)/g;
+const URL_PART_RE = /^https?:\/\/[^\s]+$/;
 function isReceipt(url) { return /\/receipt\/|struk-|\.pdf($|\?)/i.test(url); }
 
 // Render a message body with clickable links; receipt links get a download icon.
 function Body({ text = "", mine = false }) {
-  const parts = String(text).split(URL_RE);
+  const parts = String(text).split(URL_SPLIT_RE);
   return (
     <span className="whitespace-pre-wrap">
       {parts.map((part, i) =>
-        URL_RE.test(part) ? (
+        URL_PART_RE.test(part) ? (
           <a
             key={i}
             href={part}
