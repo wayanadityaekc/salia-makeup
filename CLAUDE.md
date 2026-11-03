@@ -34,7 +34,7 @@ conflict still apply. Source of truth for style is CUE.
 - [ ] Conditions: `if`/`else`. No `switch`.
 - [ ] Try/catch: every `try` has a `catch`, and the error variable is always named `e`.
 - [ ] Naming: camelCase. Descriptive names. No cryptic single letters (`el`, `dt`, `mm`, `q`, `r`, `c`, `t`). Exception: `a`/`b` inside `.sort()` comparators.
-- [ ] Comments: one line maximum, placed directly above the tricky line, saying simply what it does. No paragraph or block comments.
+- [ ] Comments: zero, in JS and CSS (as CUE and ubud-private-villas). The code explains itself through its names; explanations go in this file or a README. ESLint (`cahyana/no-comments`) and `npm run check:comments` enforce it.
 - [ ] Components with several props get default values (for example `included = []`) plus a friendly fallback message when data is missing ("Sorry, we could not load this information. Please try again.").
 - [ ] Files over about 300 lines: flag for splitting. Pure data files are exempt.
 
@@ -139,8 +139,10 @@ Nice-to-have
   the client sends `hairdo: true` — mirror of `bisaHairdo` in `BookingForm.js`.
 
 ## Auth
-- Single shared owner password (`ADMIN_PASSWORD`) → `POST /auth/login` → JWT,
-  stored in `sessionStorage` (`salia_token`). No user table.
+- Single shared owner password (`ADMIN_PASSWORD`) → `POST /auth/login` → JWT
+  (role `owner`), stored in `localStorage` (`salia_token`; an old `sessionStorage`
+  copy is still read). Customer OTP logins get a separate role `user` JWT
+  (`salia_user`) that the API refuses on admin routes.
 - Admin routes are `Bearer`-gated. A 401 makes the dashboard drop back to the
   login gate (`UnauthorizedError` in `lib/storage.js`).
 
@@ -150,7 +152,8 @@ API columns are snake_case (`service_id`, `service_nama`, `area_id`, `area_nama`
 camelCase; the mapping lives only in `lib/storage.js`.
 
 ## Before calling it "done"
-1. Frontend: `npm run build` passes.
+1. Frontend: `npm run lint:code`, `npm run format:check`, `npm run check:comments`
+   and `npm run build` pass (GitHub Actions "Quality" runs all four on every push).
 2. Touched a price? Update BOTH tables (`lib/config.js` here + `pricing.js` in
    `salia-makeup-api`) and run the API's `pricing-spec-test.js`.
 3. No secrets committed (`.env` / `.env.local` are gitignored; only `.example` files).
