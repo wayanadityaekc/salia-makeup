@@ -17,7 +17,7 @@ conflict still apply. Source of truth for style is CUE.
 - [ ] Audit first, then fix. Never fix during an audit.
 - [ ] Report format: rule, hits/files, where most of it is, likely false positives or keep-as-is.
 - [ ] Delete nothing (files, endpoints, components) without Wayan's OK.
-- [ ] Push work-order commits to the feature branch `claude/work-tree-validation-vqexsf` as you go (standing approval, that branch is not live). Never push to `main` until Wayan explicitly says so.
+- [ ] Push work-order commits to the feature branch Wayan names for the session (standing approval, feature branches are not live). Current branch, in both this repo and `salia-makeup-api`: `claude/confident-edison-u48z8e` (the earlier `claude/work-tree-validation-vqexsf` is no longer used). Never push to `main` until Wayan explicitly says so.
 - [ ] When a rule cannot be applied cleanly (for example a loop with `return`/`break`), list it separately and do it in its own work order.
 - [ ] When a new feature or new site is built, walk Wayan through the QA checklist (QA checklist below) step by step and remind him of small items he may forget.
 
@@ -108,13 +108,18 @@ Nice-to-have
   **no server-side WhatsApp** — the site just opens `wa.me` after the POST succeeds.
 
 ## Stack & structure
-- **Frontend** (this repo) = Next.js 16 + React 19 (App Router), Tailwind 3,
-  react-hook-form, lucide-react.
-  Moving to the shared stack (Cahyana standards above): react-hook-form is being
-  removed, Tailwind 3 -> 4 is its own migration work order, and Framer Motion goes
-  in per popup only after Wayan says yes to each one. Pages in `app/`, components in `components/`,
-  data/helpers in `lib/`.
-- **Backend** (`salia-makeup-api` repo) = Node + Express + Postgres (`pg`), JWT auth.
+- **Frontend** (this repo) = Next.js 16 + React 19 (App Router), Tailwind 4 (theme in
+  `@theme` inside `app/globals.css`, no `tailwind.config.js`), Framer Motion (`motion`,
+  `LazyMotion` in `components/motion/MotionRoot.js`, presets in `lib/motion.js`), lucide-react,
+  jspdf. react-hook-form is gone. Zod is not used on the frontend yet: forms pre-check by hand,
+  the API validates with Zod.
+  Pages in `app/`, components in `components/`, helpers in `lib/`.
+- **Text is data**: UI strings in `messages/id/<area>.json`, long-form content in `content/*.json`.
+  Variables use `{name}` placeholders through `lib/formatMessage.js`. No guest-facing literals in JSX.
+- **Every popup animates in and out** with the `lib/motion.js` presets (`backdropMotion`,
+  `dialogMotion`, `sheetMotion`, `dropdownMotion`, `menuMotion`) inside `AnimatePresence`.
+- **Backend** (`salia-makeup-api` repo) = Node + Express 5 + Postgres (`pg`), JWT auth, Helmet,
+  Morgan (secret paths redacted), Zod, cors, express-rate-limit. Endpoint table: its README.
 - Frontend talks to the API only through **`lib/storage.js`** (the one place that
   knows the API URL and does snake_case ⇆ camelCase mapping). Components just `await`.
 - `NEXT_PUBLIC_API_URL` = deployed API URL (unset ⇒ `http://localhost:4000`).
