@@ -163,8 +163,8 @@ export default function ChatWidget() {
 
   return (
     <>
-      <div className="fixed inset-0 z-[60] bg-ink/40" onClick={() => setOpen(false)} aria-hidden />
-      <div className="fixed inset-x-0 bottom-0 z-[61] flex justify-center">
+      <div className="fixed inset-0 z-60 bg-ink/40" onClick={() => setOpen(false)} aria-hidden />
+      <div className="fixed inset-x-0 bottom-0 z-61 flex justify-center">
         <div
           ref={panelRef}
           className={`flex w-full max-w-lg flex-col overflow-hidden rounded-t-3xl border border-rose-line bg-white shadow-xl animate-[saliaSheetUp_.22s_ease-out] ${view === 'chat' ? 'h-[80dvh]' : ''}`}

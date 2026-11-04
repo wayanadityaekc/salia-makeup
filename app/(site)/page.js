@@ -34,7 +34,7 @@ export default async function Home() {
       <section className="container-x grid items-center gap-10 py-16 lg:grid-cols-2 lg:py-24">
         <div className="animate-rise">
           <div className="eyebrow">{heroKicker}</div>
-          <h1 className="mt-4 text-4xl font-bold leading-[1.1] tracking-tight text-ink sm:text-5xl lg:text-6xl">
+          <h1 className="mt-4 text-4xl font-bold leading-[1.1] tracking-tight text-ink sm:text-5xl sm:leading-none lg:text-6xl">
             {content.heroTitle ? (
               content.heroTitle
             ) : (
@@ -61,10 +61,10 @@ export default async function Home() {
           <img
             src={content.heroPhoto}
             alt="Portofolio Salia Makeup"
-            className="aspect-[4/5] w-full rounded-3xl object-cover"
+            className="aspect-4/5 w-full rounded-3xl object-cover"
           />
         ) : (
-          <div className="foto-ph aspect-[4/5] rounded-3xl text-base">Foto portofolio Salia</div>
+          <div className="foto-ph aspect-4/5 rounded-3xl text-base">Foto portofolio Salia</div>
         )}
       </section>
 

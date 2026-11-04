@@ -43,7 +43,7 @@ export default function Select({
         onClick={() => setOpen((wasOpen) => !wasOpen)}
         aria-haspopup="listbox"
         aria-expanded={open}
-        className={`field flex items-center justify-between gap-2 text-left ${selected ? 'text-ink' : 'text-muted'} ${invalid ? '!border-rose' : ''}`}
+        className={`field flex items-center justify-between gap-2 text-left ${selected ? 'text-ink' : 'text-muted'} ${invalid ? 'border-rose!' : ''}`}
       >
         <span className="truncate">{selected ? selected.label : placeholder}</span>
         <ChevronDown size={16} className={`shrink-0 text-muted transition ${open ? 'rotate-180' : ''}`} />

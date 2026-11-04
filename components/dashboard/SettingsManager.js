@@ -110,7 +110,7 @@ export default function SettingsManager({ onUnauthorized }) {
 
           <div>
             <label className="label">Foto hero</label>
-            <div className="mt-1 aspect-[4/3] w-full overflow-hidden rounded-xl border border-rose-line bg-rose-soft/40">
+            <div className="mt-1 aspect-4/3 w-full overflow-hidden rounded-xl border border-rose-line bg-rose-soft/40">
               {form.content?.heroPhoto ? (
                 <img src={form.content.heroPhoto} alt="Hero" className="h-full w-full object-cover" />
               ) : (

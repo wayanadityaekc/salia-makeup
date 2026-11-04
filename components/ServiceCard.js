@@ -8,9 +8,9 @@ export default function ServiceCard({ item = null, badge = null }) {
   return (
     <div className="group flex flex-col overflow-hidden rounded-2xl border border-rose-line bg-white transition hover:shadow-[0_12px_40px_-18px_rgba(107,44,62,0.35)]">
       {item.foto ? (
-        <img src={item.foto} alt={item.nama} className="aspect-[4/3] w-full object-cover" loading="lazy" />
+        <img src={item.foto} alt={item.nama} className="aspect-4/3 w-full object-cover" loading="lazy" />
       ) : (
-        <div className="foto-ph aspect-[4/3] text-sm">Foto {item.nama}</div>
+        <div className="foto-ph aspect-4/3 text-sm">Foto {item.nama}</div>
       )}
       <div className="flex flex-1 flex-col p-5">
         <div className="flex items-center justify-between gap-3">

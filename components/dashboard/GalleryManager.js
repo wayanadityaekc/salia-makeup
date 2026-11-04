@@ -74,7 +74,7 @@ export default function GalleryManager({ onUnauthorized }) {
               />
               <button
                 onClick={() => remove(galleryItem.id)}
-                className="absolute right-2 top-2 inline-flex h-8 w-8 items-center justify-center rounded-full bg-white/90 text-rose shadow hover:bg-white"
+                className="absolute right-2 top-2 inline-flex h-8 w-8 items-center justify-center rounded-full bg-white/90 text-rose shadow-sm hover:bg-white"
                 aria-label="Hapus foto"
               >
                 <Trash2 size={15} />

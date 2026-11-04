@@ -84,11 +84,11 @@ export default function InstallPrompt() {
   return (
     <>
       <div
-        className="fixed inset-x-0 bottom-0 z-50 border-t border-rose-line bg-white/95 backdrop-blur"
+        className="fixed inset-x-0 bottom-0 z-50 border-t border-rose-line bg-white/95 backdrop-blur-sm"
         style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
       >
         <div className="container-x flex items-center gap-3 py-3">
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-rose text-[#F7EDEF]">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-rose text-rose-soft">
             <span className="font-serif text-base font-semibold">S</span>
           </div>
           <div className="min-w-0 flex-1">
@@ -113,7 +113,7 @@ export default function InstallPrompt() {
 
       {guide && (
         <div
-          className="fixed inset-0 z-[60] flex items-end justify-center bg-ink/40 p-4 sm:items-center"
+          className="fixed inset-0 z-60 flex items-end justify-center bg-ink/40 p-4 sm:items-center"
           onClick={() => setGuide(false)}
         >
           <div

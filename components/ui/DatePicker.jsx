@@ -76,7 +76,7 @@ export default function DatePicker({
       <button
         type="button"
         onClick={() => setOpen((wasOpen) => !wasOpen)}
-        className={`field flex items-center justify-between gap-2 text-left ${selected ? 'text-ink' : 'text-muted'} ${invalid ? '!border-rose' : ''}`}
+        className={`field flex items-center justify-between gap-2 text-left ${selected ? 'text-ink' : 'text-muted'} ${invalid ? 'border-rose!' : ''}`}
       >
         <span className="truncate">{label}</span>
         <Calendar size={16} className="shrink-0 text-muted" />

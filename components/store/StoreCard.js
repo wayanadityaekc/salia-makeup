@@ -53,24 +53,24 @@ export default function StoreCard({ item = null, big = false }) {
             src={item.foto}
             alt={item.nama}
             loading="lazy"
-            className={`aspect-square object-cover ${big ? 'w-28 shrink-0 sm:w-full' : 'w-full aspect-[4/3]'}`}
+            className={`aspect-square object-cover ${big ? 'w-28 shrink-0 sm:w-full' : 'w-full aspect-4/3'}`}
           />
         ) : (
           <div
-            className={`foto-ph ${big ? 'aspect-square w-28 shrink-0 text-xs sm:w-full sm:text-sm' : 'aspect-[4/3] w-full text-xs'}`}
+            className={`foto-ph ${big ? 'aspect-square w-28 shrink-0 text-xs sm:w-full sm:text-sm' : 'aspect-4/3 w-full text-xs'}`}
           >
             Foto {item.nama}
           </div>
         )}
         <div className={`flex min-w-0 flex-1 flex-col ${big ? 'p-3 sm:p-5' : 'p-3 sm:p-4'}`}>
           <h3
-            className={`font-semibold leading-snug text-ink ${big ? 'text-base sm:text-lg' : 'text-sm sm:text-base'}`}
+            className={`font-semibold leading-snug text-ink ${big ? 'text-base sm:text-lg sm:leading-7' : 'text-sm sm:text-base sm:leading-6'}`}
           >
             {item.nama}
           </h3>
           {desc && (
             <p
-              className={`mt-1 leading-relaxed text-muted ${big ? 'line-clamp-2 text-sm sm:line-clamp-none' : 'line-clamp-2 text-xs sm:text-sm'}`}
+              className={`mt-1 leading-relaxed text-muted ${big ? 'line-clamp-2 text-sm sm:line-clamp-none' : 'line-clamp-2 text-xs sm:text-sm sm:leading-5'}`}
             >
               {desc}
             </p>
@@ -89,7 +89,7 @@ export default function StoreCard({ item = null, big = false }) {
 
       {open && (
         <div
-          className="fixed inset-0 z-[60] flex items-end justify-center bg-ink/50 p-0 sm:items-center sm:p-4"
+          className="fixed inset-0 z-60 flex items-end justify-center bg-ink/50 p-0 sm:items-center sm:p-4"
           onClick={() => setOpen(false)}
         >
           <div
@@ -99,14 +99,14 @@ export default function StoreCard({ item = null, big = false }) {
           >
             <div className="relative">
               {item.foto ? (
-                <img src={item.foto} alt={item.nama} className="aspect-[4/3] w-full object-cover" />
+                <img src={item.foto} alt={item.nama} className="aspect-4/3 w-full object-cover" />
               ) : (
-                <div className="foto-ph aspect-[4/3] text-sm">Foto {item.nama}</div>
+                <div className="foto-ph aspect-4/3 text-sm">Foto {item.nama}</div>
               )}
               <button
                 onClick={() => setOpen(false)}
                 aria-label="Tutup"
-                className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full bg-white/90 text-ink shadow hover:bg-white"
+                className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full bg-white/90 text-ink shadow-sm hover:bg-white"
               >
                 <X size={18} />
               </button>

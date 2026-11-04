@@ -49,7 +49,7 @@ export default function Navbar() {
   return (
     <header
       className={`sticky top-0 z-50 border-b transition ${
-        solid ? 'border-rose-line bg-white/90 backdrop-blur' : 'border-transparent bg-white'
+        solid ? 'border-rose-line bg-white/90 backdrop-blur-sm' : 'border-transparent bg-white'
       }`}
     >
       <div className="container-x flex h-16 items-center justify-between">

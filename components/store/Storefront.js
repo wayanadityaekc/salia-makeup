@@ -23,7 +23,7 @@ export default function Storefront({ data = null, settings = null }) {
   return (
     <CartProvider>
       <div id="pilih">
-        <div className="sticky top-16 z-30 -mx-5 border-y border-rose-line bg-white/95 px-5 backdrop-blur sm:mx-0 sm:rounded-full sm:border">
+        <div className="sticky top-16 z-30 -mx-5 border-y border-rose-line bg-white/95 px-5 backdrop-blur-sm sm:mx-0 sm:rounded-full sm:border">
           <div className="mx-auto flex max-w-md gap-1 py-2">
             {cats.map((category) => (
               <button

@@ -1,61 +1,104 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
 
-:root {
-  --font-body: 'Inter', system-ui, -apple-system, sans-serif;
+@theme {
+  --color-rose: #6b2c3e;
+  --color-rose-deep: #4a1f2c;
+  --color-rose-soft: #f7edef;
+  --color-rose-line: #ead9dd;
+
+  --color-ink: #241c1e;
+  --color-muted: #8a7b7f;
+
+  --font-sans: var(--font-body), system-ui, sans-serif;
+
+  --container-content: 1180px;
+
+  --animate-rise: rise 0.6s ease-out both;
+
+  @keyframes rise {
+    0% {
+      opacity: 0;
+      transform: translateY(16px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: #e5e7eb;
+  }
+
+  button:not(:disabled),
+  [role='button']:not(:disabled) {
+    cursor: pointer;
+  }
 }
 
-html {
-  scroll-behavior: smooth;
-}
-.salia-locked {
-  overflow: hidden !important;
+@utility container-x {
+  @apply mx-auto w-full max-w-content px-5 sm:px-8;
 }
 
-body {
-  background: #ffffff;
-  color: #241c1e;
-  -webkit-font-smoothing: antialiased;
+@utility btn {
+  @apply inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-medium transition;
 }
 
-@layer components {
-  .container-x {
-    @apply mx-auto w-full max-w-content px-5 sm:px-8;
+@utility btn-primary {
+  @apply btn bg-rose text-white hover:bg-rose-deep;
+}
+
+@utility btn-outline {
+  @apply btn border border-rose/30 text-rose hover:bg-rose-soft;
+}
+
+@utility field {
+  @apply w-full rounded-xl border border-rose-line bg-white px-4 py-3 text-sm outline-hidden transition placeholder:text-muted focus:border-rose;
+}
+
+@utility label {
+  @apply mb-1.5 block text-sm font-medium text-ink;
+}
+
+@utility foto-ph {
+  @apply flex items-center justify-center bg-rose-soft text-rose/40;
+  background-image: linear-gradient(
+    135deg,
+    #f7edef 25%,
+    #f2e2e6 25%,
+    #f2e2e6 50%,
+    #f7edef 50%,
+    #f7edef 75%,
+    #f2e2e6 75%
+  );
+  background-size: 28px 28px;
+}
+
+@utility eyebrow {
+  @apply text-xs font-semibold uppercase tracking-[0.2em] text-rose;
+}
+
+@layer utilities {
+  :root {
+    --font-body: 'Inter', system-ui, -apple-system, sans-serif;
   }
 
-  .btn {
-    @apply inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-medium transition;
+  html {
+    scroll-behavior: smooth;
   }
-  .btn-primary {
-    @apply btn bg-rose text-white hover:bg-rose-deep;
-  }
-  .btn-outline {
-    @apply btn border border-rose/30 text-rose hover:bg-rose-soft;
+  .salia-locked {
+    overflow: hidden !important;
   }
 
-  .field {
-    @apply w-full rounded-xl border border-rose-line bg-white px-4 py-3 text-sm outline-none transition placeholder:text-muted focus:border-rose;
-  }
-  .label {
-    @apply mb-1.5 block text-sm font-medium text-ink;
-  }
-  .foto-ph {
-    @apply flex items-center justify-center bg-rose-soft text-rose/40;
-    background-image: linear-gradient(
-      135deg,
-      #f7edef 25%,
-      #f2e2e6 25%,
-      #f2e2e6 50%,
-      #f7edef 50%,
-      #f7edef 75%,
-      #f2e2e6 75%
-    );
-    background-size: 28px 28px;
-  }
-
-  .eyebrow {
-    @apply text-xs font-semibold uppercase tracking-[0.2em] text-rose;
+  body {
+    background: #ffffff;
+    color: #241c1e;
+    -webkit-font-smoothing: antialiased;
   }
 }
 @media (display-mode: standalone) {

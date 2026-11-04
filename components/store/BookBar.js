@@ -47,7 +47,7 @@ export default function BookBar() {
           </div>
           <button
             onClick={() => router.push('/booking')}
-            className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-white px-5 py-2.5 text-sm font-bold text-rose shadow-sm transition hover:bg-rose-soft sm:px-6"
+            className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-white px-5 py-2.5 text-sm font-bold text-rose shadow-xs transition hover:bg-rose-soft sm:px-6"
           >
             Book <ArrowRight size={16} />
           </button>

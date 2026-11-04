@@ -145,7 +145,7 @@ function ServiceRow({ svc: service, onChange, onUnauthorized }) {
     <div className={`rounded-2xl border border-rose-line bg-white p-4 ${form.active ? '' : 'opacity-70'}`}>
       <div className="flex flex-col gap-4 sm:flex-row">
         <div className="sm:w-40 shrink-0">
-          <div className="aspect-[4/3] overflow-hidden rounded-xl border border-rose-line bg-rose-soft">
+          <div className="aspect-4/3 overflow-hidden rounded-xl border border-rose-line bg-rose-soft">
             {form.foto ? (
               <img src={form.foto} alt={form.nama} className="h-full w-full object-cover" />
             ) : (

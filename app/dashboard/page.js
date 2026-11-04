@@ -239,7 +239,7 @@ export default function DashboardPage() {
 
         {!standalone && (
           <div className="border-b border-rose-line bg-white">
-            <div className="container-x flex gap-1 overflow-x-auto overflow-y-hidden overscroll-x-contain [touch-action:pan-x] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            <div className="container-x flex gap-1 overflow-x-auto overflow-y-hidden overscroll-x-contain [touch-action:pan-x] scrollbar-none [&::-webkit-scrollbar]:hidden">
               {TABS.map(({ key, label }) => (
                 <button
                   key={key}
@@ -442,7 +442,7 @@ export default function DashboardPage() {
 
       {standalone && (
         <nav
-          className="fixed inset-x-0 bottom-0 z-40 border-t border-rose-line bg-white/95 backdrop-blur"
+          className="fixed inset-x-0 bottom-0 z-40 border-t border-rose-line bg-white/95 backdrop-blur-sm"
           style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
           aria-label="Navigasi dashboard"
         >

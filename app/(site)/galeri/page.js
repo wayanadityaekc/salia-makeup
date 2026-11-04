@@ -15,7 +15,7 @@ export default async function GaleriPage() {
           Foto belum ditambahkan. Segera hadir.
         </div>
       ) : (
-        <div className="mt-12 columns-2 gap-4 sm:columns-3 [&>*]:mb-4">
+        <div className="mt-12 columns-2 gap-4 sm:columns-3 *:mb-4">
           {items.map((photo) => (
             <img
               key={photo.id}
