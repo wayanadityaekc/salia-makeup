@@ -7,6 +7,8 @@ import { formatTanggal } from '@/lib/utils';
 import { fetchUserBookings, fetchSettings } from '@/lib/storage';
 import { makeReceiptPdf } from '@/lib/receipt';
 import { useUser } from '@/components/auth/UserProvider';
+import { formatMessage } from '@/lib/formatMessage';
+import messages from '@/messages/id/booking.json';
 
 export default function ReceiptBanner() {
   const { user, ready } = useUser();
@@ -84,13 +86,19 @@ export default function ReceiptBanner() {
         <div className="min-w-0 flex-1 text-sm">
           {approved ? (
             <>
-              <span className="font-semibold text-ink">Booking {`SALIA-${booking.id}`} dikonfirmasi 🎉</span>{' '}
-              <span className="text-muted">{formatTanggal(booking.tanggal)} · struk siap diunduh.</span>
+              <span className="font-semibold text-ink">
+                {formatMessage(messages.receiptBanner.confirmedTitle, { ref: `SALIA-${booking.id}` })}
+              </span>{' '}
+              <span className="text-muted">
+                {formatMessage(messages.receiptBanner.confirmedDetail, { date: formatTanggal(booking.tanggal) })}
+              </span>
             </>
           ) : (
             <>
-              <span className="font-semibold text-ink">Booking {`SALIA-${booking.id}`} sedang diproses</span>{' '}
-              <span className="text-muted">Menunggu konfirmasi admin.</span>
+              <span className="font-semibold text-ink">
+                {formatMessage(messages.receiptBanner.pendingTitle, { ref: `SALIA-${booking.id}` })}
+              </span>{' '}
+              <span className="text-muted">{messages.receiptBanner.pendingDetail}</span>
             </>
           )}
         </div>
@@ -100,7 +108,8 @@ export default function ReceiptBanner() {
             disabled={busy}
             className="btn-primary shrink-0 px-4 py-2 text-sm disabled:opacity-60"
           >
-            {busy ? <Loader2 size={15} className="animate-spin" /> : <Download size={15} />} Download struk
+            {busy ? <Loader2 size={15} className="animate-spin" /> : <Download size={15} />}{' '}
+            {messages.receiptBanner.downloadReceipt}
           </button>
         )}
       </div>

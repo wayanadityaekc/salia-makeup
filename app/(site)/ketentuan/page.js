@@ -1,10 +1,11 @@
 import { CalendarCheck, Armchair, Sparkles, Shirt, Scissors, Bell } from 'lucide-react';
 import SectionHeader from '@/components/SectionHeader';
 import { PREP_TITLE, PREP_INTRO, PREP_STEPS, PREP_REMINDER } from '@/lib/prepInfo';
+import messages from '@/messages/id/terms.json';
 
 export const metadata = {
-  title: 'Ketentuan & Persiapan',
-  description: 'Informasi H-1 dan hal yang perlu klien siapkan sebelum hari acara.',
+  title: messages.metadata.title,
+  description: messages.metadata.description,
 };
 
 const ICONS = [CalendarCheck, Armchair, Sparkles, Shirt, Scissors];
@@ -12,7 +13,7 @@ const ICONS = [CalendarCheck, Armchair, Sparkles, Shirt, Scissors];
 export default function KetentuanPage() {
   return (
     <div className="container-x py-16">
-      <SectionHeader eyebrow="Informasi H-1" title={PREP_TITLE} desc={PREP_INTRO} center />
+      <SectionHeader eyebrow={messages.ketentuanPage.eyebrow} title={PREP_TITLE} desc={PREP_INTRO} center />
 
       <div className="mx-auto mt-12 max-w-2xl space-y-4">
         {PREP_STEPS.map((step, index) => {
@@ -37,7 +38,7 @@ export default function KetentuanPage() {
             <Bell size={22} strokeWidth={1.7} />
           </div>
           <div>
-            <h3 className="font-bold text-ink">Pengingat</h3>
+            <h3 className="font-bold text-ink">{messages.ketentuanPage.reminderHeading}</h3>
             <ul className="mt-2 space-y-1.5">
               {PREP_REMINDER.map((reminder, index) => (
                 <li key={index} className="flex gap-2 text-sm leading-relaxed text-ink/80">
@@ -50,9 +51,7 @@ export default function KetentuanPage() {
         </div>
       </div>
 
-      <p className="mx-auto mt-10 max-w-2xl text-center text-sm italic text-muted">
-        See you for your special moment 🤍
-      </p>
+      <p className="mx-auto mt-10 max-w-2xl text-center text-sm italic text-muted">{messages.ketentuanPage.closing}</p>
     </div>
   );
 }

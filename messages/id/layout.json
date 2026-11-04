@@ -1,0 +1,35 @@
+{
+  "rootLayout": {
+    "description": "Jasa make up, hairdo, dan nail art profesional di {kota}. Booking mudah langsung via WhatsApp."
+  },
+  "navbar": {
+    "links": {
+      "home": "Beranda",
+      "makeUp": "Make Up",
+      "nailArt": "Nail Art",
+      "gallery": "Galeri"
+    },
+    "chat": "Chat",
+    "logout": "Keluar",
+    "login": "Login",
+    "menu": "Menu"
+  },
+  "footer": {
+    "taglineInCity": "{tagline} di {kota}.",
+    "pagesHeading": "Halaman",
+    "makeUp": "Make Up",
+    "nailArt": "Nail Art",
+    "gallery": "Galeri",
+    "booking": "Booking",
+    "termsAndPrep": "Ketentuan & Persiapan",
+    "contactHeading": "Kontak",
+    "instagramHandle": "@{handle}",
+    "hoursHeading": "Jam",
+    "copyright": "© {year} {brand}. Semua hak cipta dilindungi."
+  },
+  "socialLinks": {
+    "instagram": "Instagram",
+    "tiktok": "TikTok",
+    "google": "Google Business Profile"
+  }
+}

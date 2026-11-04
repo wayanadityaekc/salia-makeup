@@ -36,13 +36,15 @@ import { makeReceiptPdf } from '@/lib/receipt';
 import { CART_KEY } from '@/components/store/CartProvider';
 import { chatCidFor } from '@/lib/chat';
 import { useUser } from '@/components/auth/UserProvider';
+import { formatMessage } from '@/lib/formatMessage';
+import messages from '@/messages/id/booking.json';
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const BOOKING_ERROR_MESSAGES = {
-  invalid_token: 'Link booking sudah tidak berlaku. Chat admin untuk link baru.',
-  invalid_email: 'Email tidak valid.',
-  too_long: 'Ada isian yang terlalu panjang. Persingkat lalu coba lagi.',
-  invalid_proof_url: 'Bukti transfer gagal dibaca. Upload ulang atau kirim via WhatsApp.',
+  invalid_token: messages.bookingErrors.invalidToken,
+  invalid_email: messages.bookingErrors.invalidEmail,
+  too_long: messages.bookingErrors.tooLong,
+  invalid_proof_url: messages.bookingErrors.invalidProofUrl,
 };
 
 const timeOptions = Array.from({ length: 16 }, (_, index) => index + 6).flatMap((hour) =>
@@ -100,21 +102,23 @@ export default function BookingPage({ settings }) {
     <div className="container-x py-8 sm:py-12">
       <div className="mx-auto max-w-lg">
         <Link href="/" className="mb-4 inline-flex items-center gap-1.5 text-sm text-muted hover:text-rose">
-          <ArrowLeft size={16} /> Kembali
+          <ArrowLeft size={16} /> {messages.bookingPage.back}
         </Link>
-        <h1 className="text-2xl font-bold text-ink">Booking</h1>
+        <h1 className="text-2xl font-bold text-ink">{messages.bookingPage.title}</h1>
 
         {cart.items.length === 0 ? (
           <div className="mt-6 rounded-2xl border border-dashed border-rose-line bg-white p-8 text-center">
-            <p className="text-sm text-muted">Belum ada layanan dipilih.</p>
+            <p className="text-sm text-muted">{messages.bookingPage.emptyCart}</p>
             <Link href="/#pilih" className="btn-primary mt-4 inline-flex">
-              Pilih layanan
+              {messages.bookingPage.chooseService}
             </Link>
           </div>
         ) : (
           <>
             <div className="mt-5 rounded-2xl border border-rose-line bg-white p-5">
-              <div className="text-xs font-semibold uppercase tracking-wider text-rose">Layanan dipilih</div>
+              <div className="text-xs font-semibold uppercase tracking-wider text-rose">
+                {messages.bookingPage.selectedServices}
+              </div>
               <ul className="mt-3 space-y-2">
                 {cart.items.map((item) => (
                   <li key={item.id} className="flex items-center justify-between text-sm">
@@ -124,12 +128,10 @@ export default function BookingPage({ settings }) {
                 ))}
               </ul>
               <div className="mt-3 flex items-center justify-between border-t border-rose-line pt-3 text-sm">
-                <span className="text-muted">Perkiraan / orang</span>
+                <span className="text-muted">{messages.bookingPage.estimatePerPerson}</span>
                 <span className="font-bold text-rose">{formatRupiah(subtotal)}</span>
               </div>
-              <p className="mt-1 text-[11px] text-muted">
-                Total final dihitung otomatis (× jumlah orang + ongkir) di langkah berikutnya.
-              </p>
+              <p className="mt-1 text-[11px] text-muted">{messages.bookingPage.finalTotalNote}</p>
             </div>
 
             {tok.status === 'valid' ? (
@@ -157,8 +159,14 @@ export default function BookingPage({ settings }) {
 
 function LockedPanel({ status = 'invalid', reason = '', cart = { items: [], orang: 1 }, settings = null }) {
   const whatsappNumber = normalizeWa(settings?.whatsapp || site.whatsapp);
-  const list = cart.items.map((item) => `- ${item.nama}`).join('\n');
-  const message = `Halo ${site.brand}, saya mau cek ketersediaan tanggal untuk booking:\n${list}\nJumlah orang: ${cart.orang}\n\nTanggal yang saya inginkan: ____\nMohon info ketersediaannya ya 🙏`;
+  const list = cart.items
+    .map((item) => formatMessage(messages.lockedPanel.whatsappListItem, { name: item.nama }))
+    .join('\n');
+  const message = formatMessage(messages.lockedPanel.whatsappMessage, {
+    brand: site.brand,
+    list,
+    orang: cart.orang,
+  });
   const href = waLink(whatsappNumber, message);
 
   const expired = reason === 'expired';
@@ -171,7 +179,7 @@ function LockedPanel({ status = 'invalid', reason = '', cart = { items: [], oran
         className="pointer-events-none select-none rounded-2xl border border-rose-line bg-white p-5 opacity-40 blur-[1px]"
       >
         <div className="grid grid-cols-2 gap-3">
-          {['Nama', 'No. WhatsApp', 'Email', 'Jumlah orang', 'Tanggal', 'Jam ready'].map((label) => (
+          {messages.lockedPanel.previewFieldLabels.map((label) => (
             <div key={label}>
               <div className="mb-1 text-xs text-muted">{label}</div>
               <div className="h-9 rounded-xl border border-rose-line bg-rose-soft/40" />
@@ -187,21 +195,23 @@ function LockedPanel({ status = 'invalid', reason = '', cart = { items: [], oran
             <Lock className="text-rose" size={22} />
           </div>
           <h2 className="mt-4 text-lg font-bold text-ink">
-            {expired ? 'Link sudah kedaluwarsa' : used ? 'Link sudah dipakai' : 'Cek ketersediaan dulu'}
+            {expired
+              ? messages.lockedPanel.expiredTitle
+              : used
+                ? messages.lockedPanel.usedTitle
+                : messages.lockedPanel.checkTitle}
           </h2>
           <p className="mt-2 text-sm text-muted">
             {expired
-              ? 'Link booking ini sudah lewat masa berlakunya. Chat admin lagi untuk link baru.'
+              ? messages.lockedPanel.expiredBody
               : used
-                ? 'Link booking ini sudah dipakai. Kalau perlu booking lagi, chat admin untuk link baru.'
-                : 'Booking dibuka setelah admin konfirmasi tanggalnya available. Chat admin untuk cek, nanti kamu dikirim link untuk lanjut booking.'}
+                ? messages.lockedPanel.usedBody
+                : messages.lockedPanel.checkBody}
           </p>
           <a href={href} target="_blank" rel="noopener noreferrer" className="btn-primary mt-5 w-full justify-center">
-            <MessageCircle size={18} /> Cek ketersediaan via WhatsApp
+            <MessageCircle size={18} /> {messages.lockedPanel.checkButton}
           </a>
-          <p className="mt-3 text-[11px] text-muted">
-            Tanpa biaya. Admin balas dengan tanggal yang tersedia + link booking.
-          </p>
+          <p className="mt-3 text-[11px] text-muted">{messages.lockedPanel.freeNote}</p>
         </div>
       </div>
     </div>
@@ -258,7 +268,7 @@ function UnlockedForm({
   }
   const areaOptions = areas.map((area) => ({
     value: area.id,
-    label: `${area.nama} ${area.fee > 0 ? `(+ ${formatRupiah(area.fee)})` : '(Gratis)'}`,
+    label: `${area.nama} ${area.fee > 0 ? formatMessage(messages.unlockedForm.areaFee, { fee: formatRupiah(area.fee) }) : messages.unlockedForm.areaFree}`,
   }));
 
   async function copy(key, text) {
@@ -282,8 +292,8 @@ function UnlockedForm({
     } catch (e) {
       setUploadError(
         e?.data?.error === 'uploads_not_configured'
-          ? 'Upload belum aktif, kirim bukti via WhatsApp saja.'
-          : 'Gagal upload. Coba lagi / kirim via WhatsApp.',
+          ? messages.unlockedForm.uploadNotConfigured
+          : messages.unlockedForm.uploadFailed,
       );
     } finally {
       setUploading(false);
@@ -294,11 +304,11 @@ function UnlockedForm({
 
   async function handleSubmit(event) {
     event.preventDefault();
-    if (!form.nama.trim() || !form.telepon.trim()) return setError('Nama & No. WhatsApp wajib diisi.');
-    if (!/^[0-9+]{9,15}$/.test(form.telepon.trim())) return setError('Nomor WhatsApp tidak valid.');
-    if (!form.jam) return setError('Pilih jam ready.');
-    if (!form.lokasi.trim()) return setError('Alamat wajib diisi.');
-    if (form.email.trim() && !EMAIL_RE.test(form.email.trim())) return setError('Email tidak valid.');
+    if (!form.nama.trim() || !form.telepon.trim()) return setError(messages.unlockedForm.missingNameOrPhone);
+    if (!/^[0-9+]{9,15}$/.test(form.telepon.trim())) return setError(messages.unlockedForm.invalidPhone);
+    if (!form.jam) return setError(messages.unlockedForm.missingTime);
+    if (!form.lokasi.trim()) return setError(messages.unlockedForm.missingAddress);
+    if (form.email.trim() && !EMAIL_RE.test(form.email.trim())) return setError(messages.unlockedForm.invalidEmail);
     setError('');
     setBusy(true);
     let saved;
@@ -319,7 +329,7 @@ function UnlockedForm({
       });
     } catch (e) {
       setBusy(false);
-      return setError(BOOKING_ERROR_MESSAGES[e?.data?.error] || 'Gagal menyimpan booking. Coba lagi atau chat admin.');
+      return setError(BOOKING_ERROR_MESSAGES[e?.data?.error] || messages.unlockedForm.saveFailed);
     }
     const ref = saved?.id ? `SALIA-${saved.id}` : '';
     let receipt = null;
@@ -367,11 +377,11 @@ function UnlockedForm({
           >
             {copied === copyKey ? (
               <>
-                <Check size={13} /> Tersalin
+                <Check size={13} /> {messages.unlockedForm.copied}
               </>
             ) : (
               <>
-                <Copy size={13} /> Salin
+                <Copy size={13} /> {messages.unlockedForm.copy}
               </>
             )}
           </button>
@@ -385,7 +395,7 @@ function UnlockedForm({
       <div className="flex items-center gap-3 rounded-2xl border border-green-200 bg-green-50 p-4">
         <CalendarCheck className="shrink-0 text-green-600" size={20} />
         <div className="text-sm">
-          <div className="font-semibold text-ink">Tanggal tersedia & terkunci</div>
+          <div className="font-semibold text-ink">{messages.unlockedForm.dateLocked}</div>
           <div className="text-muted">{formatTanggal(tanggal)}</div>
         </div>
       </div>
@@ -393,49 +403,51 @@ function UnlockedForm({
       <div className="rounded-2xl border border-rose-line bg-white p-5 space-y-3">
         <div className="grid grid-cols-2 gap-2.5">
           <div>
-            <label className="label">Nama</label>
+            <label className="label">{messages.unlockedForm.nameLabel}</label>
             <input
               className="field"
               value={form.nama}
               onChange={(event) => set('nama', event.target.value)}
-              placeholder="Nama kamu"
+              placeholder={messages.unlockedForm.namePlaceholder}
             />
           </div>
           <div>
-            <label className="label">No. WhatsApp</label>
+            <label className="label">{messages.unlockedForm.phoneLabel}</label>
             <input
               className="field"
               inputMode="numeric"
               value={form.telepon}
               onChange={(event) => set('telepon', event.target.value)}
-              placeholder="08xxxx"
+              placeholder={messages.unlockedForm.phonePlaceholder}
             />
           </div>
         </div>
         <div className="grid grid-cols-2 gap-2.5">
           <div>
-            <label className="label">Email {user ? '' : '(opsional)'}</label>
+            <label className="label">
+              {messages.unlockedForm.emailLabel} {user ? '' : messages.unlockedForm.emailOptional}
+            </label>
             <input
               className="field"
               type="email"
               value={form.email}
               onChange={(event) => set('email', event.target.value)}
-              placeholder="email@kamu.com"
+              placeholder={messages.unlockedForm.emailPlaceholder}
             />
           </div>
           <div>
-            <label className="label">Instagram</label>
+            <label className="label">{messages.unlockedForm.instagramLabel}</label>
             <input
               className="field"
               value={form.instagram}
               onChange={(event) => set('instagram', event.target.value)}
-              placeholder="@username"
+              placeholder={messages.unlockedForm.instagramPlaceholder}
             />
           </div>
         </div>
         <div className="grid grid-cols-2 items-end gap-2.5">
           <div>
-            <label className="label">Jumlah orang</label>
+            <label className="label">{messages.unlockedForm.peopleLabel}</label>
             <div className="flex items-center justify-between rounded-xl border border-rose-line px-2 py-1">
               <button
                 type="button"
@@ -455,41 +467,41 @@ function UnlockedForm({
             </div>
           </div>
           <div>
-            <label className="label">Jam ready</label>
+            <label className="label">{messages.unlockedForm.timeLabel}</label>
             <Select
               value={form.jam}
               onChange={(time) => set('jam', time)}
               options={timeOptions}
-              placeholder="Pilih jam ready"
+              placeholder={messages.unlockedForm.timePlaceholder}
             />
           </div>
         </div>
         <div>
-          <label className="label">Area</label>
+          <label className="label">{messages.unlockedForm.areaLabel}</label>
           <Select
             value={form.areaId}
             onChange={(areaId) => set('areaId', areaId)}
             options={areaOptions}
-            placeholder="Pilih area"
+            placeholder={messages.unlockedForm.areaPlaceholder}
           />
         </div>
         <div>
-          <label className="label">Alamat lengkap</label>
+          <label className="label">{messages.unlockedForm.addressLabel}</label>
           <textarea
             rows={3}
             className="field resize-none"
             value={form.lokasi}
             onChange={(event) => set('lokasi', event.target.value)}
-            placeholder="Nama jalan, no. rumah, patokan, kecamatan…"
+            placeholder={messages.unlockedForm.addressPlaceholder}
           />
         </div>
         <div>
-          <label className="label">Catatan (opsional)</label>
+          <label className="label">{messages.unlockedForm.notesLabel}</label>
           <input
             className="field"
             value={form.catatan}
             onChange={(event) => set('catatan', event.target.value)}
-            placeholder="Referensi look, tema acara, dll."
+            placeholder={messages.unlockedForm.notesPlaceholder}
           />
         </div>
       </div>
@@ -497,38 +509,48 @@ function UnlockedForm({
       <div className="flex items-center justify-between rounded-xl bg-rose-soft px-4 py-3">
         <div>
           <div className="text-xs text-muted">
-            Total ({orang} orang{area.fee > 0 ? ' + ongkir' : ''})
+            {formatMessage(messages.unlockedForm.totalLabel, {
+              orang,
+              shipping: area.fee > 0 ? messages.unlockedForm.totalShipping : '',
+            })}
           </div>
           <div className="text-xl font-bold text-rose">{formatRupiah(total)}</div>
         </div>
         <div className="text-right text-[11px] leading-tight text-muted">
-          DP {dpPercent}%<br />
+          {formatMessage(messages.unlockedForm.downPaymentLabel, { dpPercent })}
+          <br />
           {formatRupiah(downPayment)}
         </div>
       </div>
 
       <div className="rounded-2xl border border-rose-line bg-white p-5">
-        <div className="text-xs font-semibold uppercase tracking-wider text-rose">Bayar DP untuk kunci jadwal</div>
+        <div className="text-xs font-semibold uppercase tracking-wider text-rose">
+          {messages.unlockedForm.payDownPaymentTitle}
+        </div>
         <div className="mt-3 rounded-xl border border-rose-line p-4">
           {bank.number ? (
             <>
-              <Row label="Bank" value={bank.name || '-'} />
-              <Row label="No. Rekening" value={bank.number} copyKey="rek" />
-              <Row label="Atas Nama" value={bank.holder || '-'} />
-              <Row label={`DP ${dpPercent}%`} value={formatRupiah(downPayment)} copyKey="dp" />
+              <Row label={messages.unlockedForm.bankLabel} value={bank.name || '-'} />
+              <Row label={messages.unlockedForm.accountNumberLabel} value={bank.number} copyKey="rek" />
+              <Row label={messages.unlockedForm.accountHolderLabel} value={bank.holder || '-'} />
+              <Row
+                label={formatMessage(messages.unlockedForm.downPaymentLabel, { dpPercent })}
+                value={formatRupiah(downPayment)}
+                copyKey="dp"
+              />
             </>
           ) : (
-            <p className="text-sm text-muted">Nomor rekening belum diatur. Chat admin untuk detail pembayaran.</p>
+            <p className="text-sm text-muted">{messages.unlockedForm.bankMissing}</p>
           )}
         </div>
         <div className="mt-3">
-          <label className="label">Bukti transfer</label>
+          <label className="label">{messages.unlockedForm.proofLabel}</label>
           <input ref={fileRef} type="file" accept="image/*" hidden onChange={handleProofPick} />
           {proofUrl ? (
             <div className="flex items-center gap-3">
               <img
                 src={proofUrl}
-                alt="Bukti transfer"
+                alt={messages.unlockedForm.proofAlt}
                 className="h-16 w-16 rounded-lg border border-rose-line object-cover"
               />
               <button
@@ -536,7 +558,7 @@ function UnlockedForm({
                 onClick={() => fileRef.current?.click()}
                 className="text-sm text-rose hover:underline"
               >
-                Ganti
+                {messages.unlockedForm.replaceProof}
               </button>
             </div>
           ) : (
@@ -546,7 +568,10 @@ function UnlockedForm({
               disabled={uploading}
               className="inline-flex items-center gap-2 rounded-lg border border-rose-line px-4 py-2.5 text-sm font-medium text-ink hover:bg-rose-soft disabled:opacity-60"
             >
-              <Upload size={16} /> {uploading ? `Mengupload… ${uploadPercent}%` : 'Upload bukti transfer'}
+              <Upload size={16} />{' '}
+              {uploading
+                ? formatMessage(messages.unlockedForm.uploading, { percent: uploadPercent })
+                : messages.unlockedForm.uploadProof}
             </button>
           )}
           {uploadError && <p className="mt-1 text-xs text-rose">{uploadError}</p>}
@@ -555,10 +580,10 @@ function UnlockedForm({
 
       {error && <p className="text-sm text-rose">{error}</p>}
       <button type="submit" disabled={busy} className="btn-primary w-full justify-center disabled:opacity-60">
-        {busy ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />} Kirim booking
+        {busy ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />} {messages.unlockedForm.submit}
       </button>
       <p className="flex items-center justify-center gap-1.5 text-center text-[11px] text-muted">
-        <ShieldCheck size={13} /> Booking diproses setelah admin cek bukti transfer.
+        <ShieldCheck size={13} /> {messages.unlockedForm.processingNote}
       </p>
     </form>
   );
@@ -578,10 +603,12 @@ function DonePanel({ receipt = null, user = null }) {
     <div className="container-x py-16">
       <div className="mx-auto max-w-md rounded-2xl border border-rose-line bg-white p-8 text-center">
         <CheckCircle2 className="mx-auto text-rose" size={44} />
-        <h1 className="mt-4 text-xl font-bold text-ink">Terima kasih! 🎉</h1>
+        <h1 className="mt-4 text-xl font-bold text-ink">{messages.donePanel.title}</h1>
         <p className="mx-auto mt-2 max-w-xs text-sm text-muted">
-          Booking kamu tercatat & sedang diproses admin. Struk sudah dikirim ke <b>chat</b>
-          {user ? ' & email kamu' : ''}. Setelah dikonfirmasi, kamu bisa download struk final dari beranda.
+          {messages.donePanel.bodyBefore}
+          <b>{messages.donePanel.bodyBold}</b>
+          {user ? messages.donePanel.bodyEmail : ''}
+          {messages.donePanel.bodyAfter}
         </p>
         <div className="mt-6 flex flex-col gap-2">
           <button
@@ -589,10 +616,10 @@ function DonePanel({ receipt = null, user = null }) {
             disabled={!receipt}
             className="btn-primary w-full justify-center disabled:opacity-60"
           >
-            <Download size={18} /> Download struk
+            <Download size={18} /> {messages.donePanel.downloadReceipt}
           </button>
           <Link href="/" className="btn-outline w-full justify-center">
-            Kembali ke beranda
+            {messages.donePanel.backHome}
           </Link>
         </div>
       </div>

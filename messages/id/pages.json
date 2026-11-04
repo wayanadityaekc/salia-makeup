@@ -1,0 +1,54 @@
+{
+  "home": {
+    "heroTitle": {
+      "before": "Cantik di hari ",
+      "highlight": "spesialmu",
+      "after": "."
+    },
+    "heroText": "Jasa make up, hairdo, dan nail art profesional di {city}. Pilih layananmu di bawah, langsung checkout tanpa ribet.",
+    "chooseService": "Pilih layanan",
+    "viewNailArt": "Lihat Nail Art",
+    "heroPhotoAlt": "Portofolio Salia Makeup",
+    "heroPhotoPlaceholder": "Foto portofolio Salia",
+    "features": [
+      { "title": "Produk premium", "text": "Kosmetik berkualitas, aman, dan tahan lama." },
+      { "title": "Sesuai karakter", "text": "Riasan disesuaikan dengan wajah dan acaramu." },
+      { "title": "Tepat waktu", "text": "Datang on-time, bisa ke lokasi kamu." }
+    ],
+    "reviews": {
+      "eyebrow": "Testimoni",
+      "title": "Kata mereka",
+      "desc": "Contoh tampilan, akan diganti dengan review asli.",
+      "quote": "“{text}”"
+    }
+  },
+  "layanan": {
+    "metaTitle": "Make Up",
+    "eyebrow": "Layanan",
+    "title": "Make Up & Hairdo",
+    "desc": "Pilih paket sesuai acaramu. Harga dasar sudah termasuk konsultasi; hairdo dan biaya area ditambahkan sesuai kebutuhan.",
+    "hairdoBadge": "+ Hairdo",
+    "hairdoAddonTitle": "Tambahan Hairdo",
+    "hairdoAddonText": "Untuk paket tanpa hairdo, kamu bisa menambah penataan rambut.",
+    "priceAdd": "+ {price}",
+    "areaFeeTitle": "Biaya Area",
+    "areaFree": "Gratis"
+  },
+  "nailArt": {
+    "metaTitle": "Nail Art",
+    "eyebrow": "Nail Art",
+    "title": "Kuku cantik, detail sempurna",
+    "desc": "Perawatan dan seni kuku profesional, dari polish rapi sampai desain custom hand-painted yang tahan lama.",
+    "galleryEyebrow": "Inspirasi",
+    "galleryTitle": "Beberapa karya",
+    "photoAlt": "Nail art"
+  },
+  "galeri": {
+    "metaTitle": "Galeri",
+    "eyebrow": "Galeri",
+    "title": "Portofolio",
+    "desc": "Kumpulan hasil riasan dan nail art.",
+    "empty": "Foto belum ditambahkan. Segera hadir.",
+    "photoAlt": "Portofolio Salia Makeup"
+  }
+}

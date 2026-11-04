@@ -1,0 +1,19 @@
+{
+  "chatWidget": {
+    "downloadReceipt": "Download struk",
+    "sendFailed": "Gagal mengirim. Coba lagi.",
+    "whatsappGreeting": "Halo {brand}, saya mau tanya soal layanan make up / nail art.",
+    "back": "Kembali",
+    "title": "Chat {brand}",
+    "close": "Tutup",
+    "menuIntro": "Mau tanya-tanya? Pilih cara ngobrol:",
+    "webChatTitle": "Chat langsung di web",
+    "webChatSubtitle": "Ngobrol real-time, dibalas di sini",
+    "whatsappTitle": "WhatsApp",
+    "whatsappSubtitle": "Lanjut ngobrol di WhatsApp",
+    "emptyChat": "Tulis pesanmu, kami balas secepatnya. 💬",
+    "namePlaceholder": "Nama (opsional)",
+    "messagePlaceholder": "Tulis pesan…",
+    "send": "Kirim"
+  }
+}

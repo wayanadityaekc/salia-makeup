@@ -2,6 +2,8 @@ import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import { formatRupiah } from '@/lib/utils';
 import LoadFallback from '@/components/ui/LoadFallback';
+import { formatMessage } from '@/lib/formatMessage';
+import messages from '@/messages/id/store.json';
 
 export default function ServiceCard({ item = null, badge = null }) {
   if (!item) return <LoadFallback />;
@@ -10,7 +12,9 @@ export default function ServiceCard({ item = null, badge = null }) {
       {item.foto ? (
         <img src={item.foto} alt={item.nama} className="aspect-4/3 w-full object-cover" loading="lazy" />
       ) : (
-        <div className="foto-ph aspect-4/3 text-sm">Foto {item.nama}</div>
+        <div className="foto-ph aspect-4/3 text-sm">
+          {formatMessage(messages.serviceCard.photoPlaceholder, { name: item.nama })}
+        </div>
       )}
       <div className="flex flex-1 flex-col p-5">
         <div className="flex items-center justify-between gap-3">
@@ -22,14 +26,14 @@ export default function ServiceCard({ item = null, badge = null }) {
         <p className="mt-2 flex-1 text-sm leading-relaxed text-muted">{item.ringkas}</p>
         <div className="mt-4 flex items-center justify-between">
           <div>
-            <span className="text-xs text-muted">Mulai dari</span>
+            <span className="text-xs text-muted">{messages.serviceCard.startingFrom}</span>
             <div className="text-lg font-bold text-rose">{formatRupiah(item.base)}</div>
           </div>
           <Link
             href={`/booking?service=${item.id}`}
             className="inline-flex items-center gap-1 text-sm font-medium text-rose transition group-hover:gap-2"
           >
-            Booking <ArrowRight size={16} />
+            {messages.serviceCard.booking} <ArrowRight size={16} />
           </Link>
         </div>
       </div>

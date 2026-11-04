@@ -8,6 +8,8 @@ import { formatRupiah } from '@/lib/utils';
 import { useCart } from './CartProvider';
 import LoadFallback from '@/components/ui/LoadFallback';
 import useBodyLock from '@/lib/useBodyLock';
+import { formatMessage } from '@/lib/formatMessage';
+import messages from '@/messages/id/store.json';
 
 export default function StoreCard({ item = null, big = false }) {
   const { pick, isSelected } = useCart();
@@ -47,7 +49,7 @@ export default function StoreCard({ item = null, big = false }) {
       >
         {selected && (
           <span className="absolute right-2 top-2 z-10 inline-flex items-center gap-1 rounded-full bg-rose px-2 py-1 text-[11px] font-semibold text-white">
-            <Check size={12} /> Dipilih
+            <Check size={12} /> {messages.storeCard.selected}
           </span>
         )}
         {item.foto ? (
@@ -61,7 +63,7 @@ export default function StoreCard({ item = null, big = false }) {
           <div
             className={`foto-ph ${big ? 'aspect-square w-28 shrink-0 text-xs sm:w-full sm:text-sm' : 'aspect-4/3 w-full text-xs'}`}
           >
-            Foto {item.nama}
+            {formatMessage(messages.storeCard.photoPlaceholder, { name: item.nama })}
           </div>
         )}
         <div className={`flex min-w-0 flex-1 flex-col ${big ? 'p-3 sm:p-5' : 'p-3 sm:p-4'}`}>
@@ -84,7 +86,7 @@ export default function StoreCard({ item = null, big = false }) {
           <span
             className={`mt-3 inline-flex items-center justify-center gap-1.5 rounded-full bg-rose-soft font-semibold text-rose ${big ? 'w-full px-4 py-2 text-sm sm:py-2.5' : 'w-full px-4 py-2 text-sm'}`}
           >
-            Lihat detail
+            {messages.storeCard.viewDetail}
           </span>
         </div>
       </button>
@@ -107,11 +109,13 @@ export default function StoreCard({ item = null, big = false }) {
                 {item.foto ? (
                   <img src={item.foto} alt={item.nama} className="aspect-4/3 w-full object-cover" />
                 ) : (
-                  <div className="foto-ph aspect-4/3 text-sm">Foto {item.nama}</div>
+                  <div className="foto-ph aspect-4/3 text-sm">
+                    {formatMessage(messages.storeCard.photoPlaceholder, { name: item.nama })}
+                  </div>
                 )}
                 <button
                   onClick={() => setOpen(false)}
-                  aria-label="Tutup"
+                  aria-label={messages.storeCard.close}
                   className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full bg-white/90 text-ink shadow-sm hover:bg-white"
                 >
                   <X size={18} />
@@ -136,7 +140,9 @@ export default function StoreCard({ item = null, big = false }) {
                 )}
                 {item.info && (
                   <div className="mt-4 border-t border-rose-line pt-4">
-                    <h4 className="text-xs font-semibold uppercase tracking-wider text-rose">Detail produk</h4>
+                    <h4 className="text-xs font-semibold uppercase tracking-wider text-rose">
+                      {messages.storeCard.productDetail}
+                    </h4>
                     <p className="mt-2 whitespace-pre-wrap text-sm leading-relaxed text-ink/80">{item.info}</p>
                   </div>
                 )}
@@ -154,11 +160,11 @@ export default function StoreCard({ item = null, big = false }) {
                 >
                   {selected ? (
                     <>
-                      <Check size={18} /> Batalkan pilihan
+                      <Check size={18} /> {messages.storeCard.unselect}
                     </>
                   ) : (
                     <>
-                      <Plus size={18} /> Pilih layanan ini
+                      <Plus size={18} /> {messages.storeCard.select}
                     </>
                   )}
                 </button>

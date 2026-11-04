@@ -4,12 +4,13 @@ import { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, m } from 'motion/react';
 import { dropdownMotion } from '@/lib/motion';
 import { ChevronDown, Check } from 'lucide-react';
+import messages from '@/messages/id/ui.json';
 
 export default function Select({
   value = '',
   onChange = () => {},
   options = [],
-  placeholder = 'Pilih…',
+  placeholder = messages.select.placeholder,
   invalid = false,
 }) {
   const [open, setOpen] = useState(false);

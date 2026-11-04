@@ -4,6 +4,8 @@ import { useRouter } from 'next/navigation';
 import { X, ShoppingBag, ArrowRight } from 'lucide-react';
 import { formatRupiah } from '@/lib/utils';
 import { useCart } from './CartProvider';
+import { formatMessage } from '@/lib/formatMessage';
+import messages from '@/messages/id/store.json';
 
 export default function BookBar() {
   const { items, subtotal, remove } = useCart();
@@ -32,7 +34,7 @@ export default function BookBar() {
                 {index.nama}
                 <button
                   onClick={() => remove(index.kind)}
-                  aria-label={`Hapus ${index.nama}`}
+                  aria-label={formatMessage(messages.bookBar.removeItem, { name: index.nama })}
                   className="text-white/80 hover:text-white"
                 >
                   <X size={13} />
@@ -40,16 +42,18 @@ export default function BookBar() {
               </span>
             ))}
           </div>
-          <span className="flex-1 truncate text-sm font-medium text-white/90 sm:hidden">{items.length} item</span>
+          <span className="flex-1 truncate text-sm font-medium text-white/90 sm:hidden">
+            {formatMessage(messages.bookBar.itemCount, { count: items.length })}
+          </span>
           <div className="shrink-0 text-right">
-            <div className="text-[10px] leading-none text-white/70">Subtotal</div>
+            <div className="text-[10px] leading-none text-white/70">{messages.bookBar.subtotal}</div>
             <div className="text-sm font-bold text-white sm:text-base">{formatRupiah(subtotal)}</div>
           </div>
           <button
             onClick={() => router.push('/booking')}
             className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-white px-5 py-2.5 text-sm font-bold text-rose shadow-xs transition hover:bg-rose-soft sm:px-6"
           >
-            Book <ArrowRight size={16} />
+            {messages.bookBar.book} <ArrowRight size={16} />
           </button>
         </div>
       </div>

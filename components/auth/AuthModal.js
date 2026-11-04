@@ -6,6 +6,8 @@ import { backdropMotion, dialogMotion } from '@/lib/motion';
 import { X, Loader2, Mail, ArrowLeft } from 'lucide-react';
 import { useUser } from './UserProvider';
 import useBodyLock from '@/lib/useBodyLock';
+import { formatMessage } from '@/lib/formatMessage';
+import messages from '@/messages/id/auth.json';
 
 export default function AuthModal({ onClose }) {
   const { requestCode, verifyCode } = useUser();
@@ -29,20 +31,20 @@ export default function AuthModal({ onClose }) {
 
   async function handleCodeRequest(event) {
     event?.preventDefault();
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) return setError('Masukkan email yang valid.');
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) return setError(messages.authModal.invalidEmail);
     setError('');
     setBusy(true);
     try {
       const result = await requestCode(email.trim());
       setNote(
         result?.delivered === false
-          ? 'Kode dibuat. (Pengiriman email belum aktif, hubungi admin.)'
-          : `Kode dikirim ke ${email.trim()}. Cek inbox / spam.`,
+          ? messages.authModal.codeCreatedNoEmail
+          : formatMessage(messages.authModal.codeSent, { email: email.trim() }),
       );
       setStep('code');
       setTimeout(() => codeRef.current?.focus(), 50);
     } catch (e) {
-      setError('Gagal mengirim kode. Coba lagi.');
+      setError(messages.authModal.sendCodeFailed);
     } finally {
       setBusy(false);
     }
@@ -50,14 +52,14 @@ export default function AuthModal({ onClose }) {
 
   async function handleCodeVerify(event) {
     event?.preventDefault();
-    if (!/^\d{6}$/.test(code.trim())) return setError('Kode terdiri dari 6 angka.');
+    if (!/^\d{6}$/.test(code.trim())) return setError(messages.authModal.invalidCode);
     setError('');
     setBusy(true);
     try {
       await verifyCode(email.trim(), code.trim(), nama.trim() || undefined);
       onClose();
     } catch (e) {
-      setError('Kode salah atau kedaluwarsa.');
+      setError(messages.authModal.wrongCode);
     } finally {
       setBusy(false);
     }
@@ -83,17 +85,17 @@ export default function AuthModal({ onClose }) {
                   setStep('email');
                   setError('');
                 }}
-                aria-label="Kembali"
+                aria-label={messages.authModal.back}
                 className="rounded-full p-0.5 text-muted hover:text-rose"
               >
                 <ArrowLeft size={18} />
               </button>
             )}
-            {step === 'email' ? 'Masuk / Daftar' : 'Masukkan kode'}
+            {step === 'email' ? messages.authModal.titleEmail : messages.authModal.titleCode}
           </h2>
           <button
             onClick={onClose}
-            aria-label="Tutup"
+            aria-label={messages.authModal.close}
             className="rounded-full p-1.5 text-muted hover:bg-rose-soft hover:text-rose"
           >
             <X size={18} />
@@ -105,28 +107,28 @@ export default function AuthModal({ onClose }) {
             <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-rose-soft">
               <Mail className="text-rose" size={22} />
             </div>
-            <p className="text-center text-sm text-muted">Masuk pakai email, kami kirim kode 6 angka tanpa password.</p>
+            <p className="text-center text-sm text-muted">{messages.authModal.emailIntro}</p>
             <div>
-              <label className="label">Email</label>
+              <label className="label">{messages.authModal.emailLabel}</label>
               <input
                 className="field"
                 type="email"
                 autoFocus
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
-                placeholder="email@kamu.com"
+                placeholder={messages.authModal.emailPlaceholder}
               />
             </div>
             {error && <p className="text-sm text-rose">{error}</p>}
             <button type="submit" disabled={busy} className="btn-primary w-full justify-center disabled:opacity-60">
-              {busy ? <Loader2 size={18} className="animate-spin" /> : <Mail size={18} />} Kirim kode
+              {busy ? <Loader2 size={18} className="animate-spin" /> : <Mail size={18} />} {messages.authModal.sendCode}
             </button>
           </form>
         ) : (
           <form onSubmit={handleCodeVerify} className="space-y-3 p-5">
             {note && <p className="rounded-lg bg-rose-soft/60 px-3 py-2 text-xs text-ink">{note}</p>}
             <div>
-              <label className="label">Kode 6 angka</label>
+              <label className="label">{messages.authModal.codeLabel}</label>
               <input
                 ref={codeRef}
                 className="field text-center text-lg tracking-[0.4em]"
@@ -134,26 +136,26 @@ export default function AuthModal({ onClose }) {
                 maxLength={6}
                 value={code}
                 onChange={(event) => setCode(event.target.value.replace(/\D/g, '').slice(0, 6))}
-                placeholder="••••••"
+                placeholder={messages.authModal.codePlaceholder}
               />
             </div>
             <div>
-              <label className="label">Nama (untuk akun baru)</label>
+              <label className="label">{messages.authModal.nameLabel}</label>
               <input
                 className="field"
                 value={nama}
                 onChange={(event) => setNama(event.target.value)}
-                placeholder="Nama kamu (opsional)"
+                placeholder={messages.authModal.namePlaceholder}
               />
             </div>
             {error && <p className="text-sm text-rose">{error}</p>}
             <button type="submit" disabled={busy} className="btn-primary w-full justify-center disabled:opacity-60">
-              {busy ? <Loader2 size={18} className="animate-spin" /> : null} Masuk
+              {busy ? <Loader2 size={18} className="animate-spin" /> : null} {messages.authModal.signIn}
             </button>
             <p className="text-center text-sm text-muted">
-              Tidak menerima kode?{' '}
+              {messages.authModal.noCodeReceived}{' '}
               <button type="button" onClick={handleCodeRequest} className="font-semibold text-rose hover:underline">
-                Kirim ulang
+                {messages.authModal.resend}
               </button>
             </p>
           </form>

@@ -4,22 +4,10 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { AnimatePresence, m } from 'motion/react';
 import { dropdownMotion } from '@/lib/motion';
 import { Calendar, ChevronLeft, ChevronRight } from 'lucide-react';
+import messages from '@/messages/id/ui.json';
 
-const BULAN = [
-  'Januari',
-  'Februari',
-  'Maret',
-  'April',
-  'Mei',
-  'Juni',
-  'Juli',
-  'Agustus',
-  'September',
-  'Oktober',
-  'November',
-  'Desember',
-];
-const HARI = ['M', 'S', 'S', 'R', 'K', 'J', 'S'];
+const BULAN = messages.datePicker.monthNames;
+const HARI = messages.datePicker.dayInitials;
 
 function toStr(date) {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
@@ -34,7 +22,7 @@ export default function DatePicker({
   value = '',
   onChange = () => {},
   invalid = false,
-  placeholder = 'Pilih tanggal',
+  placeholder = messages.datePicker.placeholder,
 }) {
   const [open, setOpen] = useState(false);
   const ref = useRef(null);

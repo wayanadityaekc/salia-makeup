@@ -10,6 +10,8 @@ import { fetchSettings, sendChatMessage, fetchChatMessages } from '@/lib/storage
 import { waLink, normalizeWa } from '@/lib/utils';
 import { chatCidFor, OPEN_CHAT_EVENT } from '@/lib/chat';
 import { useUser } from '@/components/auth/UserProvider';
+import { formatMessage } from '@/lib/formatMessage';
+import chatMessages from '@/messages/id/chat.json';
 
 const URL_SPLIT_RE = /(https?:\/\/[^\s]+)/g;
 const URL_PART_RE = /^https?:\/\/[^\s]+$/;
@@ -32,7 +34,7 @@ function Body({ text = '', mine = false }) {
           >
             {isReceipt(part) ? (
               <>
-                <Download size={13} /> Download struk
+                <Download size={13} /> {chatMessages.chatWidget.downloadReceipt}
               </>
             ) : (
               part
@@ -150,7 +152,7 @@ export default function ChatWidget() {
       setText('');
       if (message) mergeNew([message]);
     } catch (e) {
-      setError('Gagal mengirim. Coba lagi.');
+      setError(chatMessages.chatWidget.sendFailed);
     } finally {
       setBusy(false);
     }
@@ -158,7 +160,7 @@ export default function ChatWidget() {
 
   const waHref = waLink(
     normalizeWa(whatsapp || site.whatsapp),
-    `Halo ${site.brand}, saya mau tanya soal layanan make up / nail art.`,
+    formatMessage(chatMessages.chatWidget.whatsappGreeting, { brand: site.brand }),
   );
 
   return (
@@ -184,17 +186,19 @@ export default function ChatWidget() {
                 {view === 'chat' && (
                   <button
                     onClick={() => setView('menu')}
-                    aria-label="Kembali"
+                    aria-label={chatMessages.chatWidget.back}
                     className="rounded-full p-0.5 hover:bg-white/15"
                   >
                     <ArrowLeft size={18} />
                   </button>
                 )}
-                <span className="font-semibold">Chat {site.brand}</span>
+                <span className="font-semibold">
+                  {formatMessage(chatMessages.chatWidget.title, { brand: site.brand })}
+                </span>
               </div>
               <button
                 onClick={() => setOpen(false)}
-                aria-label="Tutup"
+                aria-label={chatMessages.chatWidget.close}
                 className="rounded-full p-0.5 hover:bg-white/15"
               >
                 <X size={18} />
@@ -203,7 +207,7 @@ export default function ChatWidget() {
 
             {view === 'menu' && (
               <div className="p-4">
-                <p className="text-sm text-muted">Mau tanya-tanya? Pilih cara ngobrol:</p>
+                <p className="text-sm text-muted">{chatMessages.chatWidget.menuIntro}</p>
                 <div className="mt-3 grid gap-2">
                   <button
                     onClick={() => setView('chat')}
@@ -211,8 +215,10 @@ export default function ChatWidget() {
                   >
                     <Send size={20} className="shrink-0 text-rose" />
                     <span>
-                      <span className="block text-sm font-semibold text-ink">Chat langsung di web</span>
-                      <span className="block text-xs text-muted">Ngobrol real-time, dibalas di sini</span>
+                      <span className="block text-sm font-semibold text-ink">
+                        {chatMessages.chatWidget.webChatTitle}
+                      </span>
+                      <span className="block text-xs text-muted">{chatMessages.chatWidget.webChatSubtitle}</span>
                     </span>
                   </button>
                   <a
@@ -223,8 +229,10 @@ export default function ChatWidget() {
                   >
                     <MessageCircle size={20} className="shrink-0 text-rose" />
                     <span>
-                      <span className="block text-sm font-semibold text-ink">WhatsApp</span>
-                      <span className="block text-xs text-muted">Lanjut ngobrol di WhatsApp</span>
+                      <span className="block text-sm font-semibold text-ink">
+                        {chatMessages.chatWidget.whatsappTitle}
+                      </span>
+                      <span className="block text-xs text-muted">{chatMessages.chatWidget.whatsappSubtitle}</span>
                     </span>
                   </a>
                 </div>
@@ -235,7 +243,7 @@ export default function ChatWidget() {
               <>
                 <div className="min-h-0 flex-1 space-y-2 overflow-y-auto bg-rose-soft/40 p-4">
                   {messages.length === 0 && (
-                    <p className="py-6 text-center text-xs text-muted">Tulis pesanmu, kami balas secepatnya. 💬</p>
+                    <p className="py-6 text-center text-xs text-muted">{chatMessages.chatWidget.emptyChat}</p>
                   )}
                   {messages.map((message) => (
                     <div
@@ -256,7 +264,7 @@ export default function ChatWidget() {
                   {!nama && messages.length === 0 && (
                     <input
                       className="field mb-2"
-                      placeholder="Nama (opsional)"
+                      placeholder={chatMessages.chatWidget.namePlaceholder}
                       value={nama}
                       onChange={(event) => setNama(event.target.value)}
                     />
@@ -265,7 +273,7 @@ export default function ChatWidget() {
                   <div className="flex items-end gap-2">
                     <textarea
                       className="field max-h-24 min-h-[42px] flex-1 resize-none py-2.5"
-                      placeholder="Tulis pesan…"
+                      placeholder={chatMessages.chatWidget.messagePlaceholder}
                       rows={1}
                       value={text}
                       onChange={(event) => setText(event.target.value)}
@@ -279,7 +287,7 @@ export default function ChatWidget() {
                     <button
                       type="submit"
                       disabled={busy || !text.trim()}
-                      aria-label="Kirim"
+                      aria-label={chatMessages.chatWidget.send}
                       className="flex h-[42px] w-[42px] shrink-0 items-center justify-center rounded-full bg-rose text-white hover:bg-rose-deep disabled:opacity-50"
                     >
                       {busy ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />}

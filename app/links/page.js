@@ -2,9 +2,11 @@ import { Globe, MessageCircle, Instagram, CalendarHeart } from 'lucide-react';
 import { site } from '@/lib/config';
 import { fetchSettings } from '@/lib/storage';
 import { waLink, normalizeWa } from '@/lib/utils';
+import { formatMessage } from '@/lib/formatMessage';
+import messages from '@/messages/id/links.json';
 
 export const metadata = {
-  title: 'Links',
+  title: messages.linksPage.metaTitle,
   robots: { index: false, follow: false },
 };
 
@@ -25,23 +27,26 @@ function GoogleIcon({ size = 20 }) {
 
 export default async function LinksPage() {
   const { social, whatsapp } = await fetchSettings();
-  const whatsappHref = waLink(normalizeWa(whatsapp || site.whatsapp), `Halo ${site.brand}, saya mau booking 😊`);
+  const whatsappHref = waLink(
+    normalizeWa(whatsapp || site.whatsapp),
+    formatMessage(messages.linksPage.whatsappGreeting, { brand: site.brand }),
+  );
   const webBase = `https://${site.domain}`;
 
   const links = [
-    { href: whatsappHref, label: 'Booking via WhatsApp', Icon: MessageCircle, primary: true },
-    { href: `${webBase}/booking`, label: 'Booking Online', Icon: CalendarHeart, primary: true },
-    { href: webBase, label: 'Website Resmi', Icon: Globe },
-    social.instagram && { href: social.instagram, label: 'Instagram', Icon: Instagram },
-    social.tiktok && { href: social.tiktok, label: 'TikTok', Icon: TikTokIcon },
-    social.google && { href: social.google, label: 'Google Business', Icon: GoogleIcon },
+    { href: whatsappHref, label: messages.linksPage.bookingWhatsapp, Icon: MessageCircle, primary: true },
+    { href: `${webBase}/booking`, label: messages.linksPage.bookingOnline, Icon: CalendarHeart, primary: true },
+    { href: webBase, label: messages.linksPage.officialWebsite, Icon: Globe },
+    social.instagram && { href: social.instagram, label: messages.linksPage.instagram, Icon: Instagram },
+    social.tiktok && { href: social.tiktok, label: messages.linksPage.tiktok, Icon: TikTokIcon },
+    social.google && { href: social.google, label: messages.linksPage.google, Icon: GoogleIcon },
   ].filter(Boolean);
 
   return (
     <main className="min-h-screen bg-rose-soft px-5 py-14">
       <div className="mx-auto w-full max-w-sm text-center">
         <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-rose text-2xl font-bold text-white">
-          SM
+          {messages.linksPage.monogram}
         </div>
         <h1 className="mt-4 text-2xl font-bold text-ink">{site.brand}</h1>
         <p className="mt-1 text-sm text-muted">

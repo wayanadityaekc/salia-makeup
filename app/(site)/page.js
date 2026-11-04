@@ -13,6 +13,10 @@ import SectionHeader from '@/components/SectionHeader';
 import SocialLinks from '@/components/SocialLinks';
 import Storefront from '@/components/store/Storefront';
 import ReceiptBanner from '@/components/booking/ReceiptBanner';
+import { formatMessage } from '@/lib/formatMessage';
+import messages from '@/messages/id/pages.json';
+
+const FEATURE_ICONS = [Sparkles, Heart, Clock];
 
 export default async function Home() {
   const data = await fetchServicesData();
@@ -26,6 +30,7 @@ export default async function Home() {
 
   const content = settings.content || {};
   const heroKicker = content.heroKicker || site.tagline;
+  const features = messages.home.features.map((feature, index) => ({ ...feature, icon: FEATURE_ICONS[index] }));
 
   return (
     <>
@@ -39,20 +44,21 @@ export default async function Home() {
               content.heroTitle
             ) : (
               <>
-                Cantik di hari <span className="text-rose">spesialmu</span>.
+                {messages.home.heroTitle.before}
+                <span className="text-rose">{messages.home.heroTitle.highlight}</span>
+                {messages.home.heroTitle.after}
               </>
             )}
           </h1>
           <p className="mt-5 max-w-md text-lg leading-relaxed text-muted">
-            Jasa make up, hairdo, dan nail art profesional di {site.kota}. Pilih layananmu di bawah, langsung checkout
-            tanpa ribet.
+            {formatMessage(messages.home.heroText, { city: site.kota })}
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Link href="#pilih" className="btn-primary">
-              Pilih layanan <ArrowRight size={18} />
+              {messages.home.chooseService} <ArrowRight size={18} />
             </Link>
             <Link href="/nail-art" className="btn-outline">
-              Lihat Nail Art
+              {messages.home.viewNailArt}
             </Link>
           </div>
           <SocialLinks social={settings.social} className="mt-6" />
@@ -60,20 +66,16 @@ export default async function Home() {
         {content.heroPhoto ? (
           <img
             src={content.heroPhoto}
-            alt="Portofolio Salia Makeup"
+            alt={messages.home.heroPhotoAlt}
             className="aspect-4/5 w-full rounded-3xl object-cover"
           />
         ) : (
-          <div className="foto-ph aspect-4/5 rounded-3xl text-base">Foto portofolio Salia</div>
+          <div className="foto-ph aspect-4/5 rounded-3xl text-base">{messages.home.heroPhotoPlaceholder}</div>
         )}
       </section>
 
       <section className="container-x grid gap-5 sm:grid-cols-3">
-        {[
-          { icon: Sparkles, title: 'Produk premium', text: 'Kosmetik berkualitas, aman, dan tahan lama.' },
-          { icon: Heart, title: 'Sesuai karakter', text: 'Riasan disesuaikan dengan wajah dan acaramu.' },
-          { icon: Clock, title: 'Tepat waktu', text: 'Datang on-time, bisa ke lokasi kamu.' },
-        ].map((feature) => (
+        {features.map((feature) => (
           <div key={feature.title} className="rounded-2xl border border-rose-line bg-white p-6">
             <feature.icon className="text-rose" size={24} />
             <h3 className="mt-4 font-semibold text-ink">{feature.title}</h3>
@@ -89,15 +91,17 @@ export default async function Home() {
       {reviews.length > 0 && (
         <section className="container-x py-16">
           <SectionHeader
-            eyebrow="Testimoni"
-            title="Kata mereka"
-            desc="Contoh tampilan, akan diganti dengan review asli."
+            eyebrow={messages.home.reviews.eyebrow}
+            title={messages.home.reviews.title}
+            desc={messages.home.reviews.desc}
           />
           <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {reviews.map((review, index) => (
               <figure key={index} className="flex flex-col rounded-2xl border border-rose-line bg-white p-6">
                 <Quote className="text-rose/40" size={28} />
-                <blockquote className="mt-3 flex-1 text-sm leading-relaxed text-ink/80">“{review.teks}”</blockquote>
+                <blockquote className="mt-3 flex-1 text-sm leading-relaxed text-ink/80">
+                  {formatMessage(messages.home.reviews.quote, { text: review.teks })}
+                </blockquote>
                 <figcaption className="mt-5 border-t border-rose-line pt-4">
                   <div className="text-sm font-semibold text-ink">{review.nama}</div>
                   {review.layanan && <div className="text-xs text-muted">{review.layanan}</div>}

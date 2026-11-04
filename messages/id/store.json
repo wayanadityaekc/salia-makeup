@@ -1,0 +1,28 @@
+{
+  "bookBar": {
+    "removeItem": "Hapus {name}",
+    "itemCount": "{count} item",
+    "subtotal": "Subtotal",
+    "book": "Book"
+  },
+  "storeCard": {
+    "selected": "Dipilih",
+    "photoPlaceholder": "Foto {name}",
+    "viewDetail": "Lihat detail",
+    "close": "Tutup",
+    "productDetail": "Detail produk",
+    "unselect": "Batalkan pilihan",
+    "select": "Pilih layanan ini"
+  },
+  "storefront": {
+    "makeup": "Make Up",
+    "hairdo": "Hairdo",
+    "nail": "Nails",
+    "emptyCategory": "Belum ada item di kategori ini."
+  },
+  "serviceCard": {
+    "photoPlaceholder": "Foto {name}",
+    "startingFrom": "Mulai dari",
+    "booking": "Booking"
+  }
+}

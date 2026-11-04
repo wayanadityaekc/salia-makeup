@@ -2,13 +2,15 @@ import './globals.css';
 import { site } from '@/lib/config';
 import IosZoomFix from '@/components/IosZoomFix';
 import MotionRoot from '@/components/motion/MotionRoot';
+import { formatMessage } from '@/lib/formatMessage';
+import messages from '@/messages/id/layout.json';
 
 export const metadata = {
   title: {
     default: `${site.brand} · ${site.tagline}`,
     template: `%s · ${site.brand}`,
   },
-  description: `Jasa make up, hairdo, dan nail art profesional di ${site.kota}. Booking mudah langsung via WhatsApp.`,
+  description: formatMessage(messages.rootLayout.description, { kota: site.kota }),
   openGraph: {
     title: `${site.brand} · ${site.tagline}`,
     type: 'website',

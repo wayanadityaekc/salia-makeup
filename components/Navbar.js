@@ -11,12 +11,13 @@ import { fetchSettings } from '@/lib/storage';
 import { useUser } from '@/components/auth/UserProvider';
 import AuthModal from '@/components/auth/AuthModal';
 import { openChat } from '@/lib/chat';
+import messages from '@/messages/id/layout.json';
 
 const nav = [
-  { href: '/', label: 'Beranda' },
-  { href: '/layanan', label: 'Make Up' },
-  { href: '/nail-art', label: 'Nail Art' },
-  { href: '/galeri', label: 'Galeri' },
+  { href: '/', label: messages.navbar.links.home },
+  { href: '/layanan', label: messages.navbar.links.makeUp },
+  { href: '/nail-art', label: messages.navbar.links.nailArt },
+  { href: '/galeri', label: messages.navbar.links.gallery },
 ];
 
 export default function Navbar() {
@@ -73,10 +74,10 @@ export default function Navbar() {
           ))}
           <button
             onClick={() => openChat()}
-            aria-label="Chat"
+            aria-label={messages.navbar.chat}
             className="inline-flex items-center gap-1.5 text-sm text-ink transition hover:text-rose"
           >
-            <MessageCircle size={18} className="text-rose" /> Chat
+            <MessageCircle size={18} className="text-rose" /> {messages.navbar.chat}
           </button>
           {user ? (
             <div className="flex items-center gap-3">
@@ -86,23 +87,27 @@ export default function Navbar() {
               <button
                 onClick={logout}
                 className="inline-flex items-center gap-1 text-sm text-muted hover:text-rose"
-                aria-label="Keluar"
+                aria-label={messages.navbar.logout}
               >
-                <LogOut size={15} /> Keluar
+                <LogOut size={15} /> {messages.navbar.logout}
               </button>
             </div>
           ) : (
             <button onClick={() => setAuth(true)} className="btn-primary">
-              Login
+              {messages.navbar.login}
             </button>
           )}
         </nav>
 
         <div className="flex items-center gap-1 md:hidden">
-          <button onClick={() => openChat()} aria-label="Chat" className="p-1.5 text-rose">
+          <button onClick={() => openChat()} aria-label={messages.navbar.chat} className="p-1.5 text-rose">
             <MessageCircle size={22} />
           </button>
-          <button className="p-1.5 text-rose" onClick={() => setOpen((wasOpen) => !wasOpen)} aria-label="Menu">
+          <button
+            className="p-1.5 text-rose"
+            onClick={() => setOpen((wasOpen) => !wasOpen)}
+            aria-label={messages.navbar.menu}
+          >
             {open ? <X size={24} /> : <Menu size={24} />}
           </button>
         </div>
@@ -134,7 +139,7 @@ export default function Navbar() {
                     onClick={logout}
                     className="inline-flex items-center gap-1 text-sm text-muted hover:text-rose"
                   >
-                    <LogOut size={15} /> Keluar
+                    <LogOut size={15} /> {messages.navbar.logout}
                   </button>
                 </div>
               ) : (
@@ -145,7 +150,7 @@ export default function Navbar() {
                   }}
                   className="btn-primary mt-2"
                 >
-                  Login
+                  {messages.navbar.login}
                 </button>
               )}
             </div>

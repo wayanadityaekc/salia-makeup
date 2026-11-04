@@ -1,7 +1,9 @@
+import messages from '@/messages/id/ui.json';
+
 export default function LoadFallback({ className = '' }) {
   return (
     <p role="status" className={`m-0 text-sm text-muted ${className}`}>
-      Maaf, informasi ini belum bisa dimuat. Silakan coba lagi.
+      {messages.loadFallback.message}
     </p>
   );
 }

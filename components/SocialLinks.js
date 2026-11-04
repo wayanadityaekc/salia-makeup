@@ -1,4 +1,5 @@
 import { Instagram } from 'lucide-react';
+import messages from '@/messages/id/layout.json';
 
 function TikTokIcon({ size = 18 }) {
   return (
@@ -17,9 +18,9 @@ function GoogleIcon({ size = 18 }) {
 
 export default function SocialLinks({ social = {}, size = 18, className = '' }) {
   const links = [
-    social.instagram && { href: social.instagram, label: 'Instagram', Icon: Instagram },
-    social.tiktok && { href: social.tiktok, label: 'TikTok', Icon: TikTokIcon },
-    social.google && { href: social.google, label: 'Google Business Profile', Icon: GoogleIcon },
+    social.instagram && { href: social.instagram, label: messages.socialLinks.instagram, Icon: Instagram },
+    social.tiktok && { href: social.tiktok, label: messages.socialLinks.tiktok, Icon: TikTokIcon },
+    social.google && { href: social.google, label: messages.socialLinks.google, Icon: GoogleIcon },
   ].filter(Boolean);
   if (links.length === 0) return null;
   return (

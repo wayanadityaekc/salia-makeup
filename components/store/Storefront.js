@@ -5,15 +5,16 @@ import { CartProvider } from './CartProvider';
 import StoreCard from './StoreCard';
 import BookBar from './BookBar';
 import LoadFallback from '@/components/ui/LoadFallback';
+import messages from '@/messages/id/store.json';
 
 export default function Storefront({ data = null, settings = null }) {
   function withKind(list, kind) {
     return (list || []).map((item) => ({ ...item, kind }));
   }
   const cats = [
-    { key: 'makeup', label: 'Make Up', items: withKind(data?.services, 'makeup') },
-    { key: 'hairdo', label: 'Hairdo', items: withKind(data?.hairdo, 'hairdo') },
-    { key: 'nail', label: 'Nails', items: withKind(data?.nailArt, 'nail') },
+    { key: 'makeup', label: messages.storefront.makeup, items: withKind(data?.services, 'makeup') },
+    { key: 'hairdo', label: messages.storefront.hairdo, items: withKind(data?.hairdo, 'hairdo') },
+    { key: 'nail', label: messages.storefront.nail, items: withKind(data?.nailArt, 'nail') },
   ];
   const [cat, setCat] = useState('makeup');
   const active = cats.find((category) => category.key === cat) || cats[0];
@@ -42,7 +43,7 @@ export default function Storefront({ data = null, settings = null }) {
         <div className="mt-6 pb-28">
           {active.items.length === 0 ? (
             <p className="rounded-2xl border border-dashed border-rose-line bg-white py-16 text-center text-sm text-muted">
-              Belum ada item di kategori ini.
+              {messages.storefront.emptyCategory}
             </p>
           ) : (
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
