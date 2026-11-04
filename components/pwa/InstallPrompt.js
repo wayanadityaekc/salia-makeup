@@ -92,7 +92,7 @@ export default function InstallPrompt() {
       >
         <div className="container-x flex items-center gap-3 py-3">
           <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-rose text-rose-soft">
-            <span className="font-serif text-base font-semibold">S</span>
+            <span className="text-base font-semibold">S</span>
           </div>
           <div className="min-w-0 flex-1">
             <p className="text-sm font-semibold text-ink">Pasang Salia Admin</p>
