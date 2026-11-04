@@ -111,10 +111,10 @@ Nice-to-have
 - **Frontend** (this repo) = Next.js 16 + React 19 (App Router), Tailwind 4 (theme in
   `@theme` inside `app/globals.css`, no `tailwind.config.js`), Framer Motion (`motion`,
   `LazyMotion` in `components/motion/MotionRoot.js`, presets in `lib/motion.js`), lucide-react,
-  jspdf. react-hook-form is gone. Zod is not used on the frontend yet: forms pre-check by hand,
-  the API validates with Zod.
+  jspdf, Zod (booking and login forms, schemas in `lib/formSchemas.js`; the API validates again with
+  Zod). react-hook-form is gone.
   Pages in `app/`, components in `components/`, helpers in `lib/`.
-- **Text is data**: UI strings in `messages/id/<area>.json`, long-form content in `content/*.json`.
+- **Text is data** (site, dashboard and admin PWA): UI strings in `messages/id/<area>.json`, long-form content in `content/*.json`.
   Variables use `{name}` placeholders through `lib/formatMessage.js`. No guest-facing literals in JSX.
 - **Every popup animates in and out** with the `lib/motion.js` presets (`backdropMotion`,
   `dialogMotion`, `sheetMotion`, `dropdownMotion`, `menuMotion`) inside `AnimatePresence`.
