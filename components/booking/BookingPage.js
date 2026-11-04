@@ -37,9 +37,9 @@ import { CART_KEY } from '@/components/store/CartProvider';
 import { chatCidFor } from '@/lib/chat';
 import { useUser } from '@/components/auth/UserProvider';
 import { formatMessage } from '@/lib/formatMessage';
+import { bookingFormSchema, findFormProblem } from '@/lib/formSchemas';
 import messages from '@/messages/id/booking.json';
 
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const BOOKING_ERROR_MESSAGES = {
   invalid_token: messages.bookingErrors.invalidToken,
   invalid_email: messages.bookingErrors.invalidEmail,
@@ -304,11 +304,8 @@ function UnlockedForm({
 
   async function handleSubmit(event) {
     event.preventDefault();
-    if (!form.nama.trim() || !form.telepon.trim()) return setError(messages.unlockedForm.missingNameOrPhone);
-    if (!/^[0-9+]{9,15}$/.test(form.telepon.trim())) return setError(messages.unlockedForm.invalidPhone);
-    if (!form.jam) return setError(messages.unlockedForm.missingTime);
-    if (!form.lokasi.trim()) return setError(messages.unlockedForm.missingAddress);
-    if (form.email.trim() && !EMAIL_RE.test(form.email.trim())) return setError(messages.unlockedForm.invalidEmail);
+    const problemKey = findFormProblem(bookingFormSchema, form, 'saveFailed');
+    if (problemKey) return setError(messages.unlockedForm[problemKey] || messages.bookingErrors[problemKey]);
     setError('');
     setBusy(true);
     let saved;

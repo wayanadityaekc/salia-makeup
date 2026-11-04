@@ -7,6 +7,7 @@ import { X, Loader2, Mail, ArrowLeft } from 'lucide-react';
 import { useUser } from './UserProvider';
 import useBodyLock from '@/lib/useBodyLock';
 import { formatMessage } from '@/lib/formatMessage';
+import { findFormProblem, loginCodeSchema, loginEmailSchema } from '@/lib/formSchemas';
 import messages from '@/messages/id/auth.json';
 
 export default function AuthModal({ onClose }) {
@@ -31,7 +32,7 @@ export default function AuthModal({ onClose }) {
 
   async function handleCodeRequest(event) {
     event?.preventDefault();
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) return setError(messages.authModal.invalidEmail);
+    if (findFormProblem(loginEmailSchema, email, 'invalidEmail')) return setError(messages.authModal.invalidEmail);
     setError('');
     setBusy(true);
     try {
@@ -52,7 +53,7 @@ export default function AuthModal({ onClose }) {
 
   async function handleCodeVerify(event) {
     event?.preventDefault();
-    if (!/^\d{6}$/.test(code.trim())) return setError(messages.authModal.invalidCode);
+    if (findFormProblem(loginCodeSchema, code, 'invalidCode')) return setError(messages.authModal.invalidCode);
     setError('');
     setBusy(true);
     try {
