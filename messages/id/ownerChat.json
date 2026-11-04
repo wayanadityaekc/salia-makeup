@@ -1,0 +1,15 @@
+{
+  "chatManager": {
+    "deleteConfirm": "Hapus percakapan ini?",
+    "title": "Live chat",
+    "loading": "Memuat…",
+    "empty": "Belum ada percakapan.",
+    "guestFallback": "Tamu",
+    "ownerPrefix": "Kamu: ",
+    "selectConversation": "Pilih percakapan.",
+    "back": "Kembali",
+    "delete": "Hapus",
+    "replyPlaceholder": "Balas…",
+    "send": "Kirim"
+  }
+}

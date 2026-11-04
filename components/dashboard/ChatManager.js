@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Send, Loader2, Trash2, ArrowLeft, MessageSquare } from 'lucide-react';
 import { formatTanggal } from '@/lib/utils';
 import { fetchConversations, fetchThread, sendReply, deleteConversation, UnauthorizedError } from '@/lib/storage';
+import messages from '@/messages/id/ownerChat.json';
 
 function timeShort(iso) {
   try {
@@ -99,7 +100,7 @@ export default function ChatManager({ onUnauthorized }) {
   }
 
   async function hapus(cid) {
-    if (!confirm('Hapus percakapan ini?')) return;
+    if (!confirm(messages.chatManager.deleteConfirm)) return;
     try {
       await deleteConversation(cid);
       if (activeCid === cid) {
@@ -116,16 +117,18 @@ export default function ChatManager({ onUnauthorized }) {
 
   return (
     <div className="flex h-full flex-col">
-      <h2 className="shrink-0 text-lg font-bold text-ink">Live chat</h2>
+      <h2 className="shrink-0 text-lg font-bold text-ink">{messages.chatManager.title}</h2>
       <div className="mt-4 flex min-h-0 flex-1 overflow-hidden rounded-2xl border border-rose-line bg-white">
         <div
           className={`w-full shrink-0 overflow-y-auto border-rose-line md:w-72 md:border-r ${
             activeCid ? 'hidden md:block' : 'block'
           }`}
         >
-          {loading && conversations.length === 0 && <p className="p-6 text-center text-sm text-muted">Memuat…</p>}
+          {loading && conversations.length === 0 && (
+            <p className="p-6 text-center text-sm text-muted">{messages.chatManager.loading}</p>
+          )}
           {!loading && conversations.length === 0 && (
-            <p className="p-6 text-center text-sm text-muted">Belum ada percakapan.</p>
+            <p className="p-6 text-center text-sm text-muted">{messages.chatManager.empty}</p>
           )}
           {conversations.map((convo) => (
             <button
@@ -137,11 +140,13 @@ export default function ChatManager({ onUnauthorized }) {
             >
               <div className="min-w-0 flex-1">
                 <div className="flex items-center justify-between gap-2">
-                  <span className="truncate font-semibold text-ink">{convo.nama || 'Tamu'}</span>
+                  <span className="truncate font-semibold text-ink">
+                    {convo.nama || messages.chatManager.guestFallback}
+                  </span>
                   <span className="shrink-0 text-[11px] text-muted">{timeShort(convo.lastAt)}</span>
                 </div>
                 <p className="mt-0.5 truncate text-sm text-muted">
-                  {convo.lastSender === 'owner' ? 'Kamu: ' : ''}
+                  {convo.lastSender === 'owner' ? messages.chatManager.ownerPrefix : ''}
                   {convo.lastBody}
                 </p>
               </div>
@@ -158,23 +163,27 @@ export default function ChatManager({ onUnauthorized }) {
           {!activeCid ? (
             <div className="flex flex-1 flex-col items-center justify-center text-muted">
               <MessageSquare size={28} className="opacity-40" />
-              <p className="mt-2 text-sm">Pilih percakapan.</p>
+              <p className="mt-2 text-sm">{messages.chatManager.selectConversation}</p>
             </div>
           ) : (
             <>
               <div className="flex items-center justify-between gap-2 border-b border-rose-line px-4 py-3">
                 <div className="flex items-center gap-2">
-                  <button onClick={() => setActiveCid(null)} className="md:hidden" aria-label="Kembali">
+                  <button
+                    onClick={() => setActiveCid(null)}
+                    className="md:hidden"
+                    aria-label={messages.chatManager.back}
+                  >
                     <ArrowLeft size={18} className="text-muted" />
                   </button>
                   <div>
-                    <div className="font-semibold text-ink">{active?.nama || 'Tamu'}</div>
+                    <div className="font-semibold text-ink">{active?.nama || messages.chatManager.guestFallback}</div>
                     {active?.telepon && <div className="text-xs text-muted">{active.telepon}</div>}
                   </div>
                 </div>
                 <button
                   onClick={() => hapus(activeCid)}
-                  aria-label="Hapus"
+                  aria-label={messages.chatManager.delete}
                   className="rounded-lg p-2 text-muted hover:text-rose"
                 >
                   <Trash2 size={16} />
@@ -182,7 +191,7 @@ export default function ChatManager({ onUnauthorized }) {
               </div>
 
               <div className="flex-1 space-y-2 overflow-y-auto bg-rose-soft/30 p-4">
-                {!thread && <p className="py-6 text-center text-sm text-muted">Memuat…</p>}
+                {!thread && <p className="py-6 text-center text-sm text-muted">{messages.chatManager.loading}</p>}
                 {thread?.messages?.map((message) => (
                   <div
                     key={message.id}
@@ -208,7 +217,7 @@ export default function ChatManager({ onUnauthorized }) {
               <form onSubmit={handleSend} className="flex items-end gap-2 border-t border-rose-line p-3">
                 <textarea
                   className="field max-h-24 min-h-[42px] flex-1 resize-none py-2.5"
-                  placeholder="Balas…"
+                  placeholder={messages.chatManager.replyPlaceholder}
                   rows={1}
                   value={reply}
                   onChange={(event) => setReply(event.target.value)}
@@ -222,7 +231,7 @@ export default function ChatManager({ onUnauthorized }) {
                 <button
                   type="submit"
                   disabled={busy || !reply.trim()}
-                  aria-label="Kirim"
+                  aria-label={messages.chatManager.send}
                   className="flex h-[42px] w-[42px] shrink-0 items-center justify-center rounded-full bg-rose text-white hover:bg-rose-deep disabled:opacity-50"
                 >
                   {busy ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />}

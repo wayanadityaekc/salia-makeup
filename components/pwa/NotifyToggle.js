@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { Bell, BellRing, BellOff, Loader2, Check } from 'lucide-react';
 import { fetchPushPublicKey, savePushSubscription, removePushSubscription } from '@/lib/storage';
+import messages from '@/messages/id/pwa.json';
 
 function urlB64ToUint8Array(base64String) {
   const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
@@ -61,7 +62,7 @@ export default function NotifyToggle() {
       await savePushSubscription(subscription.toJSON());
       setStatus('on');
     } catch (e) {
-      setError('Gagal mengaktifkan notifikasi. Coba lagi.');
+      setError(messages.notifyToggle.enableError);
     } finally {
       setBusy(false);
     }
@@ -79,7 +80,7 @@ export default function NotifyToggle() {
       }
       setStatus('off');
     } catch (e) {
-      setError('Gagal menonaktifkan.');
+      setError(messages.notifyToggle.disableError);
     } finally {
       setBusy(false);
     }
@@ -92,33 +93,26 @@ export default function NotifyToggle() {
           {status === 'on' ? <BellRing size={20} /> : <Bell size={20} />}
         </div>
         <div className="min-w-0 flex-1">
-          <h3 className="font-semibold text-ink">Notifikasi booking</h3>
-          <p className="mt-0.5 text-sm text-muted">
-            Dapat notifikasi langsung di HP tiap ada booking baru masuk, walau app ketutup.
-          </p>
+          <h3 className="font-semibold text-ink">{messages.notifyToggle.title}</h3>
+          <p className="mt-0.5 text-sm text-muted">{messages.notifyToggle.hint}</p>
 
           {status === 'loading' && (
             <p className="mt-3 flex items-center gap-2 text-sm text-muted">
-              <Loader2 size={15} className="animate-spin" /> Memeriksa…
+              <Loader2 size={15} className="animate-spin" /> {messages.notifyToggle.checking}
             </p>
           )}
 
-          {status === 'unsupported' && (
-            <p className="mt-3 text-sm text-muted">Browser ini belum mendukung notifikasi.</p>
-          )}
+          {status === 'unsupported' && <p className="mt-3 text-sm text-muted">{messages.notifyToggle.unsupported}</p>}
 
           {status === 'need-install' && (
             <p className="mt-3 text-sm text-muted">
-              Di iPhone, pasang dulu app ke layar utama (tombol <b>Pasang</b>), buka dari ikonnya, baru notifikasi bisa
-              diaktifkan.
+              {messages.notifyToggle.needInstall.before}
+              <b>{messages.notifyToggle.needInstall.bold}</b>
+              {messages.notifyToggle.needInstall.after}
             </p>
           )}
 
-          {status === 'blocked' && (
-            <p className="mt-3 text-sm text-rose">
-              Notifikasi diblokir. Izinkan lewat pengaturan situs di browser, lalu buka lagi halaman ini.
-            </p>
-          )}
+          {status === 'blocked' && <p className="mt-3 text-sm text-rose">{messages.notifyToggle.blocked}</p>}
 
           {status === 'off' && (
             <button
@@ -126,21 +120,23 @@ export default function NotifyToggle() {
               disabled={busy}
               className="mt-3 inline-flex items-center gap-2 rounded-full bg-rose px-4 py-2 text-sm font-semibold text-white hover:bg-rose-deep disabled:opacity-60"
             >
-              {busy ? <Loader2 size={16} className="animate-spin" /> : <Bell size={16} />} Aktifkan notifikasi
+              {busy ? <Loader2 size={16} className="animate-spin" /> : <Bell size={16} />}{' '}
+              {messages.notifyToggle.enable}
             </button>
           )}
 
           {status === 'on' && (
             <div className="mt-3 flex flex-wrap items-center gap-3">
               <span className="inline-flex items-center gap-1.5 rounded-full bg-rose-soft px-3 py-1.5 text-sm font-semibold text-rose">
-                <Check size={15} /> Aktif di perangkat ini
+                <Check size={15} /> {messages.notifyToggle.active}
               </span>
               <button
                 onClick={disable}
                 disabled={busy}
                 className="inline-flex items-center gap-1.5 text-sm font-medium text-muted hover:text-rose disabled:opacity-60"
               >
-                {busy ? <Loader2 size={15} className="animate-spin" /> : <BellOff size={15} />} Matikan
+                {busy ? <Loader2 size={15} className="animate-spin" /> : <BellOff size={15} />}{' '}
+                {messages.notifyToggle.disable}
               </button>
             </div>
           )}

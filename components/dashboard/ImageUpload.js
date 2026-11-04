@@ -4,8 +4,10 @@ import { useRef, useState } from 'react';
 import { Upload } from 'lucide-react';
 import { uploadImage, UnauthorizedError } from '@/lib/storage';
 import { compressImage } from '@/lib/image';
+import { formatMessage } from '@/lib/formatMessage';
+import messages from '@/messages/id/catalog.json';
 
-export default function ImageUpload({ onUploaded, onUnauthorized, label = 'Upload foto' }) {
+export default function ImageUpload({ onUploaded, onUnauthorized, label = messages.imageUpload.defaultLabel }) {
   const ref = useRef(null);
   const [busy, setBusy] = useState(false);
   const [phase, setPhase] = useState('');
@@ -32,8 +34,8 @@ export default function ImageUpload({ onUploaded, onUnauthorized, label = 'Uploa
       else
         setError(
           e?.data?.error === 'uploads_not_configured'
-            ? 'Upload belum aktif (set Cloudinary di server).'
-            : 'Gagal upload foto.',
+            ? messages.imageUpload.notConfigured
+            : messages.imageUpload.uploadError,
         );
     } finally {
       setBusy(false);
@@ -44,7 +46,11 @@ export default function ImageUpload({ onUploaded, onUnauthorized, label = 'Uploa
   }
 
   const phaseLabel =
-    phase === 'compress' ? 'Menyiapkan foto…' : phase === 'process' ? 'Memproses…' : `Mengupload… ${uploadPercent}%`;
+    phase === 'compress'
+      ? messages.imageUpload.preparing
+      : phase === 'process'
+        ? messages.imageUpload.processing
+        : formatMessage(messages.imageUpload.uploading, { percent: uploadPercent });
   const barPct = phase === 'compress' ? 8 : phase === 'process' ? 100 : uploadPercent;
 
   return (

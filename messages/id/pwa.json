@@ -1,0 +1,40 @@
+{
+  "installPrompt": {
+    "monogram": "S",
+    "title": "Pasang Salia Admin",
+    "subtitle": "Buka seperti aplikasi, langsung dari layar utama.",
+    "install": "Pasang",
+    "close": "Tutup",
+    "guideTitle": "Pasang ke layar utama",
+    "iosStepShare": { "before": "Ketuk ikon ", "bold": "Bagikan", "after": "di bar Safari." },
+    "iosStepAdd": { "before": "Pilih ", "bold": "Add to Home Screen", "after": "." },
+    "iosStepConfirm": { "before": "Ketuk ", "bold": "Add", "after": " di kanan atas. Selesai, buka Salia dari ikonnya." },
+    "androidStepMenu": { "before": "Buka menu browser ", "after": "(kanan atas)." },
+    "androidStepInstall": {
+      "before": "Pilih ",
+      "boldInstall": "Install app",
+      "middle": " atau ",
+      "boldAdd": "Add to Home screen",
+      "after": "."
+    },
+    "androidStepConfirm": "Konfirmasi. Buka Salia dari ikonnya.",
+    "understood": "Mengerti"
+  },
+  "notifyToggle": {
+    "enableError": "Gagal mengaktifkan notifikasi. Coba lagi.",
+    "disableError": "Gagal menonaktifkan.",
+    "title": "Notifikasi booking",
+    "hint": "Dapat notifikasi langsung di HP tiap ada booking baru masuk, walau app ketutup.",
+    "checking": "Memeriksa…",
+    "unsupported": "Browser ini belum mendukung notifikasi.",
+    "needInstall": {
+      "before": "Di iPhone, pasang dulu app ke layar utama (tombol ",
+      "bold": "Pasang",
+      "after": "), buka dari ikonnya, baru notifikasi bisa diaktifkan."
+    },
+    "blocked": "Notifikasi diblokir. Izinkan lewat pengaturan situs di browser, lalu buka lagi halaman ini.",
+    "enable": "Aktifkan notifikasi",
+    "active": "Aktif di perangkat ini",
+    "disable": "Matikan"
+  }
+}

@@ -5,6 +5,7 @@ import { AnimatePresence, m } from 'motion/react';
 import { backdropMotion, dialogMotion, sheetMotion } from '@/lib/motion';
 import useBodyLock from '@/lib/useBodyLock';
 import { Download, Share, Plus, X, MoreVertical } from 'lucide-react';
+import messages from '@/messages/id/pwa.json';
 
 const DISMISS_KEY = 'salia_install_dismissed';
 
@@ -92,21 +93,21 @@ export default function InstallPrompt() {
       >
         <div className="container-x flex items-center gap-3 py-3">
           <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-rose text-rose-soft">
-            <span className="text-base font-semibold">S</span>
+            <span className="text-base font-semibold">{messages.installPrompt.monogram}</span>
           </div>
           <div className="min-w-0 flex-1">
-            <p className="text-sm font-semibold text-ink">Pasang Salia Admin</p>
-            <p className="mt-0.5 text-xs text-muted">Buka seperti aplikasi, langsung dari layar utama.</p>
+            <p className="text-sm font-semibold text-ink">{messages.installPrompt.title}</p>
+            <p className="mt-0.5 text-xs text-muted">{messages.installPrompt.subtitle}</p>
           </div>
           <button
             onClick={onInstallClick}
             className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-rose px-4 py-2 text-sm font-semibold text-white hover:bg-rose-deep"
           >
-            <Download size={16} /> Pasang
+            <Download size={16} /> {messages.installPrompt.install}
           </button>
           <button
             onClick={dismiss}
-            aria-label="Tutup"
+            aria-label={messages.installPrompt.close}
             className="shrink-0 rounded-full p-2 text-muted hover:bg-rose-soft hover:text-rose"
           >
             <X size={18} />
@@ -129,10 +130,10 @@ export default function InstallPrompt() {
               onClick={(event) => event.stopPropagation()}
             >
               <div className="flex items-center justify-between">
-                <h2 className="text-base font-bold text-ink">Pasang ke layar utama</h2>
+                <h2 className="text-base font-bold text-ink">{messages.installPrompt.guideTitle}</h2>
                 <button
                   onClick={() => setGuide(false)}
-                  aria-label="Tutup"
+                  aria-label={messages.installPrompt.close}
                   className="rounded-full p-1.5 text-muted hover:bg-rose-soft hover:text-rose"
                 >
                   <X size={18} />
@@ -142,27 +143,38 @@ export default function InstallPrompt() {
               {ios ? (
                 <ol className="mt-4 space-y-3">
                   <Step number={1}>
-                    Ketuk ikon <b>Bagikan</b> <Share size={15} className="mx-0.5 inline align-text-bottom text-rose" />{' '}
-                    di bar Safari.
+                    {messages.installPrompt.iosStepShare.before}
+                    <b>{messages.installPrompt.iosStepShare.bold}</b>{' '}
+                    <Share size={15} className="mx-0.5 inline align-text-bottom text-rose" />{' '}
+                    {messages.installPrompt.iosStepShare.after}
                   </Step>
                   <Step number={2}>
-                    Pilih <b>Add to Home Screen</b>{' '}
-                    <Plus size={15} className="mx-0.5 inline align-text-bottom text-rose" />.
+                    {messages.installPrompt.iosStepAdd.before}
+                    <b>{messages.installPrompt.iosStepAdd.bold}</b>{' '}
+                    <Plus size={15} className="mx-0.5 inline align-text-bottom text-rose" />
+                    {messages.installPrompt.iosStepAdd.after}
                   </Step>
                   <Step number={3}>
-                    Ketuk <b>Add</b> di kanan atas. Selesai, buka Salia dari ikonnya.
+                    {messages.installPrompt.iosStepConfirm.before}
+                    <b>{messages.installPrompt.iosStepConfirm.bold}</b>
+                    {messages.installPrompt.iosStepConfirm.after}
                   </Step>
                 </ol>
               ) : (
                 <ol className="mt-4 space-y-3">
                   <Step number={1}>
-                    Buka menu browser <MoreVertical size={15} className="mx-0.5 inline align-text-bottom text-rose" />{' '}
-                    (kanan atas).
+                    {messages.installPrompt.androidStepMenu.before}
+                    <MoreVertical size={15} className="mx-0.5 inline align-text-bottom text-rose" />{' '}
+                    {messages.installPrompt.androidStepMenu.after}
                   </Step>
                   <Step number={2}>
-                    Pilih <b>Install app</b> atau <b>Add to Home screen</b>.
+                    {messages.installPrompt.androidStepInstall.before}
+                    <b>{messages.installPrompt.androidStepInstall.boldInstall}</b>
+                    {messages.installPrompt.androidStepInstall.middle}
+                    <b>{messages.installPrompt.androidStepInstall.boldAdd}</b>
+                    {messages.installPrompt.androidStepInstall.after}
                   </Step>
-                  <Step number={3}>Konfirmasi. Buka Salia dari ikonnya.</Step>
+                  <Step number={3}>{messages.installPrompt.androidStepConfirm}</Step>
                 </ol>
               )}
 
@@ -170,7 +182,7 @@ export default function InstallPrompt() {
                 onClick={() => setGuide(false)}
                 className="mt-6 w-full rounded-full bg-rose px-4 py-2.5 text-sm font-semibold text-white hover:bg-rose-deep"
               >
-                Mengerti
+                {messages.installPrompt.understood}
               </button>
             </m.div>
           </m.div>

@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { Trash2 } from 'lucide-react';
 import { fetchGallery, createGalleryItem, deleteGalleryItem, UnauthorizedError } from '@/lib/storage';
 import ImageUpload from './ImageUpload';
+import messages from '@/messages/id/catalog.json';
 
 export default function GalleryManager({ onUnauthorized }) {
   const [items, setItems] = useState([]);
@@ -12,7 +13,7 @@ export default function GalleryManager({ onUnauthorized }) {
 
   function handleRequestError(requestError) {
     if (requestError instanceof UnauthorizedError) onUnauthorized?.();
-    else setError('Terjadi kesalahan. Coba lagi.');
+    else setError(messages.galleryManager.requestError);
   }
 
   async function refresh() {
@@ -41,7 +42,7 @@ export default function GalleryManager({ onUnauthorized }) {
   }
 
   async function remove(id) {
-    if (!confirm('Hapus foto ini?')) return;
+    if (!confirm(messages.galleryManager.confirmDelete)) return;
     try {
       await deleteGalleryItem(id);
       refresh();
@@ -53,15 +54,15 @@ export default function GalleryManager({ onUnauthorized }) {
   return (
     <div>
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <p className="text-sm text-muted">Foto yang tampil di halaman Galeri & Nail Art.</p>
-        <ImageUpload onUploaded={onUploaded} onUnauthorized={onUnauthorized} label="Tambah foto" />
+        <p className="text-sm text-muted">{messages.galleryManager.intro}</p>
+        <ImageUpload onUploaded={onUploaded} onUnauthorized={onUnauthorized} label={messages.galleryManager.addPhoto} />
       </div>
 
       {error && <p className="mt-3 text-sm text-rose">{error}</p>}
 
       {items.length === 0 && !loading ? (
         <div className="mt-6 rounded-2xl border border-dashed border-rose-line bg-white py-16 text-center text-sm text-muted">
-          Belum ada foto. Klik “Tambah foto”.
+          {messages.galleryManager.empty}
         </div>
       ) : (
         <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
@@ -69,13 +70,13 @@ export default function GalleryManager({ onUnauthorized }) {
             <div key={galleryItem.id} className="group relative overflow-hidden rounded-xl border border-rose-line">
               <img
                 src={galleryItem.url}
-                alt={galleryItem.caption || 'Foto'}
+                alt={galleryItem.caption || messages.galleryManager.photoAlt}
                 className="aspect-square w-full object-cover"
               />
               <button
                 onClick={() => remove(galleryItem.id)}
                 className="absolute right-2 top-2 inline-flex h-8 w-8 items-center justify-center rounded-full bg-white/90 text-rose shadow-sm hover:bg-white"
-                aria-label="Hapus foto"
+                aria-label={messages.galleryManager.removePhoto}
               >
                 <Trash2 size={15} />
               </button>
@@ -83,7 +84,7 @@ export default function GalleryManager({ onUnauthorized }) {
           ))}
         </div>
       )}
-      {loading && <p className="mt-4 text-sm text-muted">Memuat…</p>}
+      {loading && <p className="mt-4 text-sm text-muted">{messages.galleryManager.loading}</p>}
     </div>
   );
 }

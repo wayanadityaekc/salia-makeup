@@ -4,6 +4,9 @@ import { useEffect, useState } from 'react';
 import { Save, Mail, Loader2, Send } from 'lucide-react';
 import { formatRupiah } from '@/lib/utils';
 import { fetchSettings, updateSettings, fetchEmailPreview, sendTestEmail, UnauthorizedError } from '@/lib/storage';
+import { formatMessage } from '@/lib/formatMessage';
+import { site } from '@/lib/config';
+import messages from '@/messages/id/settings.json';
 import ImageUpload from './ImageUpload';
 
 export default function SettingsManager({ onUnauthorized }) {
@@ -18,7 +21,7 @@ export default function SettingsManager({ onUnauthorized }) {
       try {
         setForm(await fetchSettings());
       } catch (e) {
-        setError('Gagal memuat pengaturan.');
+        setError(messages.settingsManager.loadError);
       } finally {
         setLoading(false);
       }
@@ -26,7 +29,7 @@ export default function SettingsManager({ onUnauthorized }) {
     loadSettings();
   }, []);
 
-  if (loading || !form) return <p className="text-sm text-muted">Memuat…</p>;
+  if (loading || !form) return <p className="text-sm text-muted">{messages.settingsManager.loading}</p>;
 
   function setContent(field, value) {
     setForm((current) => ({ ...current, content: { ...(current.content || {}), [field]: value } }));
@@ -64,7 +67,7 @@ export default function SettingsManager({ onUnauthorized }) {
       setSaved(true);
     } catch (e) {
       if (e instanceof UnauthorizedError) onUnauthorized?.();
-      else setError('Gagal menyimpan. Coba lagi.');
+      else setError(messages.settingsManager.saveError);
     } finally {
       setBusy(false);
     }
@@ -75,18 +78,22 @@ export default function SettingsManager({ onUnauthorized }) {
       {error && <p className="text-sm text-rose">{error}</p>}
 
       <section className="rounded-2xl border border-rose-line bg-white p-5">
-        <h3 className="font-semibold text-ink">Konten Beranda</h3>
-        <p className="mt-1 text-sm text-muted">Logo, judul & foto hero. Kosongkan untuk pakai bawaan.</p>
+        <h3 className="font-semibold text-ink">{messages.settingsManager.homeContentTitle}</h3>
+        <p className="mt-1 text-sm text-muted">{messages.settingsManager.homeContentHint}</p>
 
         <div className="mt-4 grid gap-5 sm:grid-cols-2">
           <div>
-            <label className="label">Logo</label>
+            <label className="label">{messages.settingsManager.logoLabel}</label>
             <div className="mt-1 flex items-center gap-3">
               <div className="flex h-14 w-32 items-center justify-center overflow-hidden rounded-xl border border-rose-line bg-rose-soft/40">
                 {form.content?.logo ? (
-                  <img src={form.content.logo} alt="Logo" className="max-h-12 max-w-full object-contain" />
+                  <img
+                    src={form.content.logo}
+                    alt={messages.settingsManager.logoAlt}
+                    className="max-h-12 max-w-full object-contain"
+                  />
                 ) : (
-                  <span className="text-xs font-bold text-rose">Salia Makeup</span>
+                  <span className="text-xs font-bold text-rose">{site.brand}</span>
                 )}
               </div>
             </div>
@@ -94,7 +101,9 @@ export default function SettingsManager({ onUnauthorized }) {
               <ImageUpload
                 onUploaded={(url) => setContent('logo', url)}
                 onUnauthorized={onUnauthorized}
-                label={form.content?.logo ? 'Ganti' : 'Upload'}
+                label={
+                  form.content?.logo ? messages.settingsManager.replaceImage : messages.settingsManager.uploadImage
+                }
               />
               {form.content?.logo && (
                 <button
@@ -102,26 +111,32 @@ export default function SettingsManager({ onUnauthorized }) {
                   onClick={() => setContent('logo', '')}
                   className="text-xs text-muted hover:text-rose"
                 >
-                  Hapus
+                  {messages.settingsManager.removeImage}
                 </button>
               )}
             </div>
           </div>
 
           <div>
-            <label className="label">Foto hero</label>
+            <label className="label">{messages.settingsManager.heroPhotoLabel}</label>
             <div className="mt-1 aspect-4/3 w-full overflow-hidden rounded-xl border border-rose-line bg-rose-soft/40">
               {form.content?.heroPhoto ? (
-                <img src={form.content.heroPhoto} alt="Hero" className="h-full w-full object-cover" />
+                <img
+                  src={form.content.heroPhoto}
+                  alt={messages.settingsManager.heroPhotoAlt}
+                  className="h-full w-full object-cover"
+                />
               ) : (
-                <div className="foto-ph h-full w-full text-xs">Belum ada foto</div>
+                <div className="foto-ph h-full w-full text-xs">{messages.settingsManager.noPhoto}</div>
               )}
             </div>
             <div className="mt-2 flex flex-wrap items-center gap-2">
               <ImageUpload
                 onUploaded={(url) => setContent('heroPhoto', url)}
                 onUnauthorized={onUnauthorized}
-                label={form.content?.heroPhoto ? 'Ganti' : 'Upload'}
+                label={
+                  form.content?.heroPhoto ? messages.settingsManager.replaceImage : messages.settingsManager.uploadImage
+                }
               />
               {form.content?.heroPhoto && (
                 <button
@@ -129,7 +144,7 @@ export default function SettingsManager({ onUnauthorized }) {
                   onClick={() => setContent('heroPhoto', '')}
                   className="text-xs text-muted hover:text-rose"
                 >
-                  Hapus
+                  {messages.settingsManager.removeImage}
                 </button>
               )}
             </div>
@@ -138,19 +153,19 @@ export default function SettingsManager({ onUnauthorized }) {
 
         <div className="mt-4 grid gap-3">
           <div>
-            <label className="label">Kicker (teks kecil di atas judul)</label>
+            <label className="label">{messages.settingsManager.heroKickerLabel}</label>
             <input
               className="field"
-              placeholder="Make Up & Nail Art Artist"
+              placeholder={messages.settingsManager.heroKickerPlaceholder}
               value={form.content?.heroKicker || ''}
               onChange={(event) => setContent('heroKicker', event.target.value)}
             />
           </div>
           <div>
-            <label className="label">Judul hero (H1)</label>
+            <label className="label">{messages.settingsManager.heroTitleLabel}</label>
             <input
               className="field"
-              placeholder="Cantik di hari spesialmu."
+              placeholder={messages.settingsManager.heroTitlePlaceholder}
               value={form.content?.heroTitle || ''}
               onChange={(event) => setContent('heroTitle', event.target.value)}
             />
@@ -159,8 +174,8 @@ export default function SettingsManager({ onUnauthorized }) {
       </section>
 
       <section className="rounded-2xl border border-rose-line bg-white p-5">
-        <h3 className="font-semibold text-ink">Uang Muka (DP)</h3>
-        <p className="mt-1 text-sm text-muted">Persentase DP yang diminta untuk kunci jadwal.</p>
+        <h3 className="font-semibold text-ink">{messages.settingsManager.dpTitle}</h3>
+        <p className="mt-1 text-sm text-muted">{messages.settingsManager.dpHint}</p>
         <div className="mt-3 flex items-center gap-2">
           <input
             type="number"
@@ -173,18 +188,16 @@ export default function SettingsManager({ onUnauthorized }) {
               setSaved(false);
             }}
           />
-          <span className="text-sm text-ink">% dari total</span>
+          <span className="text-sm text-ink">{messages.settingsManager.dpSuffix}</span>
         </div>
       </section>
 
       <section className="rounded-2xl border border-rose-line bg-white p-5">
-        <h3 className="font-semibold text-ink">Nomor WhatsApp</h3>
-        <p className="mt-1 text-sm text-muted">
-          Dipakai untuk booking, tombol chat, & halaman /links. Format: 62… (tanpa + / 0 depan).
-        </p>
+        <h3 className="font-semibold text-ink">{messages.settingsManager.whatsappTitle}</h3>
+        <p className="mt-1 text-sm text-muted">{messages.settingsManager.whatsappHint}</p>
         <input
           className="field mt-3 sm:w-72"
-          placeholder="6281234567890"
+          placeholder={messages.settingsManager.whatsappPlaceholder}
           value={form.whatsapp || ''}
           onChange={(event) => {
             setForm((current) => ({ ...current, whatsapp: event.target.value }));
@@ -194,32 +207,32 @@ export default function SettingsManager({ onUnauthorized }) {
       </section>
 
       <section className="rounded-2xl border border-rose-line bg-white p-5">
-        <h3 className="font-semibold text-ink">Rekening Pembayaran</h3>
-        <p className="mt-1 text-sm text-muted">Ditampilkan ke tamu saat bayar DP.</p>
+        <h3 className="font-semibold text-ink">{messages.settingsManager.bankTitle}</h3>
+        <p className="mt-1 text-sm text-muted">{messages.settingsManager.bankHint}</p>
         <div className="mt-3 grid gap-3 sm:grid-cols-3">
           <div>
-            <label className="label">Nama bank</label>
+            <label className="label">{messages.settingsManager.bankNameLabel}</label>
             <input
               className="field"
-              placeholder="BCA"
+              placeholder={messages.settingsManager.bankNamePlaceholder}
               value={form.bank.name}
               onChange={(event) => setBank('name', event.target.value)}
             />
           </div>
           <div>
-            <label className="label">No. rekening</label>
+            <label className="label">{messages.settingsManager.bankNumberLabel}</label>
             <input
               className="field"
-              placeholder="1234567890"
+              placeholder={messages.settingsManager.bankNumberPlaceholder}
               value={form.bank.number}
               onChange={(event) => setBank('number', event.target.value)}
             />
           </div>
           <div>
-            <label className="label">Atas nama</label>
+            <label className="label">{messages.settingsManager.bankHolderLabel}</label>
             <input
               className="field"
-              placeholder="Salia"
+              placeholder={messages.settingsManager.bankHolderPlaceholder}
               value={form.bank.holder}
               onChange={(event) => setBank('holder', event.target.value)}
             />
@@ -228,15 +241,15 @@ export default function SettingsManager({ onUnauthorized }) {
       </section>
 
       <section className="rounded-2xl border border-rose-line bg-white p-5">
-        <h3 className="font-semibold text-ink">Ongkir per Area</h3>
-        <p className="mt-1 text-sm text-muted">Biaya tambahan sesuai jarak. Isi 0 untuk gratis.</p>
+        <h3 className="font-semibold text-ink">{messages.settingsManager.areaFeeTitle}</h3>
+        <p className="mt-1 text-sm text-muted">{messages.settingsManager.areaFeeHint}</p>
         <div className="mt-3 grid gap-4 sm:grid-cols-2">
           {form.areas.map((area) => (
             <div key={area.id}>
               <label className="label">{area.nama}</label>
               <div className="relative">
                 <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted">
-                  Rp
+                  {messages.settingsManager.currencyPrefix}
                 </span>
                 <input
                   type="number"
@@ -248,7 +261,7 @@ export default function SettingsManager({ onUnauthorized }) {
                 />
               </div>
               <p className="mt-1 text-right text-xs text-muted">
-                {Number(area.fee) > 0 ? formatRupiah(Number(area.fee)) : 'Gratis'}
+                {Number(area.fee) > 0 ? formatRupiah(Number(area.fee)) : messages.settingsManager.freeFee}
               </p>
             </div>
           ))}
@@ -256,32 +269,32 @@ export default function SettingsManager({ onUnauthorized }) {
       </section>
 
       <section className="rounded-2xl border border-rose-line bg-white p-5">
-        <h3 className="font-semibold text-ink">Link Sosial Media</h3>
-        <p className="mt-1 text-sm text-muted">Muncul sebagai ikon di footer. Kosongkan untuk sembunyikan.</p>
+        <h3 className="font-semibold text-ink">{messages.settingsManager.socialTitle}</h3>
+        <p className="mt-1 text-sm text-muted">{messages.settingsManager.socialHint}</p>
         <div className="mt-3 grid gap-3">
           <div>
-            <label className="label">Instagram (URL)</label>
+            <label className="label">{messages.settingsManager.instagramLabel}</label>
             <input
               className="field"
-              placeholder="https://instagram.com/saliamakeup"
+              placeholder={messages.settingsManager.instagramPlaceholder}
               value={form.social.instagram}
               onChange={(event) => setSocial('instagram', event.target.value)}
             />
           </div>
           <div>
-            <label className="label">TikTok (URL)</label>
+            <label className="label">{messages.settingsManager.tiktokLabel}</label>
             <input
               className="field"
-              placeholder="https://tiktok.com/@saliamakeup"
+              placeholder={messages.settingsManager.tiktokPlaceholder}
               value={form.social.tiktok}
               onChange={(event) => setSocial('tiktok', event.target.value)}
             />
           </div>
           <div>
-            <label className="label">Google Business Profile (URL)</label>
+            <label className="label">{messages.settingsManager.googleLabel}</label>
             <input
               className="field"
-              placeholder="https://g.page/..."
+              placeholder={messages.settingsManager.googlePlaceholder}
               value={form.social.google}
               onChange={(event) => setSocial('google', event.target.value)}
             />
@@ -293,7 +306,12 @@ export default function SettingsManager({ onUnauthorized }) {
 
       <div className="flex items-center gap-3">
         <button onClick={save} disabled={busy} className="btn-primary px-5 disabled:opacity-60">
-          <Save size={16} /> {saved ? 'Tersimpan' : busy ? 'Menyimpan…' : 'Simpan pengaturan'}
+          <Save size={16} />{' '}
+          {saved
+            ? messages.settingsManager.saved
+            : busy
+              ? messages.settingsManager.saving
+              : messages.settingsManager.save}
         </button>
       </div>
     </div>
@@ -314,25 +332,29 @@ function EmailPreview({ onUnauthorized }) {
       setData(await fetchEmailPreview());
     } catch (e) {
       if (e instanceof UnauthorizedError) onUnauthorized?.();
-      else setStatusMessage('Gagal memuat preview.');
+      else setStatusMessage(messages.emailPreview.loadError);
     } finally {
       setLoading(false);
     }
   }
 
   async function test() {
-    if (!recipient.trim()) return setStatusMessage('Isi email tujuan dulu.');
+    if (!recipient.trim()) return setStatusMessage(messages.emailPreview.missingRecipient);
     setSending(true);
     setStatusMessage('');
     try {
       const result = await sendTestEmail(recipient.trim());
-      if (result?.ok) setStatusMessage('Email tes terkirim ✓');
-      else if (result?.skipped)
-        setStatusMessage('Resend belum diaktifkan (set RESEND_API_KEY + RESEND_FROM). Preview tetap bisa dilihat.');
-      else setStatusMessage(`Gagal kirim: ${result?.error || 'coba lagi'}`);
+      if (result?.ok) setStatusMessage(messages.emailPreview.testSent);
+      else if (result?.skipped) setStatusMessage(messages.emailPreview.resendSkipped);
+      else
+        setStatusMessage(
+          formatMessage(messages.emailPreview.sendFailed, {
+            error: result?.error || messages.emailPreview.sendFailedFallback,
+          }),
+        );
     } catch (e) {
       if (e instanceof UnauthorizedError) onUnauthorized?.();
-      else setStatusMessage('Gagal kirim email tes.');
+      else setStatusMessage(messages.emailPreview.testError);
     } finally {
       setSending(false);
     }
@@ -341,11 +363,9 @@ function EmailPreview({ onUnauthorized }) {
   return (
     <section className="rounded-2xl border border-rose-line bg-white p-5">
       <h3 className="flex items-center gap-2 font-semibold text-ink">
-        <Mail size={17} className="text-rose" /> Email pelanggan
+        <Mail size={17} className="text-rose" /> {messages.emailPreview.title}
       </h3>
-      <p className="mt-1 text-sm text-muted">
-        Struk + kebijakan + persiapan H-1. Lihat desainnya dulu sebelum diaktifkan.
-      </p>
+      <p className="mt-1 text-sm text-muted">{messages.emailPreview.hint}</p>
 
       <div className="mt-3 flex flex-wrap items-center gap-2">
         <button
@@ -355,11 +375,11 @@ function EmailPreview({ onUnauthorized }) {
           className="btn-outline px-4 py-2 text-sm disabled:opacity-60"
         >
           {loading ? <Loader2 size={15} className="animate-spin" /> : <Mail size={15} />}{' '}
-          {data ? 'Muat ulang preview' : 'Lihat preview'}
+          {data ? messages.emailPreview.reloadPreview : messages.emailPreview.showPreview}
         </button>
         {data && (
           <span className={`text-xs ${data.emailConfigured ? 'text-green-600' : 'text-muted'}`}>
-            {data.emailConfigured ? 'Resend aktif' : 'Resend belum aktif'}
+            {data.emailConfigured ? messages.emailPreview.resendActive : messages.emailPreview.resendInactive}
           </span>
         )}
       </div>
@@ -367,20 +387,20 @@ function EmailPreview({ onUnauthorized }) {
       {data && (
         <>
           <div className="mt-3 text-xs text-muted">
-            Subject: <span className="font-medium text-ink">{data.subject}</span>
+            {messages.emailPreview.subjectLabel} <span className="font-medium text-ink">{data.subject}</span>
           </div>
           <iframe
-            title="Preview email"
+            title={messages.emailPreview.iframeTitle}
             srcDoc={data.html}
             className="mt-2 h-[520px] w-full rounded-xl border border-rose-line bg-white"
           />
           <div className="mt-3 flex flex-wrap items-end gap-2">
             <div className="flex-1 min-w-[200px]">
-              <label className="label">Kirim tes ke email</label>
+              <label className="label">{messages.emailPreview.recipientLabel}</label>
               <input
                 className="field"
                 type="email"
-                placeholder="email@kamu.com"
+                placeholder={messages.emailPreview.recipientPlaceholder}
                 value={recipient}
                 onChange={(event) => setRecipient(event.target.value)}
               />
@@ -391,7 +411,8 @@ function EmailPreview({ onUnauthorized }) {
               disabled={sending}
               className="btn-primary px-4 py-2.5 text-sm disabled:opacity-60"
             >
-              {sending ? <Loader2 size={15} className="animate-spin" /> : <Send size={15} />} Kirim tes
+              {sending ? <Loader2 size={15} className="animate-spin" /> : <Send size={15} />}{' '}
+              {messages.emailPreview.sendTest}
             </button>
           </div>
         </>

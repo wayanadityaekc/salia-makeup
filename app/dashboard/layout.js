@@ -1,14 +1,15 @@
 import RegisterSW from '@/components/pwa/RegisterSW';
 import InstallPrompt from '@/components/pwa/InstallPrompt';
+import messages from '@/messages/id/dashboard.json';
 
 export const metadata = {
-  applicationName: 'Salia Admin',
-  title: 'Salia Admin',
+  applicationName: messages.dashboardLayout.applicationName,
+  title: messages.dashboardLayout.title,
   robots: { index: false, follow: false },
   manifest: '/manifest.webmanifest',
   appleWebApp: {
     capable: true,
-    title: 'Salia Admin',
+    title: messages.dashboardLayout.appleWebAppTitle,
     statusBarStyle: 'default',
   },
   other: {

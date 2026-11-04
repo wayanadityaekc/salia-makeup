@@ -1,0 +1,90 @@
+{
+  "dashboardLayout": {
+    "applicationName": "Salia Admin",
+    "title": "Salia Admin",
+    "appleWebAppTitle": "Salia Admin"
+  },
+  "dashboardPage": {
+    "statusLabels": {
+      "baru": "Baru",
+      "konfirmasi": "Dikonfirmasi",
+      "selesai": "Selesai"
+    },
+    "tabs": {
+      "booking": { "label": "Booking", "short": "Booking" },
+      "chat": { "label": "Chat", "short": "Chat" },
+      "income": { "label": "Income", "short": "Income" },
+      "layanan": { "label": "Layanan", "short": "Layanan" },
+      "galeri": { "label": "Galeri", "short": "Galeri" },
+      "pengaturan": { "label": "Pengaturan", "short": "Atur" }
+    },
+    "ranges": {
+      "semua": "Semua",
+      "minggu": "Minggu ini",
+      "bulan": "Bulan ini",
+      "tahun": "Tahun ini"
+    },
+    "sessionExpired": "Sesi berakhir. Masuk lagi ya.",
+    "loadFailed": "Gagal memuat data. Coba muat ulang.",
+    "wrongPassword": "Password salah.",
+    "loginFailed": "Gagal masuk. Coba lagi.",
+    "confirmDelete": "Hapus booking ini?",
+    "loginTitle": "Dashboard {brand}",
+    "loginSubtitle": "Khusus admin. Masukkan password.",
+    "passwordPlaceholder": "Password",
+    "checking": "Memeriksa…",
+    "login": "Masuk",
+    "headerTitle": "{brand} · Admin",
+    "logout": "Keluar",
+    "statTotal": "Total booking",
+    "statNeedsAction": "Perlu ditangani",
+    "statIncome": "Pendapatan (selesai)",
+    "searchPlaceholder": "Cari nama / layanan…",
+    "loading": "Memuat…",
+    "empty": "Belum ada booking.",
+    "hairdoSuffix": " + Hairdo",
+    "peopleCount": " · {count} orang",
+    "scheduleLine": "{date} · ready {time} · {phone}",
+    "instagram": " · IG @{instagram}",
+    "note": "“{note}”",
+    "viewProof": "Lihat bukti transfer →",
+    "whatsappMessage": "Halo {name}, terima kasih sudah booking di {brand}.",
+    "chatClient": "Chat klien",
+    "confirm": "Konfirmasi",
+    "complete": "Selesai",
+    "delete": "Hapus",
+    "navAriaLabel": "Navigasi dashboard"
+  },
+  "bookingLinks": {
+    "missingDate": "Pilih tanggal yang disetujui.",
+    "createFailed": "Gagal membuat link. Coba lagi.",
+    "stateUsed": "Terpakai",
+    "stateExpired": "Kedaluwarsa",
+    "stateActive": "Aktif",
+    "title": "Link booking (magic link)",
+    "description": "Setelah cek tanggal available di WhatsApp, buat link ini & kirim ke pelanggan. Sekali pakai, terkunci ke tanggalnya.",
+    "approvedDate": "Tanggal disetujui",
+    "validDays": "Berlaku (hari)",
+    "create": "Buat link",
+    "expires": "exp {date}",
+    "copied": "Tersalin",
+    "copy": "Salin link"
+  },
+  "incomeTracker": {
+    "compactMillion": "{value}jt",
+    "compactThousand": "{value}rb",
+    "loadFailed": "Gagal memuat data.",
+    "loading": "Memuat…",
+    "statTotal": "Total pendapatan",
+    "statTotalHint": "dari booking selesai",
+    "statThisMonth": "Bulan ini",
+    "statCompleted": "Booking selesai",
+    "statUpcoming": "Akan datang",
+    "statUpcomingHint": "terkonfirmasi, belum selesai",
+    "chartTitle": "Pendapatan per bulan",
+    "chartSubtitle": "termasuk ongkir · {months} bulan terakhir",
+    "chartEmpty": "Belum ada booking selesai. Grafik muncul setelah ada booking yang ditandai “Selesai”.",
+    "tooltipLabel": "Pendapatan",
+    "ongkirCollected": "Ongkir terkumpul (selesai):"
+  }
+}

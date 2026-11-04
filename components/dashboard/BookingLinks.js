@@ -5,6 +5,8 @@ import { LinkIcon, Copy, Check, Loader2, Plus } from 'lucide-react';
 import { formatTanggal } from '@/lib/utils';
 import { createBookingToken, fetchBookingTokens, UnauthorizedError } from '@/lib/storage';
 import DatePicker from '@/components/ui/DatePicker';
+import { formatMessage } from '@/lib/formatMessage';
+import messages from '@/messages/id/dashboard.json';
 
 export default function BookingLinks({ onUnauthorized }) {
   const [tanggal, setTanggal] = useState('');
@@ -31,7 +33,7 @@ export default function BookingLinks({ onUnauthorized }) {
   }, []);
 
   async function create() {
-    if (!tanggal) return setError('Pilih tanggal yang disetujui.');
+    if (!tanggal) return setError(messages.bookingLinks.missingDate);
     setError('');
     setBusy(true);
     try {
@@ -40,7 +42,7 @@ export default function BookingLinks({ onUnauthorized }) {
       await loadBookingTokens();
     } catch (e) {
       if (e instanceof UnauthorizedError) onUnauthorized?.();
-      else setError('Gagal membuat link. Coba lagi.');
+      else setError(messages.bookingLinks.createFailed);
     } finally {
       setBusy(false);
     }
@@ -55,28 +57,26 @@ export default function BookingLinks({ onUnauthorized }) {
   }
 
   function state(bookingToken) {
-    if (bookingToken.used_at) return { label: 'Terpakai', cls: 'bg-ink/10 text-ink' };
-    if (new Date(bookingToken.expires_at) < new Date()) return { label: 'Kedaluwarsa', cls: 'bg-rose-soft text-rose' };
-    return { label: 'Aktif', cls: 'bg-green-100 text-green-700' };
+    if (bookingToken.used_at) return { label: messages.bookingLinks.stateUsed, cls: 'bg-ink/10 text-ink' };
+    if (new Date(bookingToken.expires_at) < new Date())
+      return { label: messages.bookingLinks.stateExpired, cls: 'bg-rose-soft text-rose' };
+    return { label: messages.bookingLinks.stateActive, cls: 'bg-green-100 text-green-700' };
   }
 
   return (
     <section className="rounded-2xl border border-rose-line bg-white p-5">
       <h3 className="flex items-center gap-2 font-semibold text-ink">
-        <LinkIcon size={17} className="text-rose" /> Link booking (magic link)
+        <LinkIcon size={17} className="text-rose" /> {messages.bookingLinks.title}
       </h3>
-      <p className="mt-1 text-sm text-muted">
-        Setelah cek tanggal available di WhatsApp, buat link ini & kirim ke pelanggan. Sekali pakai, terkunci ke
-        tanggalnya.
-      </p>
+      <p className="mt-1 text-sm text-muted">{messages.bookingLinks.description}</p>
 
       <div className="mt-4 flex flex-wrap items-end gap-3">
         <div className="min-w-[180px]">
-          <label className="label">Tanggal disetujui</label>
+          <label className="label">{messages.bookingLinks.approvedDate}</label>
           <DatePicker value={tanggal} onChange={setTanggal} />
         </div>
         <div className="w-28">
-          <label className="label">Berlaku (hari)</label>
+          <label className="label">{messages.bookingLinks.validDays}</label>
           <input
             type="number"
             min="1"
@@ -87,7 +87,7 @@ export default function BookingLinks({ onUnauthorized }) {
           />
         </div>
         <button onClick={create} disabled={busy} className="btn-primary px-4 py-2.5 text-sm disabled:opacity-60">
-          {busy ? <Loader2 size={15} className="animate-spin" /> : <Plus size={15} />} Buat link
+          {busy ? <Loader2 size={15} className="animate-spin" /> : <Plus size={15} />} {messages.bookingLinks.create}
         </button>
       </div>
       {error && <p className="mt-2 text-sm text-rose">{error}</p>}
@@ -106,7 +106,9 @@ export default function BookingLinks({ onUnauthorized }) {
                   {tokenState.label}
                 </span>
                 <span className="text-sm font-medium text-ink">{formatTanggal(bookingToken.tanggal)}</span>
-                <span className="text-xs text-muted">exp {formatTanggal(bookingToken.expires_at)}</span>
+                <span className="text-xs text-muted">
+                  {formatMessage(messages.bookingLinks.expires, { date: formatTanggal(bookingToken.expires_at) })}
+                </span>
                 <button
                   onClick={() => copy(bookingToken.token, url)}
                   disabled={bookingToken.used_at || new Date(bookingToken.expires_at) < new Date()}
@@ -114,11 +116,11 @@ export default function BookingLinks({ onUnauthorized }) {
                 >
                   {copied === bookingToken.token ? (
                     <>
-                      <Check size={13} /> Tersalin
+                      <Check size={13} /> {messages.bookingLinks.copied}
                     </>
                   ) : (
                     <>
-                      <Copy size={13} /> Salin link
+                      <Copy size={13} /> {messages.bookingLinks.copy}
                     </>
                   )}
                 </button>

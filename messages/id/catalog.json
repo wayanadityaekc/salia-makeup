@@ -1,0 +1,70 @@
+{
+  "serviceKinds": {
+    "makeup": "Make Up",
+    "hairdo": "Hairdo",
+    "nail": "Nail Art"
+  },
+  "servicesManager": {
+    "requestError": "Terjadi kesalahan. Coba lagi.",
+    "loading": "Memuat…"
+  },
+  "serviceGroup": {
+    "empty": "Belum ada layanan."
+  },
+  "serviceRow": {
+    "saveError": "Gagal menyimpan. Coba lagi.",
+    "confirmDelete": "Hapus layanan \"{name}\"?",
+    "noPhoto": "Belum ada foto",
+    "replacePhoto": "Ganti",
+    "uploadPhoto": "Upload",
+    "removePhoto": "Hapus foto",
+    "nameLabel": "Nama",
+    "priceLabel": "Harga (Rp)",
+    "summaryLabel": "Deskripsi singkat",
+    "descriptionLabel": "Deskripsi lengkap (tampil di card)",
+    "descriptionPlaceholder": "Penjelasan lebih panjang tentang layanan ini.",
+    "detailLabel": "Detail (maks 5 poin)",
+    "detailPointPlaceholder": "Poin {number}",
+    "firstDetailPointPlaceholder": "Poin {number} (mis. Termasuk konsultasi look)",
+    "infoLabel": "Detail produk (tampil di popup)",
+    "infoPlaceholder": "Info produk yang dipakai, brand, ketahanan, syarat, dll.",
+    "visibleOnSite": "Tampil di web",
+    "hidden": "disembunyikan",
+    "saved": "Tersimpan",
+    "save": "Simpan"
+  },
+  "addService": {
+    "nameExists": "Nama layanan sudah ada.",
+    "addError": "Gagal menambah layanan.",
+    "open": "Tambah layanan",
+    "categoryLabel": "Kategori",
+    "nameLabel": "Nama layanan",
+    "namePlaceholder": "mis. Prewedding",
+    "priceLabel": "Harga (Rp)",
+    "pricePlaceholder": "0",
+    "summaryLabel": "Deskripsi singkat",
+    "summaryPlaceholder": "opsional",
+    "saving": "Menyimpan…",
+    "save": "Simpan",
+    "cancel": "Batal",
+    "photoHint": "Foto bisa ditambahkan setelah layanan dibuat."
+  },
+  "galleryManager": {
+    "requestError": "Terjadi kesalahan. Coba lagi.",
+    "confirmDelete": "Hapus foto ini?",
+    "intro": "Foto yang tampil di halaman Galeri & Nail Art.",
+    "addPhoto": "Tambah foto",
+    "empty": "Belum ada foto. Klik “Tambah foto”.",
+    "photoAlt": "Foto",
+    "removePhoto": "Hapus foto",
+    "loading": "Memuat…"
+  },
+  "imageUpload": {
+    "defaultLabel": "Upload foto",
+    "notConfigured": "Upload belum aktif (set Cloudinary di server).",
+    "uploadError": "Gagal upload foto.",
+    "preparing": "Menyiapkan foto…",
+    "processing": "Memproses…",
+    "uploading": "Mengupload… {percent}%"
+  }
+}

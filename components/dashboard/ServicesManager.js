@@ -6,6 +6,8 @@ import { formatRupiah } from '@/lib/utils';
 import Select from '@/components/ui/Select';
 import { fetchServicesAdmin, createService, updateService, deleteService, UnauthorizedError } from '@/lib/storage';
 import ImageUpload from './ImageUpload';
+import { formatMessage } from '@/lib/formatMessage';
+import messages from '@/messages/id/catalog.json';
 
 export default function ServicesManager({ onUnauthorized }) {
   const [groups, setGroups] = useState({ services: [], hairdo: [], nailArt: [] });
@@ -14,7 +16,7 @@ export default function ServicesManager({ onUnauthorized }) {
 
   function handleRequestError(requestError) {
     if (requestError instanceof UnauthorizedError) onUnauthorized?.();
-    else setError('Terjadi kesalahan. Coba lagi.');
+    else setError(messages.servicesManager.requestError);
   }
 
   async function refresh() {
@@ -39,11 +41,26 @@ export default function ServicesManager({ onUnauthorized }) {
       {error && <p className="text-sm text-rose">{error}</p>}
       <AddService onDone={refresh} onUnauthorized={onUnauthorized} />
 
-      <Group title="Make Up" items={groups.services} onChange={refresh} onUnauthorized={onUnauthorized} />
-      <Group title="Hairdo" items={groups.hairdo} onChange={refresh} onUnauthorized={onUnauthorized} />
-      <Group title="Nail Art" items={groups.nailArt} onChange={refresh} onUnauthorized={onUnauthorized} />
+      <Group
+        title={messages.serviceKinds.makeup}
+        items={groups.services}
+        onChange={refresh}
+        onUnauthorized={onUnauthorized}
+      />
+      <Group
+        title={messages.serviceKinds.hairdo}
+        items={groups.hairdo}
+        onChange={refresh}
+        onUnauthorized={onUnauthorized}
+      />
+      <Group
+        title={messages.serviceKinds.nail}
+        items={groups.nailArt}
+        onChange={refresh}
+        onUnauthorized={onUnauthorized}
+      />
 
-      {loading && <p className="text-sm text-muted">Memuat…</p>}
+      {loading && <p className="text-sm text-muted">{messages.servicesManager.loading}</p>}
     </div>
   );
 }
@@ -53,7 +70,7 @@ function Group({ title, items, onChange, onUnauthorized }) {
     <div>
       <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-muted">{title}</h3>
       <div className="space-y-3">
-        {items.length === 0 && <p className="text-sm text-muted">Belum ada layanan.</p>}
+        {items.length === 0 && <p className="text-sm text-muted">{messages.serviceGroup.empty}</p>}
         {items.map((service) => (
           <ServiceRow key={service.id} svc={service} onChange={onChange} onUnauthorized={onUnauthorized} />
         ))}
@@ -105,7 +122,7 @@ function ServiceRow({ svc: service, onChange, onUnauthorized }) {
 
   function handleRequestError(requestError) {
     if (requestError instanceof UnauthorizedError) onUnauthorized?.();
-    else alert('Gagal menyimpan. Coba lagi.');
+    else alert(messages.serviceRow.saveError);
   }
 
   async function save() {
@@ -130,7 +147,7 @@ function ServiceRow({ svc: service, onChange, onUnauthorized }) {
   }
 
   async function remove() {
-    if (!confirm(`Hapus layanan "${service.nama}"?`)) return;
+    if (!confirm(formatMessage(messages.serviceRow.confirmDelete, { name: service.nama }))) return;
     setBusy(true);
     try {
       await deleteService(service.id);
@@ -149,18 +166,18 @@ function ServiceRow({ svc: service, onChange, onUnauthorized }) {
             {form.foto ? (
               <img src={form.foto} alt={form.nama} className="h-full w-full object-cover" />
             ) : (
-              <div className="foto-ph h-full w-full text-xs">Belum ada foto</div>
+              <div className="foto-ph h-full w-full text-xs">{messages.serviceRow.noPhoto}</div>
             )}
           </div>
           <div className="mt-2 flex flex-wrap items-center gap-2">
             <ImageUpload
               onUploaded={(url) => set('foto', url)}
               onUnauthorized={onUnauthorized}
-              label={form.foto ? 'Ganti' : 'Upload'}
+              label={form.foto ? messages.serviceRow.replacePhoto : messages.serviceRow.uploadPhoto}
             />
             {form.foto && (
               <button type="button" onClick={() => set('foto', '')} className="text-xs text-muted hover:text-rose">
-                Hapus foto
+                {messages.serviceRow.removePhoto}
               </button>
             )}
           </div>
@@ -169,11 +186,11 @@ function ServiceRow({ svc: service, onChange, onUnauthorized }) {
         <div className="flex-1 space-y-3">
           <div className="grid gap-3 sm:grid-cols-2">
             <div>
-              <label className="label">Nama</label>
+              <label className="label">{messages.serviceRow.nameLabel}</label>
               <input className="field" value={form.nama} onChange={(event) => set('nama', event.target.value)} />
             </div>
             <div>
-              <label className="label">Harga (Rp)</label>
+              <label className="label">{messages.serviceRow.priceLabel}</label>
               <input
                 type="number"
                 min="0"
@@ -185,21 +202,21 @@ function ServiceRow({ svc: service, onChange, onUnauthorized }) {
             </div>
           </div>
           <div>
-            <label className="label">Deskripsi singkat</label>
+            <label className="label">{messages.serviceRow.summaryLabel}</label>
             <input className="field" value={form.ringkas} onChange={(event) => set('ringkas', event.target.value)} />
           </div>
           <div>
-            <label className="label">Deskripsi lengkap (tampil di card)</label>
+            <label className="label">{messages.serviceRow.descriptionLabel}</label>
             <textarea
               rows={3}
               className="field resize-none"
               value={form.deskripsi}
               onChange={(event) => set('deskripsi', event.target.value)}
-              placeholder="Penjelasan lebih panjang tentang layanan ini."
+              placeholder={messages.serviceRow.descriptionPlaceholder}
             />
           </div>
           <div>
-            <label className="label">Detail (maks 5 poin)</label>
+            <label className="label">{messages.serviceRow.detailLabel}</label>
             <div className="space-y-2">
               {detailRows.map((rowValue, index) => (
                 <div key={index} className="flex items-center gap-2">
@@ -208,20 +225,25 @@ function ServiceRow({ svc: service, onChange, onUnauthorized }) {
                     className="field"
                     value={rowValue}
                     onChange={(event) => setDetailRow(index, event.target.value)}
-                    placeholder={`Poin ${index + 1}${index === 0 ? ' (mis. Termasuk konsultasi look)' : ''}`}
+                    placeholder={formatMessage(
+                      index === 0
+                        ? messages.serviceRow.firstDetailPointPlaceholder
+                        : messages.serviceRow.detailPointPlaceholder,
+                      { number: index + 1 },
+                    )}
                   />
                 </div>
               ))}
             </div>
           </div>
           <div>
-            <label className="label">Detail produk (tampil di popup)</label>
+            <label className="label">{messages.serviceRow.infoLabel}</label>
             <textarea
               rows={3}
               className="field resize-none"
               value={form.info}
               onChange={(event) => set('info', event.target.value)}
-              placeholder="Info produk yang dipakai, brand, ketahanan, syarat, dll."
+              placeholder={messages.serviceRow.infoPlaceholder}
             />
           </div>
 
@@ -233,17 +255,17 @@ function ServiceRow({ svc: service, onChange, onUnauthorized }) {
                 checked={form.active}
                 onChange={(event) => set('active', event.target.checked)}
               />
-              Tampil di web
+              {messages.serviceRow.visibleOnSite}
             </label>
             {!form.active && (
               <span className="inline-flex items-center gap-1 text-xs text-muted">
-                <EyeOff size={12} /> disembunyikan
+                <EyeOff size={12} /> {messages.serviceRow.hidden}
               </span>
             )}
 
             <div className="ml-auto flex items-center gap-2">
               <button onClick={save} disabled={busy} className="btn-primary px-4 py-2 text-sm disabled:opacity-60">
-                <Save size={15} /> {saved ? 'Tersimpan' : 'Simpan'}
+                <Save size={15} /> {saved ? messages.serviceRow.saved : messages.serviceRow.save}
               </button>
               <button
                 onClick={remove}
@@ -281,7 +303,7 @@ function AddService({ onDone, onUnauthorized }) {
       onDone();
     } catch (e) {
       if (e instanceof UnauthorizedError) onUnauthorized?.();
-      else alert(e?.data?.error === 'id_exists' ? 'Nama layanan sudah ada.' : 'Gagal menambah layanan.');
+      else alert(e?.data?.error === 'id_exists' ? messages.addService.nameExists : messages.addService.addError);
     } finally {
       setBusy(false);
     }
@@ -290,7 +312,7 @@ function AddService({ onDone, onUnauthorized }) {
   if (!open) {
     return (
       <button onClick={() => setOpen(true)} className="btn-outline px-4 py-2 text-sm">
-        <Plus size={16} /> Tambah layanan
+        <Plus size={16} /> {messages.addService.open}
       </button>
     );
   }
@@ -299,56 +321,56 @@ function AddService({ onDone, onUnauthorized }) {
     <form onSubmit={handleSubmit} className="rounded-2xl border border-rose-line bg-white p-5">
       <div className="grid gap-3 sm:grid-cols-2">
         <div>
-          <label className="label">Kategori</label>
+          <label className="label">{messages.addService.categoryLabel}</label>
           <Select
             value={form.kind}
             onChange={(value) => setForm({ ...form, kind: value })}
             options={[
-              { value: 'makeup', label: 'Make Up' },
-              { value: 'hairdo', label: 'Hairdo' },
-              { value: 'nail', label: 'Nail Art' },
+              { value: 'makeup', label: messages.serviceKinds.makeup },
+              { value: 'hairdo', label: messages.serviceKinds.hairdo },
+              { value: 'nail', label: messages.serviceKinds.nail },
             ]}
           />
         </div>
         <div>
-          <label className="label">Nama layanan</label>
+          <label className="label">{messages.addService.nameLabel}</label>
           <input
             className="field"
             value={form.nama}
             onChange={(event) => setForm({ ...form, nama: event.target.value })}
-            placeholder="mis. Prewedding"
+            placeholder={messages.addService.namePlaceholder}
           />
         </div>
         <div>
-          <label className="label">Harga (Rp)</label>
+          <label className="label">{messages.addService.priceLabel}</label>
           <input
             type="number"
             min="0"
             className="field"
             value={form.base}
             onChange={(event) => setForm({ ...form, base: event.target.value })}
-            placeholder="0"
+            placeholder={messages.addService.pricePlaceholder}
           />
         </div>
         <div>
-          <label className="label">Deskripsi singkat</label>
+          <label className="label">{messages.addService.summaryLabel}</label>
           <input
             className="field"
             value={form.ringkas}
             onChange={(event) => setForm({ ...form, ringkas: event.target.value })}
-            placeholder="opsional"
+            placeholder={messages.addService.summaryPlaceholder}
           />
         </div>
       </div>
       <div className="mt-4 flex gap-2">
         <button type="submit" disabled={busy} className="btn-primary px-4 py-2 text-sm disabled:opacity-60">
-          {busy ? 'Menyimpan…' : 'Simpan'}
+          {busy ? messages.addService.saving : messages.addService.save}
         </button>
         <button type="button" onClick={() => setOpen(false)} className="btn-outline px-4 py-2 text-sm">
-          Batal
+          {messages.addService.cancel}
         </button>
       </div>
-      <p className="mt-2 text-xs text-muted">Foto bisa ditambahkan setelah layanan dibuat.</p>
+      <p className="mt-2 text-xs text-muted">{messages.addService.photoHint}</p>
     </form>
   );
 }

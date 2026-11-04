@@ -34,20 +34,52 @@ import IncomeTracker from '@/components/dashboard/IncomeTracker';
 import ChatManager from '@/components/dashboard/ChatManager';
 import BookingLinks from '@/components/dashboard/BookingLinks';
 import NotifyToggle from '@/components/pwa/NotifyToggle';
+import { formatMessage } from '@/lib/formatMessage';
+import messages from '@/messages/id/dashboard.json';
 
 const STATUS = {
-  baru: { label: 'Baru', cls: 'bg-rose text-white' },
-  konfirmasi: { label: 'Dikonfirmasi', cls: 'bg-rose-soft text-rose' },
-  selesai: { label: 'Selesai', cls: 'bg-ink/10 text-ink' },
+  baru: { label: messages.dashboardPage.statusLabels.baru, cls: 'bg-rose text-white' },
+  konfirmasi: { label: messages.dashboardPage.statusLabels.konfirmasi, cls: 'bg-rose-soft text-rose' },
+  selesai: { label: messages.dashboardPage.statusLabels.selesai, cls: 'bg-ink/10 text-ink' },
 };
 
 const TABS = [
-  { key: 'booking', label: 'Booking', short: 'Booking', Icon: CalendarDays },
-  { key: 'chat', label: 'Chat', short: 'Chat', Icon: MessageSquare },
-  { key: 'income', label: 'Income', short: 'Income', Icon: Wallet },
-  { key: 'layanan', label: 'Layanan', short: 'Layanan', Icon: Sparkles },
-  { key: 'galeri', label: 'Galeri', short: 'Galeri', Icon: Images },
-  { key: 'pengaturan', label: 'Pengaturan', short: 'Atur', Icon: Settings },
+  {
+    key: 'booking',
+    label: messages.dashboardPage.tabs.booking.label,
+    short: messages.dashboardPage.tabs.booking.short,
+    Icon: CalendarDays,
+  },
+  {
+    key: 'chat',
+    label: messages.dashboardPage.tabs.chat.label,
+    short: messages.dashboardPage.tabs.chat.short,
+    Icon: MessageSquare,
+  },
+  {
+    key: 'income',
+    label: messages.dashboardPage.tabs.income.label,
+    short: messages.dashboardPage.tabs.income.short,
+    Icon: Wallet,
+  },
+  {
+    key: 'layanan',
+    label: messages.dashboardPage.tabs.layanan.label,
+    short: messages.dashboardPage.tabs.layanan.short,
+    Icon: Sparkles,
+  },
+  {
+    key: 'galeri',
+    label: messages.dashboardPage.tabs.galeri.label,
+    short: messages.dashboardPage.tabs.galeri.short,
+    Icon: Images,
+  },
+  {
+    key: 'pengaturan',
+    label: messages.dashboardPage.tabs.pengaturan.label,
+    short: messages.dashboardPage.tabs.pengaturan.short,
+    Icon: Settings,
+  },
 ];
 
 export default function DashboardPage() {
@@ -98,7 +130,7 @@ export default function DashboardPage() {
   function handleUnauthorized() {
     clearToken();
     setAuthed(false);
-    setError('Sesi berakhir. Masuk lagi ya.');
+    setError(messages.dashboardPage.sessionExpired);
   }
 
   async function refresh() {
@@ -108,7 +140,7 @@ export default function DashboardPage() {
       setList(await fetchBookings());
     } catch (e) {
       if (e instanceof UnauthorizedError) handleUnauthorized();
-      else setLoadError('Gagal memuat data. Coba muat ulang.');
+      else setLoadError(messages.dashboardPage.loadFailed);
     } finally {
       setLoading(false);
     }
@@ -127,7 +159,9 @@ export default function DashboardPage() {
       setPass('');
       setAuthed(true);
     } catch (e) {
-      setError(e instanceof UnauthorizedError ? 'Password salah.' : 'Gagal masuk. Coba lagi.');
+      setError(
+        e instanceof UnauthorizedError ? messages.dashboardPage.wrongPassword : messages.dashboardPage.loginFailed,
+      );
     } finally {
       setBusy(false);
     }
@@ -148,7 +182,7 @@ export default function DashboardPage() {
     }
   }
   async function hapus(id) {
-    if (!confirm('Hapus booking ini?')) return;
+    if (!confirm(messages.dashboardPage.confirmDelete)) return;
     try {
       await deleteBooking(id);
       await refresh();
@@ -204,18 +238,20 @@ export default function DashboardPage() {
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-rose-soft">
             <Lock className="text-rose" size={22} />
           </div>
-          <h1 className="mt-4 text-center text-xl font-bold text-ink">Dashboard {site.brand}</h1>
-          <p className="mt-1 text-center text-sm text-muted">Khusus admin. Masukkan password.</p>
+          <h1 className="mt-4 text-center text-xl font-bold text-ink">
+            {formatMessage(messages.dashboardPage.loginTitle, { brand: site.brand })}
+          </h1>
+          <p className="mt-1 text-center text-sm text-muted">{messages.dashboardPage.loginSubtitle}</p>
           <input
             type="password"
             value={pass}
             onChange={(event) => setPass(event.target.value)}
-            placeholder="Password"
+            placeholder={messages.dashboardPage.passwordPlaceholder}
             className="field mt-6"
           />
           {error && <p className="mt-2 text-xs text-rose">{error}</p>}
           <button type="submit" disabled={busy} className="btn-primary mt-4 w-full disabled:opacity-60">
-            {busy ? 'Memeriksa…' : 'Masuk'}
+            {busy ? messages.dashboardPage.checking : messages.dashboardPage.login}
           </button>
         </form>
       </div>
@@ -230,9 +266,11 @@ export default function DashboardPage() {
       <div ref={topRef} className="sticky top-0 z-30">
         <header className="border-b border-rose-line bg-white">
           <div className="container-x flex h-16 items-center justify-between">
-            <div className="font-bold text-rose">{site.brand} · Admin</div>
+            <div className="font-bold text-rose">
+              {formatMessage(messages.dashboardPage.headerTitle, { brand: site.brand })}
+            </div>
             <button onClick={logout} className="inline-flex items-center gap-2 text-sm text-muted hover:text-rose">
-              <LogOut size={16} /> Keluar
+              <LogOut size={16} /> {messages.dashboardPage.logout}
             </button>
           </div>
         </header>
@@ -298,18 +336,13 @@ export default function DashboardPage() {
         </div>
 
         <div className="grid gap-4 sm:grid-cols-3">
-          <Stat label="Total booking" value={stats.total} />
-          <Stat label="Perlu ditangani" value={stats.baru} />
-          <Stat label="Pendapatan (selesai)" value={formatRupiah(stats.pendapatan)} />
+          <Stat label={messages.dashboardPage.statTotal} value={stats.total} />
+          <Stat label={messages.dashboardPage.statNeedsAction} value={stats.baru} />
+          <Stat label={messages.dashboardPage.statIncome} value={formatRupiah(stats.pendapatan)} />
         </div>
 
         <div className="mt-6 flex flex-wrap gap-2">
-          {[
-            ['semua', 'Semua'],
-            ['minggu', 'Minggu ini'],
-            ['bulan', 'Bulan ini'],
-            ['tahun', 'Tahun ini'],
-          ].map(([key, label]) => (
+          {Object.entries(messages.dashboardPage.ranges).map(([key, label]) => (
             <button
               key={key}
               onClick={() => setRange(key)}
@@ -343,7 +376,7 @@ export default function DashboardPage() {
             <input
               value={searchQuery}
               onChange={(event) => setSearchQuery(event.target.value)}
-              placeholder="Cari nama / layanan…"
+              placeholder={messages.dashboardPage.searchPlaceholder}
               className="field w-64 pl-9"
             />
           </div>
@@ -357,12 +390,12 @@ export default function DashboardPage() {
           )}
           {loading && list.length === 0 && (
             <div className="rounded-2xl border border-dashed border-rose-line bg-white py-16 text-center text-sm text-muted">
-              Memuat…
+              {messages.dashboardPage.loading}
             </div>
           )}
           {!loading && shown.length === 0 && (
             <div className="rounded-2xl border border-dashed border-rose-line bg-white py-16 text-center text-sm text-muted">
-              Belum ada booking.
+              {messages.dashboardPage.empty}
             </div>
           )}
 
@@ -378,15 +411,24 @@ export default function DashboardPage() {
                   </div>
                   <p className="mt-1 text-sm text-muted">
                     {b.serviceNama}
-                    {b.hairdo ? ' + Hairdo' : ''}
-                    {b.orang > 1 ? ` · ${b.orang} orang` : ''} · {b.areaNama}
+                    {b.hairdo ? messages.dashboardPage.hairdoSuffix : ''}
+                    {b.orang > 1 ? formatMessage(messages.dashboardPage.peopleCount, { count: b.orang }) : ''} ·{' '}
+                    {b.areaNama}
                   </p>
                   <p className="mt-0.5 text-sm text-muted">
-                    {formatTanggal(b.tanggal)} · ready {b.jam} · {b.telepon}
-                    {b.instagram ? ` · IG @${b.instagram}` : ''}
+                    {formatMessage(messages.dashboardPage.scheduleLine, {
+                      date: formatTanggal(b.tanggal),
+                      time: b.jam,
+                      phone: b.telepon,
+                    })}
+                    {b.instagram ? formatMessage(messages.dashboardPage.instagram, { instagram: b.instagram }) : ''}
                     {b.email ? ` · ${b.email}` : ''}
                   </p>
-                  {b.catatan && <p className="mt-1 text-sm text-ink/70">“{b.catatan}”</p>}
+                  {b.catatan && (
+                    <p className="mt-1 text-sm text-ink/70">
+                      {formatMessage(messages.dashboardPage.note, { note: b.catatan })}
+                    </p>
+                  )}
                   {b.proofUrl && (
                     <a
                       href={b.proofUrl}
@@ -394,7 +436,7 @@ export default function DashboardPage() {
                       rel="noopener noreferrer"
                       className="mt-1 inline-block text-sm font-medium text-rose hover:underline"
                     >
-                      Lihat bukti transfer →
+                      {messages.dashboardPage.viewProof}
                     </a>
                   )}
                 </div>
@@ -405,19 +447,22 @@ export default function DashboardPage() {
 
               <div className="mt-4 flex flex-wrap gap-2 border-t border-rose-line pt-4">
                 <a
-                  href={waLink(normalizeWa(b.telepon), `Halo ${b.nama}, terima kasih sudah booking di ${site.brand}.`)}
+                  href={waLink(
+                    normalizeWa(b.telepon),
+                    formatMessage(messages.dashboardPage.whatsappMessage, { name: b.nama, brand: site.brand }),
+                  )}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-1.5 rounded-lg bg-rose-soft px-3 py-1.5 text-xs font-medium text-rose hover:bg-rose-line"
                 >
-                  <MessageCircle size={14} /> Chat klien
+                  <MessageCircle size={14} /> {messages.dashboardPage.chatClient}
                 </a>
                 {b.status !== 'konfirmasi' && b.status !== 'selesai' && (
                   <button
                     onClick={() => setStatus(b.id, 'konfirmasi')}
                     className="inline-flex items-center gap-1.5 rounded-lg border border-rose-line px-3 py-1.5 text-xs font-medium text-ink hover:bg-rose-soft"
                   >
-                    <Check size={14} /> Konfirmasi
+                    <Check size={14} /> {messages.dashboardPage.confirm}
                   </button>
                 )}
                 {b.status !== 'selesai' && (
@@ -425,14 +470,14 @@ export default function DashboardPage() {
                     onClick={() => setStatus(b.id, 'selesai')}
                     className="inline-flex items-center gap-1.5 rounded-lg border border-rose-line px-3 py-1.5 text-xs font-medium text-ink hover:bg-rose-soft"
                   >
-                    <CheckCheck size={14} /> Selesai
+                    <CheckCheck size={14} /> {messages.dashboardPage.complete}
                   </button>
                 )}
                 <button
                   onClick={() => hapus(b.id)}
                   className="ml-auto inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-muted hover:text-rose"
                 >
-                  <Trash2 size={14} /> Hapus
+                  <Trash2 size={14} /> {messages.dashboardPage.delete}
                 </button>
               </div>
             </div>
@@ -444,7 +489,7 @@ export default function DashboardPage() {
         <nav
           className="fixed inset-x-0 bottom-0 z-40 border-t border-rose-line bg-white/95 backdrop-blur-sm"
           style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
-          aria-label="Navigasi dashboard"
+          aria-label={messages.dashboardPage.navAriaLabel}
         >
           <div className="mx-auto flex max-w-content items-stretch justify-around px-2">
             {TABS.map(({ key, short, Icon }) => {

@@ -4,6 +4,8 @@ import { useEffect, useMemo, useState } from 'react';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
 import { formatRupiah } from '@/lib/utils';
 import { fetchBookings, fetchSettings, UnauthorizedError } from '@/lib/storage';
+import { formatMessage } from '@/lib/formatMessage';
+import messages from '@/messages/id/dashboard.json';
 
 const ROSE = '#6B2C3E';
 const LINE = '#EAD9DD';
@@ -16,8 +18,12 @@ function buildMonthKey(date) {
 }
 
 function compact(value) {
-  if (value >= 1_000_000) return `${(value / 1_000_000).toLocaleString('id-ID', { maximumFractionDigits: 1 })}jt`;
-  if (value >= 1_000) return `${Math.round(value / 1_000)}rb`;
+  if (value >= 1_000_000)
+    return formatMessage(messages.incomeTracker.compactMillion, {
+      value: (value / 1_000_000).toLocaleString('id-ID', { maximumFractionDigits: 1 }),
+    });
+  if (value >= 1_000)
+    return formatMessage(messages.incomeTracker.compactThousand, { value: Math.round(value / 1_000) });
   return String(value);
 }
 
@@ -39,7 +45,7 @@ export default function IncomeTracker({ onUnauthorized }) {
         setAreaFee(map);
       } catch (e) {
         if (e instanceof UnauthorizedError) onUnauthorized?.();
-        else setError('Gagal memuat data.');
+        else setError(messages.incomeTracker.loadFailed);
       } finally {
         setLoading(false);
       }
@@ -73,7 +79,7 @@ export default function IncomeTracker({ onUnauthorized }) {
     return { monthly: months, stats: totals };
   }, [bookings, areaFee]);
 
-  if (loading) return <p className="text-sm text-muted">Memuat…</p>;
+  if (loading) return <p className="text-sm text-muted">{messages.incomeTracker.loading}</p>;
   if (error) return <p className="text-sm text-rose">{error}</p>;
 
   const empty = stats.countRealized === 0;
@@ -81,21 +87,29 @@ export default function IncomeTracker({ onUnauthorized }) {
   return (
     <div className="space-y-6">
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <Stat label="Total pendapatan" value={formatRupiah(stats.totalRealized)} hint="dari booking selesai" />
-        <Stat label="Bulan ini" value={formatRupiah(stats.thisMonth)} />
-        <Stat label="Booking selesai" value={stats.countRealized} />
-        <Stat label="Akan datang" value={formatRupiah(stats.upcoming)} hint="terkonfirmasi, belum selesai" />
+        <Stat
+          label={messages.incomeTracker.statTotal}
+          value={formatRupiah(stats.totalRealized)}
+          hint={messages.incomeTracker.statTotalHint}
+        />
+        <Stat label={messages.incomeTracker.statThisMonth} value={formatRupiah(stats.thisMonth)} />
+        <Stat label={messages.incomeTracker.statCompleted} value={stats.countRealized} />
+        <Stat
+          label={messages.incomeTracker.statUpcoming}
+          value={formatRupiah(stats.upcoming)}
+          hint={messages.incomeTracker.statUpcomingHint}
+        />
       </div>
 
       <div className="rounded-2xl border border-rose-line bg-white p-5">
         <div className="flex items-baseline justify-between">
-          <h3 className="font-semibold text-ink">Pendapatan per bulan</h3>
-          <span className="text-xs text-muted">termasuk ongkir · 12 bulan terakhir</span>
+          <h3 className="font-semibold text-ink">{messages.incomeTracker.chartTitle}</h3>
+          <span className="text-xs text-muted">
+            {formatMessage(messages.incomeTracker.chartSubtitle, { months: MONTHS_SHOWN })}
+          </span>
         </div>
         {empty ? (
-          <div className="py-16 text-center text-sm text-muted">
-            Belum ada booking selesai. Grafik muncul setelah ada booking yang ditandai “Selesai”.
-          </div>
+          <div className="py-16 text-center text-sm text-muted">{messages.incomeTracker.chartEmpty}</div>
         ) : (
           <div className="mt-4 h-72 w-full">
             <ResponsiveContainer width="100%" height="100%">
@@ -111,7 +125,7 @@ export default function IncomeTracker({ onUnauthorized }) {
                 />
                 <Tooltip
                   cursor={{ fill: 'rgba(107,44,62,0.06)' }}
-                  formatter={(value) => [formatRupiah(value), 'Pendapatan']}
+                  formatter={(value) => [formatRupiah(value), messages.incomeTracker.tooltipLabel]}
                   contentStyle={{ borderRadius: 12, border: `1px solid ${LINE}`, fontSize: 13 }}
                 />
                 <Bar dataKey="income" fill={ROSE} radius={[4, 4, 0, 0]} maxBarSize={40} />
@@ -120,7 +134,8 @@ export default function IncomeTracker({ onUnauthorized }) {
           </div>
         )}
         <p className="mt-3 text-xs text-muted">
-          Ongkir terkumpul (selesai): <span className="font-semibold text-ink">{formatRupiah(stats.ongkir)}</span>
+          {messages.incomeTracker.ongkirCollected}{' '}
+          <span className="font-semibold text-ink">{formatRupiah(stats.ongkir)}</span>
         </p>
       </div>
     </div>
