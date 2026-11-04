@@ -1,6 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { AnimatePresence, m } from 'motion/react';
+import { backdropMotion, dialogMotion, sheetMotion } from '@/lib/motion';
 import useBodyLock from '@/lib/useBodyLock';
 import { Download, Share, Plus, X, MoreVertical } from 'lucide-react';
 
@@ -83,7 +85,8 @@ export default function InstallPrompt() {
 
   return (
     <>
-      <div
+      <m.div
+        {...sheetMotion}
         className="fixed inset-x-0 bottom-0 z-50 border-t border-rose-line bg-white/95 backdrop-blur-sm"
         style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
       >
@@ -109,65 +112,70 @@ export default function InstallPrompt() {
             <X size={18} />
           </button>
         </div>
-      </div>
+      </m.div>
 
-      {guide && (
-        <div
-          className="fixed inset-0 z-60 flex items-end justify-center bg-ink/40 p-4 sm:items-center"
-          onClick={() => setGuide(false)}
-        >
-          <div
-            className="w-full max-w-sm rounded-3xl border border-rose-line bg-white p-6"
-            style={{ marginBottom: 'env(safe-area-inset-bottom)' }}
-            onClick={(event) => event.stopPropagation()}
+      <AnimatePresence>
+        {guide && (
+          <m.div
+            key="install-guide"
+            {...backdropMotion}
+            className="fixed inset-0 z-60 flex items-end justify-center bg-ink/40 p-4 sm:items-center"
+            onClick={() => setGuide(false)}
           >
-            <div className="flex items-center justify-between">
-              <h2 className="text-base font-bold text-ink">Pasang ke layar utama</h2>
+            <m.div
+              {...dialogMotion}
+              className="w-full max-w-sm rounded-3xl border border-rose-line bg-white p-6"
+              style={{ marginBottom: 'env(safe-area-inset-bottom)' }}
+              onClick={(event) => event.stopPropagation()}
+            >
+              <div className="flex items-center justify-between">
+                <h2 className="text-base font-bold text-ink">Pasang ke layar utama</h2>
+                <button
+                  onClick={() => setGuide(false)}
+                  aria-label="Tutup"
+                  className="rounded-full p-1.5 text-muted hover:bg-rose-soft hover:text-rose"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+
+              {ios ? (
+                <ol className="mt-4 space-y-3">
+                  <Step number={1}>
+                    Ketuk ikon <b>Bagikan</b> <Share size={15} className="mx-0.5 inline align-text-bottom text-rose" />{' '}
+                    di bar Safari.
+                  </Step>
+                  <Step number={2}>
+                    Pilih <b>Add to Home Screen</b>{' '}
+                    <Plus size={15} className="mx-0.5 inline align-text-bottom text-rose" />.
+                  </Step>
+                  <Step number={3}>
+                    Ketuk <b>Add</b> di kanan atas. Selesai, buka Salia dari ikonnya.
+                  </Step>
+                </ol>
+              ) : (
+                <ol className="mt-4 space-y-3">
+                  <Step number={1}>
+                    Buka menu browser <MoreVertical size={15} className="mx-0.5 inline align-text-bottom text-rose" />{' '}
+                    (kanan atas).
+                  </Step>
+                  <Step number={2}>
+                    Pilih <b>Install app</b> atau <b>Add to Home screen</b>.
+                  </Step>
+                  <Step number={3}>Konfirmasi. Buka Salia dari ikonnya.</Step>
+                </ol>
+              )}
+
               <button
                 onClick={() => setGuide(false)}
-                aria-label="Tutup"
-                className="rounded-full p-1.5 text-muted hover:bg-rose-soft hover:text-rose"
+                className="mt-6 w-full rounded-full bg-rose px-4 py-2.5 text-sm font-semibold text-white hover:bg-rose-deep"
               >
-                <X size={18} />
+                Mengerti
               </button>
-            </div>
-
-            {ios ? (
-              <ol className="mt-4 space-y-3">
-                <Step number={1}>
-                  Ketuk ikon <b>Bagikan</b> <Share size={15} className="mx-0.5 inline align-text-bottom text-rose" /> di
-                  bar Safari.
-                </Step>
-                <Step number={2}>
-                  Pilih <b>Add to Home Screen</b>{' '}
-                  <Plus size={15} className="mx-0.5 inline align-text-bottom text-rose" />.
-                </Step>
-                <Step number={3}>
-                  Ketuk <b>Add</b> di kanan atas. Selesai, buka Salia dari ikonnya.
-                </Step>
-              </ol>
-            ) : (
-              <ol className="mt-4 space-y-3">
-                <Step number={1}>
-                  Buka menu browser <MoreVertical size={15} className="mx-0.5 inline align-text-bottom text-rose" />{' '}
-                  (kanan atas).
-                </Step>
-                <Step number={2}>
-                  Pilih <b>Install app</b> atau <b>Add to Home screen</b>.
-                </Step>
-                <Step number={3}>Konfirmasi. Buka Salia dari ikonnya.</Step>
-              </ol>
-            )}
-
-            <button
-              onClick={() => setGuide(false)}
-              className="mt-6 w-full rounded-full bg-rose px-4 py-2.5 text-sm font-semibold text-white hover:bg-rose-deep"
-            >
-              Mengerti
-            </button>
-          </div>
-        </div>
-      )}
+            </m.div>
+          </m.div>
+        )}
+      </AnimatePresence>
     </>
   );
 }

@@ -1,6 +1,7 @@
 import './globals.css';
 import { site } from '@/lib/config';
 import IosZoomFix from '@/components/IosZoomFix';
+import MotionRoot from '@/components/motion/MotionRoot';
 
 export const metadata = {
   title: {
@@ -28,7 +29,7 @@ export default function RootLayout({ children }) {
       </head>
       <body>
         <IosZoomFix />
-        {children}
+        <MotionRoot>{children}</MotionRoot>
       </body>
     </html>
   );

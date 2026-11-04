@@ -1,6 +1,8 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { AnimatePresence, m } from 'motion/react';
+import { dropdownMotion } from '@/lib/motion';
 import { ChevronDown, Check } from 'lucide-react';
 
 export default function Select({
@@ -49,27 +51,31 @@ export default function Select({
         <ChevronDown size={16} className={`shrink-0 text-muted transition ${open ? 'rotate-180' : ''}`} />
       </button>
 
-      {open && (
-        <div
-          role="listbox"
-          className="absolute z-40 mt-1 max-h-64 w-full overflow-auto rounded-xl border border-rose-line bg-white p-1 shadow-lg"
-        >
-          {options.map((option, index) =>
-            option.options ? (
-              <div key={index}>
-                <div className="px-3 pb-1 pt-2 text-xs font-semibold uppercase tracking-wide text-muted">
-                  {option.group}
+      <AnimatePresence>
+        {open && (
+          <m.div
+            key="dropdown"
+            {...dropdownMotion}
+            role="listbox"
+            className="absolute z-40 mt-1 max-h-64 w-full overflow-auto rounded-xl border border-rose-line bg-white p-1 shadow-lg"
+          >
+            {options.map((option, index) =>
+              option.options ? (
+                <div key={index}>
+                  <div className="px-3 pb-1 pt-2 text-xs font-semibold uppercase tracking-wide text-muted">
+                    {option.group}
+                  </div>
+                  {option.options.map((child) => (
+                    <Opt key={child.value} option={child} value={value} onPick={pick} />
+                  ))}
                 </div>
-                {option.options.map((child) => (
-                  <Opt key={child.value} option={child} value={value} onPick={pick} />
-                ))}
-              </div>
-            ) : (
-              <Opt key={option.value} option={option} value={value} onPick={pick} />
-            ),
-          )}
-        </div>
-      )}
+              ) : (
+                <Opt key={option.value} option={option} value={value} onPick={pick} />
+              ),
+            )}
+          </m.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

@@ -1,6 +1,8 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { AnimatePresence, m } from 'motion/react';
+import { backdropMotion, sheetMotion } from '@/lib/motion';
 import useBodyLock from '@/lib/useBodyLock';
 import { MessageCircle, X, Send, Loader2, ArrowLeft, Download } from 'lucide-react';
 import { site } from '@/lib/config';
@@ -159,124 +161,136 @@ export default function ChatWidget() {
     `Halo ${site.brand}, saya mau tanya soal layanan make up / nail art.`,
   );
 
-  if (!open) return null;
-
   return (
-    <>
-      <div className="fixed inset-0 z-60 bg-ink/40" onClick={() => setOpen(false)} aria-hidden />
-      <div className="fixed inset-x-0 bottom-0 z-61 flex justify-center">
-        <div
-          ref={panelRef}
-          className={`flex w-full max-w-lg flex-col overflow-hidden rounded-t-3xl border border-rose-line bg-white shadow-xl animate-[saliaSheetUp_.22s_ease-out] ${view === 'chat' ? 'h-[80dvh]' : ''}`}
-          style={{ paddingBottom: 'env(safe-area-inset-bottom)', maxHeight: 'min(85dvh, 640px)' }}
-        >
-          <div className="flex items-center justify-between bg-rose px-4 py-3 text-white">
-            <div className="flex items-center gap-2">
-              {view === 'chat' && (
-                <button
-                  onClick={() => setView('menu')}
-                  aria-label="Kembali"
-                  className="rounded-full p-0.5 hover:bg-white/15"
-                >
-                  <ArrowLeft size={18} />
-                </button>
-              )}
-              <span className="font-semibold">Chat {site.brand}</span>
-            </div>
-            <button onClick={() => setOpen(false)} aria-label="Tutup" className="rounded-full p-0.5 hover:bg-white/15">
-              <X size={18} />
-            </button>
-          </div>
-
-          {view === 'menu' && (
-            <div className="p-4">
-              <p className="text-sm text-muted">Mau tanya-tanya? Pilih cara ngobrol:</p>
-              <div className="mt-3 grid gap-2">
-                <button
-                  onClick={() => setView('chat')}
-                  className="flex items-center gap-3 rounded-xl border border-rose-line px-4 py-3 text-left hover:bg-rose-soft"
-                >
-                  <Send size={20} className="shrink-0 text-rose" />
-                  <span>
-                    <span className="block text-sm font-semibold text-ink">Chat langsung di web</span>
-                    <span className="block text-xs text-muted">Ngobrol real-time, dibalas di sini</span>
-                  </span>
-                </button>
-                <a
-                  href={waHref}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-3 rounded-xl border border-rose-line px-4 py-3 text-left hover:bg-rose-soft"
-                >
-                  <MessageCircle size={20} className="shrink-0 text-rose" />
-                  <span>
-                    <span className="block text-sm font-semibold text-ink">WhatsApp</span>
-                    <span className="block text-xs text-muted">Lanjut ngobrol di WhatsApp</span>
-                  </span>
-                </a>
-              </div>
-            </div>
-          )}
-
-          {view === 'chat' && (
-            <>
-              <div className="min-h-0 flex-1 space-y-2 overflow-y-auto bg-rose-soft/40 p-4">
-                {messages.length === 0 && (
-                  <p className="py-6 text-center text-xs text-muted">Tulis pesanmu, kami balas secepatnya. 💬</p>
-                )}
-                {messages.map((message) => (
-                  <div
-                    key={message.id}
-                    className={`flex ${message.sender === 'guest' ? 'justify-end' : 'justify-start'}`}
-                  >
-                    <div
-                      className={`max-w-[80%] rounded-2xl px-3 py-2 text-sm ${message.sender === 'guest' ? 'bg-rose text-white' : 'border border-rose-line bg-white text-ink'}`}
-                    >
-                      <Body text={message.body} mine={message.sender === 'guest'} />
-                    </div>
-                  </div>
-                ))}
-                <div ref={bottomRef} />
-              </div>
-
-              <form onSubmit={handleSend} className="border-t border-rose-line p-3">
-                {!nama && messages.length === 0 && (
-                  <input
-                    className="field mb-2"
-                    placeholder="Nama (opsional)"
-                    value={nama}
-                    onChange={(event) => setNama(event.target.value)}
-                  />
-                )}
-                {error && <p className="mb-2 text-xs text-rose">{error}</p>}
-                <div className="flex items-end gap-2">
-                  <textarea
-                    className="field max-h-24 min-h-[42px] flex-1 resize-none py-2.5"
-                    placeholder="Tulis pesan…"
-                    rows={1}
-                    value={text}
-                    onChange={(event) => setText(event.target.value)}
-                    onKeyDown={(event) => {
-                      if (event.key === 'Enter' && !event.shiftKey) {
-                        event.preventDefault();
-                        handleSend(event);
-                      }
-                    }}
-                  />
+    <AnimatePresence>
+      {open && (
+        <m.div
+          key="chat-backdrop"
+          {...backdropMotion}
+          className="fixed inset-0 z-60 bg-ink/40"
+          onClick={() => setOpen(false)}
+          aria-hidden
+        />
+      )}
+      {open && (
+        <m.div key="chat-panel" {...sheetMotion} className="fixed inset-x-0 bottom-0 z-61 flex justify-center">
+          <div
+            ref={panelRef}
+            className={`flex w-full max-w-lg flex-col overflow-hidden rounded-t-3xl border border-rose-line bg-white shadow-xl ${view === 'chat' ? 'h-[80dvh]' : ''}`}
+            style={{ paddingBottom: 'env(safe-area-inset-bottom)', maxHeight: 'min(85dvh, 640px)' }}
+          >
+            <div className="flex items-center justify-between bg-rose px-4 py-3 text-white">
+              <div className="flex items-center gap-2">
+                {view === 'chat' && (
                   <button
-                    type="submit"
-                    disabled={busy || !text.trim()}
-                    aria-label="Kirim"
-                    className="flex h-[42px] w-[42px] shrink-0 items-center justify-center rounded-full bg-rose text-white hover:bg-rose-deep disabled:opacity-50"
+                    onClick={() => setView('menu')}
+                    aria-label="Kembali"
+                    className="rounded-full p-0.5 hover:bg-white/15"
                   >
-                    {busy ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />}
+                    <ArrowLeft size={18} />
                   </button>
+                )}
+                <span className="font-semibold">Chat {site.brand}</span>
+              </div>
+              <button
+                onClick={() => setOpen(false)}
+                aria-label="Tutup"
+                className="rounded-full p-0.5 hover:bg-white/15"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            {view === 'menu' && (
+              <div className="p-4">
+                <p className="text-sm text-muted">Mau tanya-tanya? Pilih cara ngobrol:</p>
+                <div className="mt-3 grid gap-2">
+                  <button
+                    onClick={() => setView('chat')}
+                    className="flex items-center gap-3 rounded-xl border border-rose-line px-4 py-3 text-left hover:bg-rose-soft"
+                  >
+                    <Send size={20} className="shrink-0 text-rose" />
+                    <span>
+                      <span className="block text-sm font-semibold text-ink">Chat langsung di web</span>
+                      <span className="block text-xs text-muted">Ngobrol real-time, dibalas di sini</span>
+                    </span>
+                  </button>
+                  <a
+                    href={waHref}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-3 rounded-xl border border-rose-line px-4 py-3 text-left hover:bg-rose-soft"
+                  >
+                    <MessageCircle size={20} className="shrink-0 text-rose" />
+                    <span>
+                      <span className="block text-sm font-semibold text-ink">WhatsApp</span>
+                      <span className="block text-xs text-muted">Lanjut ngobrol di WhatsApp</span>
+                    </span>
+                  </a>
                 </div>
-              </form>
-            </>
-          )}
-        </div>
-      </div>
-    </>
+              </div>
+            )}
+
+            {view === 'chat' && (
+              <>
+                <div className="min-h-0 flex-1 space-y-2 overflow-y-auto bg-rose-soft/40 p-4">
+                  {messages.length === 0 && (
+                    <p className="py-6 text-center text-xs text-muted">Tulis pesanmu, kami balas secepatnya. 💬</p>
+                  )}
+                  {messages.map((message) => (
+                    <div
+                      key={message.id}
+                      className={`flex ${message.sender === 'guest' ? 'justify-end' : 'justify-start'}`}
+                    >
+                      <div
+                        className={`max-w-[80%] rounded-2xl px-3 py-2 text-sm ${message.sender === 'guest' ? 'bg-rose text-white' : 'border border-rose-line bg-white text-ink'}`}
+                      >
+                        <Body text={message.body} mine={message.sender === 'guest'} />
+                      </div>
+                    </div>
+                  ))}
+                  <div ref={bottomRef} />
+                </div>
+
+                <form onSubmit={handleSend} className="border-t border-rose-line p-3">
+                  {!nama && messages.length === 0 && (
+                    <input
+                      className="field mb-2"
+                      placeholder="Nama (opsional)"
+                      value={nama}
+                      onChange={(event) => setNama(event.target.value)}
+                    />
+                  )}
+                  {error && <p className="mb-2 text-xs text-rose">{error}</p>}
+                  <div className="flex items-end gap-2">
+                    <textarea
+                      className="field max-h-24 min-h-[42px] flex-1 resize-none py-2.5"
+                      placeholder="Tulis pesan…"
+                      rows={1}
+                      value={text}
+                      onChange={(event) => setText(event.target.value)}
+                      onKeyDown={(event) => {
+                        if (event.key === 'Enter' && !event.shiftKey) {
+                          event.preventDefault();
+                          handleSend(event);
+                        }
+                      }}
+                    />
+                    <button
+                      type="submit"
+                      disabled={busy || !text.trim()}
+                      aria-label="Kirim"
+                      className="flex h-[42px] w-[42px] shrink-0 items-center justify-center rounded-full bg-rose text-white hover:bg-rose-deep disabled:opacity-50"
+                    >
+                      {busy ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />}
+                    </button>
+                  </div>
+                </form>
+              </>
+            )}
+          </div>
+        </m.div>
+      )}
+    </AnimatePresence>
   );
 }

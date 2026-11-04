@@ -1,6 +1,8 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { m } from 'motion/react';
+import { backdropMotion, dialogMotion } from '@/lib/motion';
 import { X, Loader2, Mail, ArrowLeft } from 'lucide-react';
 import { useUser } from './UserProvider';
 import useBodyLock from '@/lib/useBodyLock';
@@ -62,11 +64,13 @@ export default function AuthModal({ onClose }) {
   }
 
   return (
-    <div
+    <m.div
+      {...backdropMotion}
       className="fixed inset-0 z-70 flex items-end justify-center bg-ink/50 p-0 sm:items-center sm:p-4"
       onClick={onClose}
     >
-      <div
+      <m.div
+        {...dialogMotion}
         className="w-full max-w-sm overflow-hidden rounded-t-3xl bg-white sm:rounded-3xl"
         style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
         onClick={(event) => event.stopPropagation()}
@@ -154,7 +158,7 @@ export default function AuthModal({ onClose }) {
             </p>
           </form>
         )}
-      </div>
-    </div>
+      </m.div>
+    </m.div>
   );
 }

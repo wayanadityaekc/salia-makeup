@@ -1,6 +1,8 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { AnimatePresence, m } from 'motion/react';
+import { dropdownMotion } from '@/lib/motion';
 import { Calendar, ChevronLeft, ChevronRight } from 'lucide-react';
 
 const BULAN = [
@@ -82,59 +84,65 @@ export default function DatePicker({
         <Calendar size={16} className="shrink-0 text-muted" />
       </button>
 
-      {open && (
-        <div className="absolute z-40 mt-1 w-[18rem] rounded-xl border border-rose-line bg-white p-3 shadow-lg">
-          <div className="flex items-center justify-between px-1">
-            <button
-              type="button"
-              onClick={() => setView(new Date(year, month - 1, 1))}
-              className="rounded-lg p-1.5 text-muted hover:bg-rose-soft"
-            >
-              <ChevronLeft size={18} />
-            </button>
-            <div className="text-sm font-semibold text-ink">
-              {BULAN[month]} {year}
-            </div>
-            <button
-              type="button"
-              onClick={() => setView(new Date(year, month + 1, 1))}
-              className="rounded-lg p-1.5 text-muted hover:bg-rose-soft"
-            >
-              <ChevronRight size={18} />
-            </button>
-          </div>
-          <div className="mt-2 grid grid-cols-7 gap-1 text-center text-xs text-muted">
-            {HARI.map((dayName, index) => (
-              <div key={index} className="py-1">
-                {dayName}
+      <AnimatePresence>
+        {open && (
+          <m.div
+            key="dropdown"
+            {...dropdownMotion}
+            className="absolute z-40 mt-1 w-[18rem] rounded-xl border border-rose-line bg-white p-3 shadow-lg"
+          >
+            <div className="flex items-center justify-between px-1">
+              <button
+                type="button"
+                onClick={() => setView(new Date(year, month - 1, 1))}
+                className="rounded-lg p-1.5 text-muted hover:bg-rose-soft"
+              >
+                <ChevronLeft size={18} />
+              </button>
+              <div className="text-sm font-semibold text-ink">
+                {BULAN[month]} {year}
               </div>
-            ))}
-          </div>
-          <div className="grid grid-cols-7 gap-1">
-            {cells.map((day, index) => {
-              if (!day) return <div key={index} />;
-              const disabled = day < min;
-              const isSel = selected && toStr(day) === toStr(selected);
-              return (
-                <button
-                  key={index}
-                  type="button"
-                  disabled={disabled}
-                  onClick={() => {
-                    onChange(toStr(day));
-                    setOpen(false);
-                  }}
-                  className={`h-9 rounded-lg text-sm transition ${
-                    isSel ? 'bg-rose text-white' : disabled ? 'text-muted/40' : 'text-ink hover:bg-rose-soft'
-                  }`}
-                >
-                  {day.getDate()}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      )}
+              <button
+                type="button"
+                onClick={() => setView(new Date(year, month + 1, 1))}
+                className="rounded-lg p-1.5 text-muted hover:bg-rose-soft"
+              >
+                <ChevronRight size={18} />
+              </button>
+            </div>
+            <div className="mt-2 grid grid-cols-7 gap-1 text-center text-xs text-muted">
+              {HARI.map((dayName, index) => (
+                <div key={index} className="py-1">
+                  {dayName}
+                </div>
+              ))}
+            </div>
+            <div className="grid grid-cols-7 gap-1">
+              {cells.map((day, index) => {
+                if (!day) return <div key={index} />;
+                const disabled = day < min;
+                const isSel = selected && toStr(day) === toStr(selected);
+                return (
+                  <button
+                    key={index}
+                    type="button"
+                    disabled={disabled}
+                    onClick={() => {
+                      onChange(toStr(day));
+                      setOpen(false);
+                    }}
+                    className={`h-9 rounded-lg text-sm transition ${
+                      isSel ? 'bg-rose text-white' : disabled ? 'text-muted/40' : 'text-ink hover:bg-rose-soft'
+                    }`}
+                  >
+                    {day.getDate()}
+                  </button>
+                );
+              })}
+            </div>
+          </m.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

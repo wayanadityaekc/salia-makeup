@@ -1,6 +1,8 @@
 'use client';
 
 import Link from 'next/link';
+import { AnimatePresence, m } from 'motion/react';
+import { menuMotion } from '@/lib/motion';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Menu, X, User, LogOut, MessageCircle } from 'lucide-react';
@@ -106,43 +108,52 @@ export default function Navbar() {
         </div>
       </div>
 
-      {open && (
-        <nav className="border-t border-rose-line bg-white md:hidden">
-          <div className="container-x flex flex-col py-3">
-            {nav.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className={`py-3 text-sm ${pathname === link.href ? 'font-semibold text-rose' : 'text-ink'}`}
-              >
-                {link.label}
-              </Link>
-            ))}
-            {user ? (
-              <div className="mt-2 flex items-center justify-between border-t border-rose-line pt-3">
-                <span className="inline-flex items-center gap-1.5 text-sm font-medium text-ink">
-                  <User size={16} className="text-rose" /> {user.nama}
-                </span>
-                <button onClick={logout} className="inline-flex items-center gap-1 text-sm text-muted hover:text-rose">
-                  <LogOut size={15} /> Keluar
+      <AnimatePresence>
+        {open && (
+          <m.nav
+            key="mobile-menu"
+            {...menuMotion}
+            className="overflow-hidden border-t border-rose-line bg-white md:hidden"
+          >
+            <div className="container-x flex flex-col py-3">
+              {nav.map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={`py-3 text-sm ${pathname === link.href ? 'font-semibold text-rose' : 'text-ink'}`}
+                >
+                  {link.label}
+                </Link>
+              ))}
+              {user ? (
+                <div className="mt-2 flex items-center justify-between border-t border-rose-line pt-3">
+                  <span className="inline-flex items-center gap-1.5 text-sm font-medium text-ink">
+                    <User size={16} className="text-rose" /> {user.nama}
+                  </span>
+                  <button
+                    onClick={logout}
+                    className="inline-flex items-center gap-1 text-sm text-muted hover:text-rose"
+                  >
+                    <LogOut size={15} /> Keluar
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={() => {
+                    setOpen(false);
+                    setAuth(true);
+                  }}
+                  className="btn-primary mt-2"
+                >
+                  Login
                 </button>
-              </div>
-            ) : (
-              <button
-                onClick={() => {
-                  setOpen(false);
-                  setAuth(true);
-                }}
-                className="btn-primary mt-2"
-              >
-                Login
-              </button>
-            )}
-          </div>
-        </nav>
-      )}
+              )}
+            </div>
+          </m.nav>
+        )}
+      </AnimatePresence>
 
-      {auth && <AuthModal onClose={() => setAuth(false)} />}
+      <AnimatePresence>{auth && <AuthModal key="auth" onClose={() => setAuth(false)} />}</AnimatePresence>
     </header>
   );
 }

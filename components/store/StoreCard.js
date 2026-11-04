@@ -1,6 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { AnimatePresence, m } from 'motion/react';
+import { backdropMotion, dialogMotion } from '@/lib/motion';
 import { Check, Plus, X } from 'lucide-react';
 import { formatRupiah } from '@/lib/utils';
 import { useCart } from './CartProvider';
@@ -87,79 +89,84 @@ export default function StoreCard({ item = null, big = false }) {
         </div>
       </button>
 
-      {open && (
-        <div
-          className="fixed inset-0 z-60 flex items-end justify-center bg-ink/50 p-0 sm:items-center sm:p-4"
-          onClick={() => setOpen(false)}
-        >
-          <div
-            className="flex max-h-[92vh] w-full max-w-md flex-col overflow-hidden rounded-t-3xl bg-white sm:rounded-3xl"
-            style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
-            onClick={(event) => event.stopPropagation()}
+      <AnimatePresence>
+        {open && (
+          <m.div
+            key="service-detail"
+            {...backdropMotion}
+            className="fixed inset-0 z-60 flex items-end justify-center bg-ink/50 p-0 sm:items-center sm:p-4"
+            onClick={() => setOpen(false)}
           >
-            <div className="relative">
-              {item.foto ? (
-                <img src={item.foto} alt={item.nama} className="aspect-4/3 w-full object-cover" />
-              ) : (
-                <div className="foto-ph aspect-4/3 text-sm">Foto {item.nama}</div>
-              )}
-              <button
-                onClick={() => setOpen(false)}
-                aria-label="Tutup"
-                className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full bg-white/90 text-ink shadow-sm hover:bg-white"
-              >
-                <X size={18} />
-              </button>
-            </div>
-
-            <div className="flex-1 overflow-y-auto p-5">
-              <div className="flex items-start justify-between gap-3">
-                <h3 className="text-lg font-bold text-ink">{item.nama}</h3>
-                <div className="shrink-0 text-lg font-bold text-rose">{formatRupiah(item.base)}</div>
-              </div>
-              {desc && <p className="mt-2 text-sm leading-relaxed text-muted">{desc}</p>}
-              {details.length > 0 && (
-                <ul className="mt-4 space-y-2">
-                  {details.map((detail, index) => (
-                    <li key={index} className="flex gap-2 text-sm leading-snug text-ink/80">
-                      <Check size={15} className="mt-0.5 shrink-0 text-rose" />
-                      <span>{detail}</span>
-                    </li>
-                  ))}
-                </ul>
-              )}
-              {item.info && (
-                <div className="mt-4 border-t border-rose-line pt-4">
-                  <h4 className="text-xs font-semibold uppercase tracking-wider text-rose">Detail produk</h4>
-                  <p className="mt-2 whitespace-pre-wrap text-sm leading-relaxed text-ink/80">{item.info}</p>
-                </div>
-              )}
-            </div>
-
-            <div className="border-t border-rose-line p-4">
-              <button
-                onClick={() => {
-                  pick(item);
-                  setOpen(false);
-                }}
-                className={`inline-flex w-full items-center justify-center gap-2 rounded-full px-4 py-3 text-sm font-semibold transition ${
-                  selected ? 'bg-rose-soft text-rose' : 'bg-rose text-white hover:bg-rose-deep'
-                }`}
-              >
-                {selected ? (
-                  <>
-                    <Check size={18} /> Batalkan pilihan
-                  </>
+            <m.div
+              {...dialogMotion}
+              className="flex max-h-[92vh] w-full max-w-md flex-col overflow-hidden rounded-t-3xl bg-white sm:rounded-3xl"
+              style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
+              onClick={(event) => event.stopPropagation()}
+            >
+              <div className="relative">
+                {item.foto ? (
+                  <img src={item.foto} alt={item.nama} className="aspect-4/3 w-full object-cover" />
                 ) : (
-                  <>
-                    <Plus size={18} /> Pilih layanan ini
-                  </>
+                  <div className="foto-ph aspect-4/3 text-sm">Foto {item.nama}</div>
                 )}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+                <button
+                  onClick={() => setOpen(false)}
+                  aria-label="Tutup"
+                  className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full bg-white/90 text-ink shadow-sm hover:bg-white"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+
+              <div className="flex-1 overflow-y-auto p-5">
+                <div className="flex items-start justify-between gap-3">
+                  <h3 className="text-lg font-bold text-ink">{item.nama}</h3>
+                  <div className="shrink-0 text-lg font-bold text-rose">{formatRupiah(item.base)}</div>
+                </div>
+                {desc && <p className="mt-2 text-sm leading-relaxed text-muted">{desc}</p>}
+                {details.length > 0 && (
+                  <ul className="mt-4 space-y-2">
+                    {details.map((detail, index) => (
+                      <li key={index} className="flex gap-2 text-sm leading-snug text-ink/80">
+                        <Check size={15} className="mt-0.5 shrink-0 text-rose" />
+                        <span>{detail}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+                {item.info && (
+                  <div className="mt-4 border-t border-rose-line pt-4">
+                    <h4 className="text-xs font-semibold uppercase tracking-wider text-rose">Detail produk</h4>
+                    <p className="mt-2 whitespace-pre-wrap text-sm leading-relaxed text-ink/80">{item.info}</p>
+                  </div>
+                )}
+              </div>
+
+              <div className="border-t border-rose-line p-4">
+                <button
+                  onClick={() => {
+                    pick(item);
+                    setOpen(false);
+                  }}
+                  className={`inline-flex w-full items-center justify-center gap-2 rounded-full px-4 py-3 text-sm font-semibold transition ${
+                    selected ? 'bg-rose-soft text-rose' : 'bg-rose text-white hover:bg-rose-deep'
+                  }`}
+                >
+                  {selected ? (
+                    <>
+                      <Check size={18} /> Batalkan pilihan
+                    </>
+                  ) : (
+                    <>
+                      <Plus size={18} /> Pilih layanan ini
+                    </>
+                  )}
+                </button>
+              </div>
+            </m.div>
+          </m.div>
+        )}
+      </AnimatePresence>
     </>
   );
 }
